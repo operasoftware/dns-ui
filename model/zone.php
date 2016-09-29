@@ -67,13 +67,13 @@ class Zone extends Record {
 		$change = new StdClass;
 		$change->name = $rrset->name;
 		$change->type = $rrset->type;
+		$change->ttl = $rrset->ttl;
 		$change->changetype = 'REPLACE';
 		$change->records = array();
 		foreach($rrset->list_resource_records() as $record) {
 			$change_record = new StdClass;
 			$change_record->name = $rrset->name;
 			$change_record->type = $rrset->type;
-			$change_record->ttl = $record->ttl;
 			$change_record->content = $record->content;
 			$change_record->disabled = $record->disabled;
 			$change_record->{'set-ptr'} = $record->{'set-ptr'};
@@ -84,7 +84,9 @@ class Zone extends Record {
 			$change_comment = new StdClass;
 			$change_comment->content = $comment->content;
 			$change_comment->account = $comment->account;
-			$change_comment->modified_at = $comment->modified_at;
+			if($comment->modified_at) {
+				$change_comment->modified_at = $comment->modified_at;
+			}
 			$change->comments[] = $change_comment;
 		}
 		$this->changes[] = $change;
@@ -105,7 +107,7 @@ class Zone extends Record {
 	public function commit_changes() {
 		$patch = new StdClass;
 		$patch->rrsets = $this->changes;
-		//echo 'PATCH: <pre>'.hesc(print_r($patch, true)).'</pre>';die;
+		//echo 'PATCH: <pre>'.hesc(json_encode($patch, JSON_PRETTY_PRINT)).'</pre>';die;
 		try {
 			$this->powerdns->patch('zones/'.urlencode($this->pdns_id), $patch);
 		} catch(Pest_InvalidRecord $e) {
@@ -137,7 +139,7 @@ class Zone extends Record {
 			$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id));
 			$this->rrsets = array();
 			$this->nameservers = array();
-			usort($data->records,
+			usort($data->rrsets,
 				function($a, $b) {
 					if($a->type == 'SOA' && $b->type != 'SOA') return -1;
 					if($b->type == 'SOA' && $a->type != 'SOA') return 1;
@@ -146,39 +148,44 @@ class Zone extends Record {
 					if($aname == $bname) {
 						if($a->type == 'NS' && $b->type != 'NS') return -1;
 						if($b->type == 'NS' && $a->type != 'NS') return 1;
-						return strnatcasecmp($a->content, $b->content);
+						return 0;
 					} else {
 						return strnatcasecmp($aname, $bname);
 					}
 				}
 			);
-			foreach($data->records as $record) {
+			foreach($data->rrsets as $recordset) {
 				$rrset = new ResourceRecordSet;
-				$rrset->name = $record->name;
-				$rrset->type = $record->type;
-				if(!isset($this->rrsets[$record->name.' '.$record->type])) $this->rrsets[$record->name.' '.$record->type] = $rrset;
-				if($record->type == 'SOA') {
-					// example.com hostmaster.example.com 2015112300 10800 3600 604800 3600
-					list($primary_ns, $contact, $serial, $refresh, $retry, $expiry, $default_ttl) = explode(' ', $record->content);
-					$this->soa = new SOA;
-					$this->soa->ttl = $record->ttl;
-					$this->soa->content = $record->content;
-					$this->soa->primary_ns = $primary_ns;
-					$this->soa->contact = $contact;
-					$this->soa->serial = $serial;
-					$this->soa->refresh = $refresh;
-					$this->soa->retry = $retry;
-					$this->soa->expiry = $expiry;
-					$this->soa->default_ttl = $default_ttl;
-				} elseif($record->type == 'NS' && $record->name == $this->name) {
-					$this->nameservers[] = $record->content;
+				$rrset->name = $recordset->name;
+				$rrset->type = $recordset->type;
+				$rrset->ttl = $recordset->ttl;
+				$this->rrsets[$recordset->name.' '.$recordset->type] = $rrset;
+				usort($recordset->records,
+					function($a, $b) {
+						return strnatcasecmp($a->content, $b->content);
+					}
+				);
+				foreach($recordset->records as $record) {
+					if($recordset->type == 'SOA') {
+						// ns1.oslo.osa hostmaster.oslo.osa 2015112300 10800 3600 604800 3600
+						list($primary_ns, $contact, $serial, $refresh, $retry, $expiry, $default_ttl) = explode(' ', $record->content);
+						$this->soa = new SOA;
+						$this->soa->ttl = $recordset->ttl;
+						$this->soa->content = $record->content;
+						$this->soa->primary_ns = $primary_ns;
+						$this->soa->contact = $contact;
+						$this->soa->serial = $serial;
+						$this->soa->refresh = $refresh;
+						$this->soa->retry = $retry;
+						$this->soa->expiry = $expiry;
+						$this->soa->default_ttl = $default_ttl;
+					} elseif($recordset->type == 'NS' && $recordset->name == $this->name) {
+						$this->nameservers[] = $record->content;
+					}
+					$this->rrsets[$recordset->name.' '.$recordset->type]->add_resource_record(new ResourceRecord($record));
 				}
-				$this->rrsets[$record->name.' '.$record->type]->add_resource_record(new ResourceRecord($record));
-			}
-			#usort($data->comments, function($a, $b) { return $a->modified_at > $b->modified_at;});
-			foreach($data->comments as $comment) {
-				if(isset($this->rrsets[$comment->name.' '.$comment->type])) {
-					$this->rrsets[$comment->name.' '.$comment->type]->add_comment(new Comment($comment));
+				foreach($recordset->comments as $comment) {
+					$this->rrsets[$recordset->name.' '.$recordset->type]->add_comment(new Comment($comment));
 				}
 			}
 		}
@@ -264,12 +271,12 @@ class Zone extends Record {
 	public function export_as_bind9_format() {
 		$this->rrsets = null;
 		$rrsets = $this->list_resource_record_sets();
-		$output = "\$ORIGIN $this->name.\n";
+		$output = "\$ORIGIN $this->name\n";
 		$output .= "\$TTL {$this->soa->default_ttl}\n";
 		foreach($rrsets as $rrset) {
 			foreach($rrset->list_resource_records() as $rr) {
 				$row = str_pad(($rr->disabled ? ';' : '').DNSName::abbreviate($rrset->name, $this->name), 30)." ";
-				$row .= str_pad(DNSTime::abbreviate($rr->ttl), 6)." ";
+				$row .= str_pad(DNSTime::abbreviate($rrset->ttl), 6)." ";
 				$row .= str_pad($rrset->type, 6)." ";
 				$row .= str_pad(DNSContent::bind9_format($rr->content, $rrset->type, $this->name), 30);
 				$comments = $rrset->list_comments();
@@ -419,14 +426,15 @@ class Zone extends Record {
 			$rrset = new ResourceRecordSet;
 			$rrset->name = $update->name;
 			$rrset->type = $update->type;
+			if(!isset($update->ttl)) throw new BadData('Malformed recordset.');
+			$rrset->ttl = DNSTime::expand($update->ttl);
 			$trash[$update->name.' '.$update->type] = false;
 			foreach($update->records as $record) {
-				if(!(isset($record->ttl) && isset($record->content) && isset($record->enabled))) throw new BadData('Malformed record.');
+				if(!(isset($record->content) && isset($record->enabled))) throw new BadData('Malformed record.');
 				$record->content = DNSContent::encode($record->content, $update->type);
 				$rr = new ResourceRecord;
 				$rr->name = $update->name;
 				$rr->type = $update->type;
-				$rr->ttl = DNSTime::expand($record->ttl);
 				$rr->content = $record->content;
 				$rr->disabled = ($record->enabled === 'No' || $record->enabled === false);
 				$rr->{'set-ptr'} = $rr->disabled ? false : $zone_dir->check_reverse_record_zone($rr->type, $rr->content, $revs_missing, $revs_updated);
@@ -455,6 +463,7 @@ class Zone extends Record {
 			}
 			$trash[$update->name.' '.$update->type] = false;
 			$rrset->clear_resource_records();
+			$rrset->ttl = DNSTime::expand($update->ttl);
 			$record_count = 0;
 			foreach($update->records as $record) {
 				if(!empty($record->delete)) continue;
@@ -463,7 +472,6 @@ class Zone extends Record {
 				$rr = new ResourceRecord;
 				$rr->name = $update->name;
 				$rr->type = $update->type;
-				$rr->ttl = DNSTime::expand($record->ttl);
 				$rr->content = $record->content;
 				$rr->disabled = ($record->enabled === 'No' || $record->enabled === false);
 				$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rr->type, $rr->content, $revs_missing, $revs_updated);

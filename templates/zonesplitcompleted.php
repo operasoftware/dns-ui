@@ -18,8 +18,8 @@
 $zone = $this->get('zone');
 $newzonename = $this->get('newzonename');
 ?>
-<h2>Zone split of <?php out(idn_to_utf8($newzonename, 0, INTL_IDNA_VARIANT_UTS46))?> from <?php out(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46))?></h2>
+<h2>Zone split of <?php out(idn_to_utf8(DNSZoneName::unqualify($newzonename), 0, INTL_IDNA_VARIANT_UTS46))?> from <?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?></h2>
 <ul>
-	<li><a href="/zones/<?php out(urlencode($zone->name))?>">View <?php out(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46))?> zone</a></li>
-	<li><a href="/zones/<?php out(urlencode($newzonename))?>">View <?php out(idn_to_utf8($newzonename, 0, INTL_IDNA_VARIANT_UTS46))?> zone</a></li>
+	<li><a href="/zones/<?php out(urlencode(DNSZoneName::unqualify($zone->name)))?>">View <?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?> zone</a></li>
+	<li><a href="/zones/<?php out(urlencode(DNSZoneName::unqualify($newzonename)))?>">View <?php out(idn_to_utf8(DNSZoneName::unqualify($newzonename), 0, INTL_IDNA_VARIANT_UTS46))?> zone</a></li>
 </ul>

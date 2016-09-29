@@ -195,6 +195,7 @@ class PestJSON extends Pest
      */
     public function processBody($body)
     {
+        if($body == '') return false;
         return $this->jsonDecode($body);
     }
 

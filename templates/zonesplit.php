@@ -21,8 +21,8 @@ $suffix = $this->get('suffix');
 $split = $this->get('split');
 $cname_error = $this->get('cname_error');
 ?>
-<h2>Zone split of <?php out(idn_to_utf8($newzonename, 0, INTL_IDNA_VARIANT_UTS46))?> from <?php out(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46))?></h2>
-<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>/split">
+<h2>Zone split of <?php out(idn_to_utf8(DNSZoneName::unqualify($newzonename), 0, INTL_IDNA_VARIANT_UTS46))?> from <?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?></h2>
+<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/split">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<?php if(count($split) == 0) { ?>
 	<p>No records match this pattern.</p>
@@ -54,8 +54,8 @@ $cname_error = $this->get('cname_error');
 				if($newname == '@' && $rrset->type == 'CNAME') $rowclasses[] = 'danger';
 				?>
 			<tr class="<?php out(implode(' ', $rowclasses))?>">
-				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?></strong><span class="text-muted">.<?php out(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46))?></span></td>
-				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(idn_to_utf8($newname, 0, INTL_IDNA_VARIANT_UTS46))?></strong><span class="text-muted">.<?php out(idn_to_utf8($newzonename, 0, INTL_IDNA_VARIANT_UTS46))?></span></td>
+				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?></strong><span class="text-muted">.<?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?></span></td>
+				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(idn_to_utf8($newname, 0, INTL_IDNA_VARIANT_UTS46))?></strong><span class="text-muted">.<?php out(idn_to_utf8(DNSZoneName::unqualify($newzonename), 0, INTL_IDNA_VARIANT_UTS46))?></span></td>
 				<td rowspan="<?php out(count($rrs))?>"><?php out($rrset->type)?></td>
 				<?php
 				$count = 0;
@@ -93,7 +93,7 @@ $cname_error = $this->get('cname_error');
 		<?php if(!$cname_error) { ?>
 		<button type="submit" name="confirm" value="1" class="btn btn-primary">Split records into new zone</button>
 		<?php } ?>
-		<a href="/zones/<?php out($zone->name, ESC_URL)?>" class="btn btn-default">Cancel</a>
+		<a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="btn btn-default">Cancel</a>
 	</div>
 	<?php } ?>
 </form>

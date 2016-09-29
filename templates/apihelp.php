@@ -21,19 +21,19 @@
 	<li>
 		<a href="#zones">Zones</a>
 		<ul>
-			<li><a href="#zones-get">GET /api/v1/zones</a></li>
-			<li><a href="#zones-name-get">GET /api/v1/zones/{name}</a></li>
-			<li><a href="#zones-name-patch">PATCH /api/v1/zones/{name}</a></li>
-			<li><a href="#zones-name-changes-get">GET /api/v1/zones/{name}/changes</a></li>
-			<li><a href="#zones-name-changes-id-get">GET /api/v1/zones/{name}/changes/{id}</a></li>
+			<li><a href="#zones-get">GET /api/v2/zones</a></li>
+			<li><a href="#zones-name-get">GET /api/v2/zones/{name}</a></li>
+			<li><a href="#zones-name-patch">PATCH /api/v2/zones/{name}</a></li>
+			<li><a href="#zones-name-changes-get">GET /api/v2/zones/{name}/changes</a></li>
+			<li><a href="#zones-name-changes-id-get">GET /api/v2/zones/{name}/changes/{id}</a></li>
 		</ul>
 	</li>
 </ul>
 <h2 id="zones">Zones</h2>
-<h3 id="zones-get">GET /api/v1/zones</h3>
+<h3 id="zones-get">GET /api/v2/zones</h3>
 <p>Returns an array of all zones.</p>
 <h4>Example</h4>
-<pre>GET /api/v1/zones</pre>
+<pre>GET /api/v2/zones</pre>
 <h5>Response content</h5>
 <?php syntax_highlight('[
     {
@@ -54,16 +54,16 @@
     }
 ]', 'javascript')?>
 <!--
-<h3>POST /api/v1/zones</h3>
+<h3>POST /api/v2/zones</h3>
 <p>Creates a new zone.</p>
 <h4>Example</h4>
 <pre><code>[
 ]</code></pre>
 -->
-<h3 id="zones-name-get">GET /api/v1/zones/{name}</h3>
+<h3 id="zones-name-get">GET /api/v2/zones/{name}</h3>
 <p>Returns all data regarding the named zone.</p>
 <h4>Example</h4>
-<pre>GET /api/v1/zones/example.com</pre>
+<pre>GET /api/v2/zones/example.com</pre>
 <h5>Response content</h5>
 <?php syntax_highlight('{
     "name": "example.com",
@@ -72,9 +72,9 @@
         {
             "name": "@",
             "type": "SOA",
+            "ttl": "1H",
             "records": [
                 {
-                    "ttl": "1H",
                     "content": "ns.example.net hostmaster.example.com 2016020200 28800 7200 604800 86400",
                     "enabled": true
                 }
@@ -84,14 +84,13 @@
         {
             "name": "@",
             "type": "NS",
+            "ttl": "1H",
             "records": [
                 {
-                    "ttl": "1H",
                     "content": "ns1.example.net",
                     "enabled": true
                 },
                 {
-                    "ttl": "1H",
                     "content": "ns2.example.net",
                     "enabled": true
                 }
@@ -101,9 +100,9 @@
         {
             "name": "record-1",
             "type": "A",
+            "ttl": "1H",
             "records": [
                 {
-                    "ttl": "1H",
                     "content": "1.1.1.1",
                     "enabled": true
                 }
@@ -119,9 +118,9 @@
         {
             "name": "record3",
             "type": "AAAA",
+            "ttl": "1H",
             "records": [
                 {
-                    "ttl": "1H",
                     "content": "2001:db8:3000:620:107:167:104:10",
                     "enabled": true
                 }
@@ -136,7 +135,7 @@
         }
     ]
 }', 'javascript')?>
-<h3 id="zones-name-patch">PATCH /api/v1/zones/{name}</h3>
+<h3 id="zones-name-patch">PATCH /api/v2/zones/{name}</h3>
 <p>Update recordsets in the named zone. Multiple actions can be performed in a single request, of which there are 3 types:</p>
 <ul>
 	<li><code>add</code> - create a new resource recordset</li>
@@ -144,7 +143,7 @@
 	<li><code>delete</code> - remove an existing resource recordset</li>
 </ul>
 <h4>Example</h4>
-<pre>PATCH /api/v1/zones/example.com</pre>
+<pre>PATCH /api/v2/zones/example.com</pre>
 <h5>Request content</h5>
 <?php syntax_highlight('{
 	"actions": [
@@ -152,10 +151,10 @@
 			"action": "add",
 			"name": "record2",
 			"type": "A",
+			"ttl": "1D",
 			"comment": "Issue 1234",
 			"records": [
 				{
-					"ttl": "1D",
 					"content": "10.10.10.10",
 					"enabled": true
 				}
@@ -167,15 +166,14 @@
 			"oldtype": "A",
 			"name": "record1",
 			"type": "A",
+			"ttl": "1H",
 			"comment": "Issue 1232",
 			"records": [
 				{
-					"ttl": "1H",
 					"content": "1.1.1.1",
 					"enabled": true
 				},
 				{
-					"ttl": "1H",
 					"content": "1.1.1.2",
 					"enabled": true
 				}
@@ -189,10 +187,10 @@
 	],
 	"comment": "A comment for this update"
 }', 'javascript')?>
-<h3 id="zones-name-changes-get">GET /api/v1/zones/{name}/changes</h3>
+<h3 id="zones-name-changes-get">GET /api/v2/zones/{name}/changes</h3>
 <p>Returns all changelog entries for the named zone.</p>
 <h4>Example</h4>
-<pre>GET /api/v1/zones/example.com/changes</pre>
+<pre>GET /api/v2/zones/example.com/changes</pre>
 <h5>Response content</h5>
 <?php syntax_highlight('[
     {
@@ -212,10 +210,10 @@
         "added": 1
     }
 ]', 'javascript')?>
-<h3 id="zones-name-changes-id-get">GET /api/v1/zones/{name}/changes/{id}</h3>
+<h3 id="zones-name-changes-id-get">GET /api/v2/zones/{name}/changes/{id}</h3>
 <p>Returns full change information for a specific changeset within the named zone.</p>
 <h4>Example</h4>
-<pre>GET /api/v1/zones/example.com/changes/207</pre>
+<pre>GET /api/v2/zones/example.com/changes/207</pre>
 <h5>Response content</h5>
 <?php syntax_highlight('{
     "id": 207,
@@ -229,9 +227,9 @@
             "before": {
                 "name": "record3.example.com",
                 "type": "A",
+                "ttl": "1H",
                 "rrs": [
                     {
-                        "ttl": "1H",
                         "content": "1.1.1.1",
                         "enabled": true
                     }
@@ -241,9 +239,9 @@
             "after": {
                 "name": "record3.example.com",
                 "type": "A",
+                "ttl": "1H",
                 "rrs": [
                     {
-                        "ttl": "1H",
                         "content": "1.1.1.1",
                         "enabled": false
                     }

@@ -16,7 +16,7 @@
 ##
 
 try {
-	$zone = $zone_dir->get_zone_by_name($router->vars['name']);
+	$zone = $zone_dir->get_zone_by_name($router->vars['name'].'.');
 } catch(ZoneNotFound $e) {
 	require('views/error404.php');
 	exit;
@@ -33,5 +33,5 @@ $page = new PageSection('zoneexport');
 $page->set('zone', $zone);
 $page->set('rrsets', $rrsets);
 header('Content-type: text/plain; charset=utf-8');
-header('Content-disposition: attachment; filename='.$zone->name);
+header('Content-disposition: attachment; filename='.DNSZoneName::unqualify($zone->name));
 echo $page->generate();

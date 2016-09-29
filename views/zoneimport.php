@@ -16,7 +16,7 @@
 ##
 
 try {
-	$zone = $zone_dir->get_zone_by_name($router->vars['name']);
+	$zone = $zone_dir->get_zone_by_name($router->vars['name'].'.');
 } catch(ZoneNotFound $e) {
 	require('views/error404.php');
 	exit;
@@ -45,7 +45,7 @@ if(isset($_FILES['zonefile'])) {
 }
 
 $page = new PageSection('base');
-$page->set('title', 'Import preview for '.$zone->name.' zone update');
+$page->set('title', 'Import preview for '.DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)).' zone update');
 $page->set('content', $content);
 $page->set('alerts', $active_user->list_alerts());
 
@@ -94,7 +94,7 @@ function import_bind9_zonefile($zone, $lines, $comment_handling) {
 			} catch(UnterminatedString $e) {
 				throw new ZoneImportError("Unterminated string on line $line_number");
 			}
-		} elseif(preg_match('/^\$ORIGIN\s+(\S+)\.\s*(?:;.*)?$/', $line, $matches)) {
+		} elseif(preg_match('/^\$ORIGIN\s+(\S+)\s*(?:;.*)?$/', $line, $matches)) {
 			// $ORIGIN directive
 			$origin = $matches[1];
 		} elseif(preg_match('/^\$TTL\s+(\S+)\s*(?:;.*)?$/', $line, $matches)) {
@@ -207,11 +207,11 @@ function import_bind9_zonefile($zone, $lines, $comment_handling) {
 					$rrset = new ResourceRecordSet;
 					$rrset->name = $name;
 					$rrset->type = $type;
+					$rrset->ttl = $ttl;
 					$new_rrsets[$name.' '.$type] = $rrset;
 				}
 				if($type == 'SOA') $record->comment = '';
 				$rr = new ResourceRecord;
-				$rr->ttl = $ttl;
 				$rr->content = $content;
 				$rr->disabled = $disabled;
 				$new_rrsets[$name.' '.$type]->add_resource_record($rr);
@@ -234,10 +234,13 @@ function import_bind9_zonefile($zone, $lines, $comment_handling) {
 			$old_comment = $old_rrset->merge_comment_text();
 			$new_comment = $new_rrset_comments[$ref];
 			$rrset_modifications = array();
+			if($old_rrset->ttl != $new_rrset->ttl) {
+				$rrset_modifications[] = 'TTL changed from '.DNSTime::abbreviate($old_rrset->ttl).' to '.DNSTime::abbreviate($new_rrset->ttl);
+			}
 			foreach($new_rrs as $new_rr) {
 				$rr_match = false;
 				foreach($old_rrs as $rr_ref => $old_rr) {
-					if($new_rr->ttl == $old_rr->ttl && $new_rr->content == $old_rr->content) {
+					if($new_rr->content == $old_rr->content) {
 						$rr_match = true;
 						unset($old_rrs[$rr_ref]);
 						break;
@@ -245,19 +248,19 @@ function import_bind9_zonefile($zone, $lines, $comment_handling) {
 				}
 				if($rr_match) {
 					if($new_rr->disabled && !$old_rr->disabled) {
-						$rrset_modifications[] = 'Disabled RR: '.DNSTime::abbreviate($new_rr->ttl).' '.$new_rr->content;
+						$rrset_modifications[] = 'Disabled RR: '.$new_rr->content;
 					}
 					if(!$new_rr->disabled && $old_rr->disabled) {
-						$rrset_modifications[] = 'Enabled RR: '.DNSTime::abbreviate($new_rr->ttl).' '.$new_rr->content;
+						$rrset_modifications[] = 'Enabled RR: '.$new_rr->content;
 					}
 				} else {
 					// New RR
-					$rrset_modifications[] = 'New RR: '.DNSTime::abbreviate($new_rr->ttl).' '.$new_rr->content;
+					$rrset_modifications[] = 'New RR: '.$new_rr->content;
 				}
 			}
 			foreach($old_rrs as $old_rr) {
 				// Deleted RR
-				$rrset_modifications[] = 'Deleted RR: '.DNSTime::abbreviate($old_rr->ttl).' '.$old_rr->content;
+				$rrset_modifications[] = 'Deleted RR: '.$old_rr->content;
 			}
 			if($old_comment == $new_comment) {
 				foreach($old_rrset->list_comments() as $comment) {
@@ -402,6 +405,7 @@ function build_json($action, $rrset, $zonename) {
 	$data->action = $action;
 	$data->name = DNSName::abbreviate($rrset->name, $zonename);
 	$data->type = $rrset->type;
+	$data->ttl = $rrset->ttl;
 	if($action != 'add') {
 		$data->oldname = $data->name;
 		$data->oldtype = $data->type;
@@ -410,7 +414,6 @@ function build_json($action, $rrset, $zonename) {
 		$data->records = array();
 		foreach($rrset->list_resource_records() as $rr) {
 			$rr_data = new StdClass;
-			$rr_data->ttl = $rr->ttl;
 			$rr_data->content = DNSContent::decode($rr->content, $rrset->type);
 			$rr_data->enabled = $rr->disabled ? 'No' : 'Yes';
 			$data->records[] = $rr_data;

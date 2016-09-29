@@ -41,17 +41,19 @@ class ZoneDirectory extends DBDirectory {
 		$data->name = $zone->name;
 		$data->kind = $zone->kind;
 		$data->nameservers = $zone->nameservers;
-		$data->records = array();
-		$data->comments = array();
+		$data->rrsets = array();
 		foreach($zone->list_resource_record_sets() as $rrset) {
+			$recordset = new StdClass;
+			$recordset->name = $rrset->name;
+			$recordset->type = $rrset->type;
+			$recordset->ttl = $rrset->ttl;
+			$recordset->records = array();
+			$recordset->comments = array();
 			foreach($rrset->list_resource_records() as $rr) {
 				$record = new StdClass;
-				$record->name = $rrset->name;
-				$record->type = $rrset->type;
-				$record->ttl = $rr->ttl;
 				$record->content = $rr->content;
 				$record->disabled = $rr->disabled;
-				$data->records[] = $record;
+				$recordset->records[] = $record;
 			}
 			foreach($rrset->list_comments() as $c) {
 				$comment = new StdClass;
@@ -60,8 +62,9 @@ class ZoneDirectory extends DBDirectory {
 				$comment->content = $c->content;
 				$comment->account = $c->account;
 				$comment->modified_at = $c->modified_at;
-				$data->comments[] = $comment;
+				$recordset->comments[] = $comment;
 			}
+			$data->rrsets[] = $recordset;
 		}
 		$data->soa_edit = 'INCEPTION-INCREMENT';
 		$data->soa_edit_api = 'INCEPTION-INCREMENT';
@@ -175,10 +178,10 @@ class ZoneDirectory extends DBDirectory {
 		global $zone_dir, $active_user;
 
 		if($type == 'A') {
-			$reverse_address = implode('.', array_reverse(explode('.', $address))).'.in-addr.arpa';
+			$reverse_address = implode('.', array_reverse(explode('.', $address))).'.in-addr.arpa.';
 		} elseif($type == 'AAAA') {
 			$address = ipv6_address_expand($address);
-			$reverse_address = implode('.', array_reverse(str_split(str_replace(':', '', $address)))).'.ip6.arpa';
+			$reverse_address = implode('.', array_reverse(str_split(str_replace(':', '', $address)))).'.ip6.arpa.';
 		} else {
 			return false;
 		}
@@ -193,7 +196,7 @@ class ZoneDirectory extends DBDirectory {
 					if($rrset->type == 'PTR' && $rrset->name == $reverse_address) {
 						$alert = new UserAlert;
 						$alert->escaping = ESC_NONE;
-						$alert->content = 'Reverse record already exists for '.hesc($address).' in <a href="/zones/'.urlencode($reverse_zone->name).'" class="alert-link">'.hesc($reverse_zone->name).'</a>. Not modifying existing record.';
+						$alert->content = 'Reverse record already exists for '.hesc($address).' in <a href="/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name)).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not modifying existing record.';
 						$alert->class = 'warning';
 						$active_user->add_alert($alert);
 						return false;

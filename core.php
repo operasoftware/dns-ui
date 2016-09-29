@@ -184,6 +184,12 @@ function simplify_search($defaults, $values) {
 	}
 }
 
+class DNSZoneName {
+	public static function unqualify($name) {
+		return rtrim($name, '.');
+	}
+}
+
 class DNSName {
 	public static function abbreviate($name, $zonename) {
 		if(strrpos($name, $zonename) === strlen($name) - strlen($zonename)) {
@@ -191,12 +197,12 @@ class DNSName {
 			if($name == '') return '@';
 			else return $name;
 		} else {
-			return "$name.";
+			return $name;
 		}
 	}
 	public static function canonify($name, $zonename) {
 		if($name == '@') return $zonename;
-		if(substr($name, -1) == '.') return substr($name, 0, -1);
+		if(substr($name, -1) == '.') return $name;
 		return "$name.$zonename";
 	}
 }
@@ -204,7 +210,7 @@ class DNSName {
 class DNSTime {
 	public static function abbreviate($time) {
 		// Although formats like "3w12h" are allowed, we're discouraging that use by only returning 1 unit
-		if($time % 60 != 0) return $time;
+		if($time % 60 != 0 || $time == 0) return $time;
 		if($time % (60 * 60) != 0) return ($time / 60).'M';
 		if($time % (60 * 60 * 24) != 0) return ($time / 60 / 60).'H';
 		if($time % (60 * 60 * 24 * 7) != 0) return $time / (60 * 60 * 24).'D';
@@ -340,29 +346,29 @@ function ipv6_address_expand($address) {
 }
 
 function ipv4_reverse_zone_to_range($zonename) {
-	// eg. 3.2.1.in-addr.arpa
-	$result = substr($zonename, 0, -13); // Chop off .in-addr.arpa = 3.2.1
-	$result = explode('.', $result);     // Split by .             = 3, 2, 1
-	$result = array_reverse($result);    // Reverse chunks         = 1, 2, 3
-	$result = implode('.', $result).'.'; // Combine with .         = 1.2.3.
+	// eg. 3.2.1.in-addr.arpa.
+	$result = substr($zonename, 0, -14); // Chop off .in-addr.arpa. = 3.2.1
+	$result = explode('.', $result);     // Split by .              = 3, 2, 1
+	$result = array_reverse($result);    // Reverse chunks          = 1, 2, 3
+	$result = implode('.', $result).'.'; // Combine with .          = 1.2.3.
 	return $result;
 }
 
 function ipv4_reverse_zone_to_subnet($zonename) {
-	// eg. 3.2.1.in-addr.arpa
-	$result = substr($zonename, 0, -13);   // Chop off .in-addr.arpa = 3.2.1
-	$result = explode('.', $result);       // Split by .             = 3, 2, 1
-	$result = array_reverse($result);      // Reverse chunks         = 1, 2, 3
+	// eg. 3.2.1.in-addr.arpa.
+	$result = substr($zonename, 0, -14);   // Chop off .in-addr.arpa. = 3.2.1
+	$result = explode('.', $result);       // Split by .              = 3, 2, 1
+	$result = array_reverse($result);      // Reverse chunks          = 1, 2, 3
 	$prefix_len = count($result) * 8;
-	$result = array_pad($result, 4, '0');  // Pad with zero chunks   = 1, 2, 3, 0
-	$result = implode('.', $result);       // Combine with .         = 1.2.3.0
-	$result .= '/'.$prefix_len;            // Append prefix length   = 1.2.3.0/24
+	$result = array_pad($result, 4, '0');  // Pad with zero chunks    = 1, 2, 3, 0
+	$result = implode('.', $result);       // Combine with .          = 1.2.3.0
+	$result .= '/'.$prefix_len;            // Append prefix length    = 1.2.3.0/24
 	return $result;
 }
 
 function ipv6_reverse_zone_to_range($zonename) {
-	// eg. 2.2.8.b.d.0.1.0.0.2.ip6.arpa
-	$result = substr($zonename, 0, -9);       // Chop off .ip6.arpa         = 2.2.8.b.d.0.1.0.0.2
+	// eg. 2.2.8.b.d.0.1.0.0.2.ip6.arpa.
+	$result = substr($zonename, 0, -10);      // Chop off .ip6.arpa.        = 2.2.8.b.d.0.1.0.0.2
 	$result = explode('.', $result);          // Split by . separators      = 2, 2, 8, b, d, 0, 1, 0, 0, 2
 	$result = array_reverse($result);         // Reverse chunks             = 2, 0, 0, 1, 0, d, b, 8, 2, 2
 	$result = implode('', $result);           // Combine into single string = 20010db822
@@ -374,8 +380,8 @@ function ipv6_reverse_zone_to_range($zonename) {
 }
 
 function ipv6_reverse_zone_to_subnet($zonename) {
-	// eg. 2.2.8.b.d.0.1.0.0.2.ip6.arpa
-	$result = substr($zonename, 0, -9);       // Chop off .ip6.arpa         = 2.2.8.b.d.0.1.0.0.2
+	// eg. 2.2.8.b.d.0.1.0.0.2.ip6.arpa.
+	$result = substr($zonename, 0, -10);      // Chop off .ip6.arpa.        = 2.2.8.b.d.0.1.0.0.2
 	$result = explode('.', $result);          // Split by . separators      = 2, 2, 8, b, d, 0, 1, 0, 0, 2
 	$result = array_reverse($result);         // Reverse chunks             = 2, 0, 0, 1, 0, d, b, 8, 2, 2
 	$result = implode('', $result);           // Combine into single string = 20010db822

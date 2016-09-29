@@ -17,11 +17,11 @@
 
 $routes = array(
 	'/' => 'home',
-	'/api/v1' => 'api',
-	'/api/v1/{objects}' => 'api',
-	'/api/v1/{objects}/{id}' => 'api',
-	'/api/v1/{objects}/{id}/{subobjects}' => 'api',
-	'/api/v1/{objects}/{id}/{subobjects}/{subid}' => 'api',
+	'/api/v2' => 'api',
+	'/api/v2/{objects}' => 'api',
+	'/api/v2/{objects}/{id}' => 'api',
+	'/api/v2/{objects}/{id}/{subobjects}' => 'api',
+	'/api/v2/{objects}/{id}/{subobjects}/{subid}' => 'api',
 	'/templates' => 'templates',
 	'/templates/{type}' => 'templates',
 	'/templates/{type}/{name}' => 'template',
