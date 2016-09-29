@@ -118,10 +118,10 @@ class API {
 			$rrs_data = new StdClass;
 			$rrs_data->name = DNSName::abbreviate($rrset->name, $zone->name);
 			$rrs_data->type = $rrset->type;
+			$rrs_data->ttl = DNSTime::abbreviate($rrset->ttl);
 			$rrs_data->records = array();
 			foreach($rrset->list_resource_records() as $rr) {
 				$rr_data = new StdClass;
-				$rr_data->ttl = DNSTime::abbreviate($rr->ttl);
 				$rr_data->content = DNSContent::decode($rr->content, $rrset->type);
 				$rr_data->enabled = !$rr->disabled;
 				$rrs_data->records[] = $rr_data;
@@ -197,12 +197,12 @@ class API {
 					$c_data->{$state} = new StdClass;
 					$c_data->{$state}->name = idn_to_utf8($rrset->name, 0, INTL_IDNA_VARIANT_UTS46);
 					$c_data->{$state}->type = $rrset->type;
+					$c_data->{$state}->ttl = DNSTime::abbreviate($rrset->ttl);
 					$c_data->{$state}->rrs = array();
 					$c_data->{$state}->comment = $rrset->merge_comment_text();
 					$rrs = $rrset->list_resource_records();
 					foreach($rrs as $rr) {
 						$rr_data = new StdClass;
-						$rr_data->ttl = DNSTime::abbreviate($rr->ttl);
 						$rr_data->content = DNSContent::decode($rr->content, $rr->type);
 						$rr_data->enabled = !$rr->disabled;
 						$c_data->{$state}->rrs[] = $rr_data;
@@ -216,7 +216,7 @@ class API {
 
 	public function created($url) {
 		header('HTTP/1.1 201 Created');
-		header('Location: /api/v1'.$url);
+		header('Location: /api/v2'.$url);
 		exit;
 	}
 

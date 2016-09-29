@@ -194,6 +194,7 @@ $(function() {
 				update.oldname = rrset.name;
 				update.oldtype = rrset.type;
 			}
+			update.ttl = $('td.ttl input', rows).val();
 			update.comment = $('td.comment input', rows).val();
 			var li = document.createElement('li');
 			li.id = 'rrsetreport' + rrsetnum;
@@ -215,11 +216,7 @@ $(function() {
 					var comment = $('td.comment input', this).val();
 					li.appendChild(document.createTextNode(' '));
 					var span = document.createElement('span');
-					span.appendChild(document.createTextNode('Added new resource record, TTL = '));
-					var em = document.createElement('em');
-					$(em).text(ttl);
-					span.appendChild(em);
-					span.appendChild(document.createTextNode(', Content = '));
+					span.appendChild(document.createTextNode('Added new resource record, Content = '));
 					var em = document.createElement('em');
 					$(em).text(content);
 					span.appendChild(em);
@@ -237,7 +234,6 @@ $(function() {
 					}
 					span.appendChild(document.createTextNode('.'));
 					li.appendChild(span);
-					update.records[index]['ttl'] = ttl;
 					update.records[index]['content'] = content;
 					update.records[index]['enabled'] = enabled;
 				} else {
@@ -285,10 +281,10 @@ $(function() {
 						switch(this.parentNode.className) {
 						case 'name':
 						case 'type':
+						case 'ttl':
 						case 'comment':
 							update[this.parentNode.className] = $(this).val();
 							break;
-						case 'ttl':
 						case 'content':
 						case 'enabled':
 							update.records[index][this.parentNode.className] = $(this).val();
@@ -433,22 +429,22 @@ $(function() {
 				td.className = 'type';
 				td.appendChild(document.createTextNode(type));
 				tr.appendChild(td);
+				var td = document.createElement('td');
+				td.className = 'ttl';
+				td.appendChild(document.createTextNode(ttl));
+				tr.appendChild(td);
 				tr.dataset.newrrset = 1;
 				max_rrsetnum++;
 				var rrsetnum = max_rrsetnum;
 			} else {
 				// Add this rr to the existing rrset
-				$('td.name, td.type, td.comment', rows).prop('rowspan', function(i, rs) { return rs + 1; });
+				$('td.name, td.type, td.ttl, td.comment', rows).prop('rowspan', function(i, rs) { return rs + 1; });
 				var rrsetnum = rows.data('rrsetnum');
 			}
 			tr.dataset.name = name;
 			tr.dataset.type = type;
 			tr.dataset.rrsetnum = rrsetnum;
 			tr.dataset.newrow = 1;
-			var td = document.createElement('td');
-			td.className = 'ttl';
-			td.appendChild(document.createTextNode(ttl));
-			tr.appendChild(td);
 			var td = document.createElement('td');
 			td.className = 'content';
 			td.appendChild(document.createTextNode(content));
@@ -473,7 +469,6 @@ $(function() {
 				$(tr).insertAfter(rows.last());
 				if(rows.data('editing')) {
 					// This rrset is already in edit mode - do the same with this row
-					$('td.ttl', tr).each(function() { inputify($(this)); });
 					$('td.content', tr).each(function() { inputify($(this)); });
 					$('td.enabled', tr).each(function() { selectify($(this), enabledselect); });
 					$(tr).data('editing', true);
@@ -486,7 +481,6 @@ $(function() {
 
 			$('#new_name').val('');
 			$('#new_type').val('');
-			$('#new_ttl').val($('#new_ttl').data('default-value'));
 			$('#new_content').val('');
 			$('#new_enabled').val('Yes');
 			$('#new_comment').val('');
@@ -827,28 +821,28 @@ $(function() {
 
 				tr.data('details_loaded', true);
 
-				$.getJSON('/api/v1/zones/' + encodeURIComponent(zone) + '/changes/' + encodeURIComponent(changeset), function(data) {
+				$.getJSON('/api/v2/zones/' + encodeURIComponent(zone) + '/changes/' + encodeURIComponent(changeset), function(data) {
 					var change;
 					for(i = 0; change = data.changes[i]; i++) {
 						var panelheader = $('<div>').addClass('panel-heading');
 						if(!change.before) {
 							var panelclass = 'success';
-							panelheader.append('Added ').append($('<tt>').append(change.after.name + ' ' + change.after.type));
+							panelheader.append('Added ').append($('<tt>').append(change.after.name + ' ' + change.after.type)).append(', TTL: ' + change.after.ttl);
 						} else if(!change.after) {
 							var panelclass = 'danger';
-							panelheader.append('Deleted ').append($('<tt>').append(change.before.name + ' ' + change.before.type));
+							panelheader.append('Deleted ').append($('<tt>').append(change.before.name + ' ' + change.before.type)).append(', TTL: ' + change.before.ttl);
 						} else {
 							var panelclass = 'default';
 							var tt = $('<tt>');
 							show_diff(tt, change.before.name + ' ' + change.before.type, change.after.name + ' ' + change.after.type);
-							panelheader.append('Updated ').append(tt);
+							panelheader.append('Updated ').append(tt).append(', TTL: ');
+							show_diff(panelheader, change.before.ttl, change.after.ttl)
 							var heading = 'Updated ';
 						}
 						var panel = $('<div>').addClass('panel').addClass('panel-' + panelclass);
 						var panelbody = $('<div>').addClass('panel-body');
 						var table = $('<table>').addClass('table').addClass('table-condensed');
 						table.append($('<thead>').append($('<tr>')
-							.append($('<th>').append('TTL'))
 							.append($('<th>').append('Content'))
 							.append($('<th>').append('Enabled'))
 						));
@@ -869,16 +863,12 @@ $(function() {
 								}
 								if(rr_match) {
 									var td = $('<td>');
-									show_diff(td, rr.ttl, after_rr.ttl);
-									tr.append(td);
-									var td = $('<td>');
 									show_diff(td, rr.content, after_rr.content);
 									tr.append(td);
 									var td = $('<td>');
 									show_diff(td, rr.enabled ? 'Yes' : 'No', after_rr.enabled ? 'Yes' : 'No');
 									tr.append(td);
 								} else {
-									tr.append($('<td>').append($('<del>').append(rr.ttl)));
 									tr.append($('<td>').append($('<del>').append(rr.content)));
 									tr.append($('<td>').append($('<del>').append(rr.enabled ? 'Yes' : 'No')));
 								}
@@ -888,7 +878,6 @@ $(function() {
 						if(change.after) {
 							for(j = 0; rr = change.after.rrs[j]; j++) {
 								var tr = $('<tr>');
-								tr.append($('<td>').append($('<ins>').append(rr.ttl)));
 								tr.append($('<td>').append($('<ins>').append(rr.content)));
 								tr.append($('<td>').append($('<ins>').append(rr.enabled ? 'Yes' : 'No')));
 								tbody.append(tr);

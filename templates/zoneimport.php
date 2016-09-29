@@ -20,11 +20,11 @@ $checked = 'checked ';
 $count = 0;
 $limit = 2500;
 ?>
-<h1>Import preview for <?php out($zone->name)?> zone update</h1>
+<h1>Import preview for <?php out(DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)))?> zone update</h1>
 <?php if(count($modifications['add']) == 0 && count($modifications['update']) == 0 && count($modifications['delete']) == 0) { ?>
-<p>No changes have been made! <a href="/zones/<?php out($zone->name, ESC_URL)?>">Go back</a>.</p>
+<p>No changes have been made! <a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">Go back</a>.</p>
 <?php } else { ?>
-<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>" class="zoneedit">
+<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zoneedit">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<?php if(count($modifications['add']) > 0) { ?>
 	<h2>New resource recordsets</h2>
@@ -33,6 +33,7 @@ $limit = 2500;
 			<tr>
 				<th class="name">Name</th>
 				<th class="type">Type</th>
+				<th class="ttl">TTL</th>
 				<th>Data</th>
 				<th>Comments</th>
 				<th class="confirm">Okay to add?</th>
@@ -47,10 +48,11 @@ $limit = 2500;
 			<tr>
 				<td><?php out(DNSName::abbreviate($mod['new']->name, $zone->name))?></td>
 				<td><?php out($mod['new']->type)?></td>
+				<td><?php out(DNSTime::abbreviate($mod['new']->ttl))?></td>
 				<td>
 					<ul class="plain">
 						<?php foreach($mod['new']->list_resource_records() as $rr) { ?>
-						<li><?php out('TTL: '.DNSTime::abbreviate($rr->ttl).', Content: '.$rr->content.', Enabled: '.($rr->disabled ? 'No' : 'Yes')) ?></li>
+						<li><?php out('Content: '.$rr->content.', Enabled: '.($rr->disabled ? 'No' : 'Yes')) ?></li>
 						<?php } ?>
 					</ul>
 				</td>
@@ -74,6 +76,7 @@ $limit = 2500;
 			<tr>
 				<th class="name">Name</th>
 				<th class="type">Type</th>
+				<th class="ttl">TTL</th>
 				<th>Changes</th>
 				<th class="confirm">Okay to update?</th>
 			</tr>
@@ -87,6 +90,7 @@ $limit = 2500;
 			<tr>
 				<td><?php out(DNSName::abbreviate($mod['new']->name, $zone->name))?></td>
 				<td><?php out($mod['new']->type)?></td>
+				<td><?php out(DNSTime::abbreviate($mod['new']->ttl))?></td>
 				<td>
 					<ul class="plain">
 						<?php foreach($mod['changelist'] as $change) { ?>
@@ -107,6 +111,7 @@ $limit = 2500;
 			<tr>
 				<th class="name">Name</th>
 				<th class="type">Type</th>
+				<th class="ttl">TTL</th>
 				<th>Data</th>
 				<th>Comments</th>
 				<th class="confirm">Okay to delete?</th>
@@ -121,10 +126,11 @@ $limit = 2500;
 			<tr>
 				<td><?php out(DNSName::abbreviate($mod['old']->name, $zone->name))?></td>
 				<td><?php out($mod['old']->type)?></td>
+				<td><?php out(DNSTime::abbreviate($mod['old']->ttl))?></td>
 				<td>
 					<ul class="plain">
 						<?php foreach($mod['old']->list_resource_records() as $rr) { ?>
-						<li><?php out('TTL: '.DNSTime::abbreviate($rr->ttl).', Content: '.$rr->content) ?></li>
+						<li><?php out('Content: '.$rr->content) ?></li>
 						<?php } ?>
 					</ul>
 				</td>
@@ -149,7 +155,7 @@ $limit = 2500;
 	<?php } ?>
 	<p>
 		<button type="submit" name="update_rrs" value="1" class="btn btn-primary">Confirm selected changes</button>
-		<a href="/zones/<?php out($zone->name, ESC_URL)?>" class="btn btn-default">Cancel import</a>
+		<a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="btn btn-default">Cancel import</a>
 	</p>
 </form>
 <?php } ?>

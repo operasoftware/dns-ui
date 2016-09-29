@@ -21,9 +21,9 @@ $ns_templates = $this->get('ns_templates');
 $zone_types = array('forward' => array(), 'reverse4' => array(), 'reverse6' => array());
 $accounts = array();
 foreach($zones as $zone) {
-	if(substr($zone->name, -13) == '.in-addr.arpa') {
+	if(substr($zone->name, -14) == '.in-addr.arpa.') {
 		$zone_types['reverse4'][] = $zone;
-	} elseif(substr($zone->name, -9) == '.ip6.arpa') {
+	} elseif(substr($zone->name, -10) == '.ip6.arpa.') {
 		$zone_types['reverse6'][] = $zone;
 	} else {
 		$zone_types['forward'][] = $zone;
@@ -59,7 +59,7 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['forward'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="/zones/<?php out($zone->name, ESC_URL)?>"><?php out(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46))?></a></td>
+					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name, ESC_URL))?>"><?php out(DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)))?></a></td>
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->account)?></td>
 				</tr>
@@ -86,7 +86,7 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['reverse4'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="/zones/<?php out($zone->name, ESC_URL)?>"><?php out($zone->name)?></a></td>
+					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
 					<td><?php out(ipv4_reverse_zone_to_range($zone->name))?></td>
 					<td><?php out(ipv4_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>
@@ -120,7 +120,7 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['reverse6'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="/zones/<?php out($zone->name, ESC_URL)?>"><?php out($zone->name)?></a></td>
+					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
 					<td><tt><?php out(ipv6_reverse_zone_to_range($zone->name))?></tt></td>
 					<td><?php out(ipv6_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>

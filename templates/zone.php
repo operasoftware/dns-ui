@@ -31,10 +31,10 @@ $reverse = false;
 global $output_formatter;
 ?>
 <h1>
-	<?php out(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46))?> zone
-	<?php if(substr($zone->name, -13) == '.in-addr.arpa') { $reverse = true; ?>
-	<small>IPv4 reverse zone for <?php out(implode('.', array_reverse(explode('.', substr($zone->name, 0, -13)))).'.')?></small>
-	<?php } elseif(substr($zone->name, -9) == '.ip6.arpa') { $reverse = true; ?>
+	<?php out(DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)))?> zone
+	<?php if(substr($zone->name, -14) == '.in-addr.arpa.') { $reverse = true; ?>
+	<small>IPv4 reverse zone for <?php out(ipv4_reverse_zone_to_range($zone->name))?></small>
+	<?php } elseif(substr($zone->name, -10) == '.ip6.arpa.') { $reverse = true; ?>
 	<small>IPv6 reverse zone for <tt><?php out(ipv6_reverse_zone_to_range($zone->name))?></tt></small>
 	<?php } ?>
 </h1>
@@ -52,7 +52,7 @@ global $output_formatter;
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="records">
 		<h2 class="sr-only">Resource records</h2>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>" class="zoneedit" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zoneedit" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<nav></nav>
 			<table class="table table-bordered table-condensed table-hover stickyHeader rrsets">
@@ -84,6 +84,7 @@ global $output_formatter;
 					<tr data-name="<?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?>" data-type="<?php out($rrset->type)?>" data-rrsetnum="<?php out($rrsetnum)?>" class="<?php out(implode(' ', $rowclasses))?>">
 						<td class="name" rowspan="<?php out(count($rrs))?>"><?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?></td>
 						<td class="type" rowspan="<?php out(count($rrs))?>"><?php out($rrset->type)?></td>
+						<td class="ttl" rowspan="<?php out(count($rrs))?>"><?php out(DNSTime::abbreviate($rrset->ttl))?></td>
 						<?php
 						$count = 0;
 						foreach($rrs as $rr) {
@@ -100,7 +101,6 @@ global $output_formatter;
 							}
 							$rr->content = DNSContent::decode($rr->content, $rrset->type);
 							?>
-						<td class="ttl"><?php out(DNSTime::abbreviate($rr->ttl))?></td>
 						<td class="content"><?php out($rr->content)?></td>
 						<td class="enabled"><?php out($rr->disabled ? 'No' : 'Yes')?></td>
 						<td class="actions">
@@ -161,7 +161,7 @@ global $output_formatter;
 			<nav></nav>
 			<input type="hidden" id="maxperpage" value="<?php out($maxperpage)?>">
 		</form>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div id="updates" style="display:none">
 				<h3>Updates</h3>
@@ -204,7 +204,7 @@ global $output_formatter;
 			}
 		}
 		?>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>" class="pending_update">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="pending_update">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -314,7 +314,7 @@ global $output_formatter;
 	</div>
 	<div role="tabpanel" class="tab-pane" id="soa">
 		<h2 class="sr-only">Zone configuration</h2>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>" class="form-horizontal zoneeditsoa">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="form-horizontal zoneeditsoa">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<h3>Zone classification</h3>
 			<div class="form-group">
@@ -432,9 +432,9 @@ global $output_formatter;
 	<div role="tabpanel" class="tab-pane" id="import">
 		<h2 class="sr-only">Export / Import</h2>
 		<h3>Export zone</h3>
-		<a href="/zones/<?php out($zone->name, ESC_URL)?>/export" class="btn btn-primary">Export zone in bind9 format</a>
+		<a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/export" class="btn btn-primary">Export zone in bind9 format</a>
 		<h3>Import zone</h3>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>/import" enctype="multipart/form-data">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/import" enctype="multipart/form-data">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="form-group">
 				<label>bind9 zone file</label>
@@ -462,13 +462,13 @@ global $output_formatter;
 		<h2 class="sr-only">Tools</h2>
 		<h3>Split zone</h3>
 		<p>This tool allows you to split records off into a separate new zone.</p>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>/split" class="form-inline">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/split" class="form-inline">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<label for="zone_split_prefix" class="sr-only">Suffix</label>
 			<div class="input-group">
 				<div class="input-group-addon">*.</div>
 				<input type="text" id="zone_split_suffix" name="suffix" class="form-control" required>
-				<div class="input-group-addon">.<?php out(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46))?></div>
+				<div class="input-group-addon">.<?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?></div>
 			</div>
 			<button type="submit" class="btn btn-primary">Split matching records into new zone…</button>
 		</form>
@@ -509,7 +509,7 @@ global $output_formatter;
 		<?php if(count($access) == 0) { ?>
 		<p>No users have been assigned to this zone.</p>
 		<?php } else { ?>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<table class="table table-condensed table-bordered">
 				<thead>
@@ -536,7 +536,7 @@ global $output_formatter;
 		</form>
 		<?php } ?>
 		<?php if($active_user->admin) { ?>
-		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>" class="form-horizontal">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="form-horizontal">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="form-group">
 				<label for="uid" class="col-sm-2 control-label">Username</label>

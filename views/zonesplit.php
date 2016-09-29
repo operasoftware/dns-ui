@@ -16,7 +16,7 @@
 ##
 
 try {
-	$zone = $zone_dir->get_zone_by_name($router->vars['name']);
+	$zone = $zone_dir->get_zone_by_name($router->vars['name'].'.');
 } catch(ZoneNotFound $e) {
 	require('views/error404.php');
 	exit;
@@ -59,12 +59,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$newzone->add_resource_record_set($rrset);
 			}
 			$soa = new ResourceRecord;
-			$soa->ttl = $zone->soa->ttl;
 			$soa->content = $zone->soa->content;
 			$soa->disabled = false;
 			$soaset = new ResourceRecordSet;
 			$soaset->name = $newzonename;
 			$soaset->type = 'SOA';
+			$soaset->ttl = $zone->soa->ttl;
 			$soaset->add_resource_record($soa);
 			$newzone->add_resource_record_set($soaset);
 			try {
@@ -95,7 +95,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				}
 				$zone_dir->git_tracked_export(array($zone), $git_commit_comment);
 				$alert = new UserAlert;
-				$alert->content = "Zone split of {$newzonename} from {$zone->name} has been completed.";
+				$alert->content = "Zone split of ".DNSZoneName::unqualify($newzonename)." from ".DNSZoneName::unqualify($zone->name)." has been completed.";
 				$active_user->add_alert($alert);
 				$content = new PageSection('zonesplitcompleted');
 				$content->set('zone', $zone);

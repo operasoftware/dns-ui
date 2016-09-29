@@ -16,7 +16,7 @@
 ##
 
 try {
-	$zone = $zone_dir->get_zone_by_name($router->vars['name']);
+	$zone = $zone_dir->get_zone_by_name($router->vars['name'].'.');
 } catch(ZoneNotFound $e) {
 	require('views/error404.php');
 	exit;
@@ -74,14 +74,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$mail->add_recipient(preg_replace('/^([^\.]+)\./', '$1@', trim($zone->soa->contact, '.')));
 			}
 			$mail->add_reply_to($active_user->email, $active_user->name);
-			$mail->subject = "DNS change requested for ".idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)." zone by {$active_user->name}";
-			$mail->body = "{$active_user->name} ({$active_user->uid}) has requested a change to the ".idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)." zone.\n\n";
-			$mail->body .= "See the changes here:\n\n  {$config['web']['baseurl']}/zones/".urlencode($zone->name)."#pending";
+			$mail->subject = "DNS change requested for ".idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46)." zone by {$active_user->name}";
+			$mail->body = "{$active_user->name} ({$active_user->uid}) has requested a change to the ".idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46)." zone.\n\n";
+			$mail->body .= "See the changes here:\n\n  {$config['web']['baseurl']}/zones/".urlencode(DNSZoneName::unqualify($zone->name))."#pending";
 			$mail->send();
 			$alert = new UserAlert;
 			$alert->content = "Your changes have been requested and are awaiting approval.";
 			$active_user->add_alert($alert);
-			redirect('/zones/'.urlencode($zone->name).'#pending');
+			redirect('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)).'#pending');
 		}
 	} elseif(isset($_POST['cancel_update'])) {
 		try {
@@ -168,7 +168,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		|| $zone->soa->default_ttl != $default_ttl
 		|| $zone->soa->ttl != $soa_ttl) {
 			$record = new StdClass;
-			$record->ttl = $soa_ttl;
 			$record->content = "$primary_ns $contact {$zone->soa->serial} $refresh $retry $expiry $default_ttl";
 			$record->enabled = 'Yes';
 			$update = new StdClass;
@@ -177,6 +176,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$update->oldtype = 'SOA';
 			$update->name = '@';
 			$update->type = 'SOA';
+			$update->ttl = $soa_ttl;
 			$update->records = array($record);
 			$json = new StdClass;
 			$json->actions = array($update);
@@ -233,7 +233,7 @@ if(!isset($content)) {
 }
 
 $page = new PageSection('base');
-$page->set('title', idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46));
+$page->set('title', DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)));
 $page->set('content', $content);
 $page->set('alerts', $active_user->list_alerts());
 

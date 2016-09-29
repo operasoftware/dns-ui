@@ -27,7 +27,7 @@ $ns_templates = $template_dir->list_ns_templates();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['add_zone']) && $active_user->admin) {
-		$zonename = idn_to_ascii(trim($_POST['name']), 0, INTL_IDNA_VARIANT_UTS46);
+		$zonename = idn_to_ascii(rtrim(trim($_POST['name']), '.'), 0, INTL_IDNA_VARIANT_UTS46).'.';
 		$zone = new Zone;
 		$zone->name = $zonename;
 		$zone->account = trim($_POST['classification']);
@@ -37,17 +37,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone->nameservers[] = $nameserver;
 		}
 		$soa = new ResourceRecord;
-		$soa->ttl = DNSTime::expand($_POST['soa_ttl']);
 		$soa->content = "$_POST[primary_ns] $_POST[contact] ".date('Ymd00')." ".DNSTime::expand($_POST['refresh'])." ".DNSTime::expand($_POST['retry'])." ".DNSTime::expand($_POST['expire'])." ".DNSTime::expand($_POST['default_ttl']);
 		$soa->disabled = false;
 		$soaset = new ResourceRecordSet;
 		$soaset->name = $zonename;
 		$soaset->type = 'SOA';
+		$soaset->ttl = DNSTime::expand($_POST['soa_ttl']);
 		$soaset->add_resource_record($soa);
 		$zone->add_resource_record_set($soaset);
 		try {
 			$zone_dir->create_zone($zone);
-			redirect('/zones/'.urlencode($zonename));
+			redirect('/zones/'.urlencode(DNSZoneName::unqualify($zonename)));
 		} catch(Pest_InvalidRecord $e) {
 			$content = new PageSection('zone_add_failed');
 			$content->set('message', json_decode($e->getMessage())->error);
