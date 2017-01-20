@@ -1,0 +1,214 @@
+/*
+##
+## Copyright 2013-2017 Opera Software AS
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+## http://www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+##
+*/
+html,
+body {
+	height: 100%;
+	/* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+	min-height: 100%;
+	height: auto;
+	/* Negative indent footer by its height */
+	margin: 0 auto -60px;
+	/* Pad bottom by footer height */
+	padding: 0 0 60px;
+}
+#wrap > .container {
+	padding: 60px 15px 0;
+}
+#content *:first-child {
+	margin-top: 0;
+}
+.nav-tabs {
+	margin-bottom: 20px;
+}
+#footer {
+	height: 60px;
+	background-color: #f5f5f5;
+}
+#footer > .container {
+	padding: 20px 15px 0 15px;
+}
+.navbar-brand img {
+	height: 100%;
+	float: left;
+	margin-right: 1em;
+}
+.panel-group + p {
+	margin-top: 1em;
+}
+ul.plain {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+table.zonelist td.name {
+	text-align: right;
+}
+table.zonelist tr.filtered {
+	display: none;
+}
+form.zoneedit div.filter {
+	margin-bottom: 2em;
+	margin-right: 1em;
+}
+table.rrsets {
+	table-layout: fixed;
+}
+table.rrsets tr td input[type=text] {
+	padding: 0;
+	line-height: 12px;
+}
+table.rrsets tr td input,
+table.rrsets tr td select,
+table.rrsets tr td button {
+	width: 100%;
+	background-color: white;
+	color: #555;
+}
+table.rrsets td.name,
+table.rrsets td.type,
+table.rrsets td.ttl,
+table.rrsets td.content,
+table.rrsets td.enabled,
+table.rrsets td.comment {
+	cursor: pointer;
+}
+table.rrsets td.name:hover,
+table.rrsets td.type:hover,
+table.rrsets td.ttl:hover,
+table.rrsets td.content:hover,
+table.rrsets td.enabled:hover,
+table.rrsets td.comment:hover {
+	background-color: #ccf;
+}
+table.rrsets th.name {
+	width: 21em;
+}
+table.rrsets th.type {
+	width: 7em;
+}
+table.rrsets th.ttl {
+	width: 7em;
+}
+table.rrsets th.content {
+	width: 21em;
+}
+table.rrsets th.enabled {
+	width: 7em;
+}
+table.rrsets th.actions {
+	width: 6em;
+}
+table.rrsets td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+table.rrsets td.name, table.rrsets td.name input {
+	text-align: right;
+}
+table.rrsets tr.disabled td.enabled {
+	background-color: #ddd;
+}
+table.rrsets tr.disabled td.enabled:hover {
+	background-color: #ccd;
+}
+table.rrsets tr.delete td.ttl,
+table.rrsets tr.delete td.content,
+table.rrsets tr.delete td.enabled {
+	background-color: #f2dede;
+}
+table.rrsets tr.filtered {
+	display: none;
+}
+table.changepreview {
+	table-layout: fixed;
+}
+table.changepreview th.name {
+	width: 21em;
+}
+table.changepreview th.type {
+	width: 7em;
+}
+table.changepreview th.confirm {
+	width: 10em;
+}
+table.changepreview td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+table.changelog tbody tr {
+	cursor: pointer;
+}
+table.changelog tbody tr.changeset {
+	cursor: default;
+}
+
+input[type=text]:focus:invalid, input[type=email]:focus:invalid, select:focus:invalid, textarea:focus:invalid {
+	box-shadow: 0 0 5px #d45252;
+	border-color: #b03535;
+}
+input[type=text]:focus:valid, input[type=email]:focus:valid, select:focus:valid, textarea:focus:valid {
+	box-shadow: 0 0 5px #5cd053;
+	border-color: #28921f;
+}
+ins {
+	background-color: #dff0d8;
+	color: #3c763d;
+	text-decoration: none;
+}
+del {
+	background-color: #f2dede;
+	color: #a94442;
+}
+.align-right {
+	text-align: right;
+}
+.nowrap {
+	white-space: nowrap;
+}
+div.stickyHeader {
+	position: fixed;
+	top: 51px;
+}
+div.stickyHeader th {
+	background-color: white;
+}
+
+/**
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ */
+.javascript  {font-family:monospace;}
+.javascript .imp {font-weight: bold; color: red;}
+.javascript .kw1 {color: #000066; font-weight: bold;}
+.javascript .kw2 {color: #003366; font-weight: bold;}
+.javascript .kw3 {color: #000066;}
+.javascript .kw5 {color: #FF0000;}
+.javascript .co1 {color: #006600; font-style: italic;}
+.javascript .co2 {color: #009966; font-style: italic;}
+.javascript .coMULTI {color: #006600; font-style: italic;}
+.javascript .es0 {color: #000099; font-weight: bold;}
+.javascript .br0 {color: #009900;}
+.javascript .sy0 {color: #339933;}
+.javascript .st0 {color: #3366CC;}
+.javascript .nu0 {color: #CC0000;}
+.javascript .me1 {color: #660066;}
+.javascript span.xtra { display:block; }

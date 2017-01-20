@@ -1,0 +1,2 @@
+Disallow CNAME and A/AAAA record with same name / multiple CNAMEs with same name
+Detect and handle concurrent edits
