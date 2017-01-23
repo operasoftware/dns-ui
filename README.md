@@ -18,11 +18,7 @@ Features
 Compatibility
 -------------
 
-The current version is only compatible with the experimental JSON API of PowerDNS 3.
-
-A branch exists that implements full PowerDNS 4 support, but PowerDNS 4 has [a serious API
-bug](https://github.com/PowerDNS/pdns/issues/4766) that greatly affects functionality of the DNS UI and can lead to data
-corruption.
+The current version is only compatible with PowerDNS 4.1.0 and higher.
 
 Requirements
 ------------
@@ -34,7 +30,7 @@ Requirements
 * PHP LDAP extension
 * PHP PDO_PGSQL extension
 * PostgreSQL database
-* PowerDNS authoritative server (>= 3.4.2, < 4.0)
+* PowerDNS authoritative server (>= 4.1.0)
 
 Installation
 ------------
