@@ -130,9 +130,12 @@ table.rrsets tr.disabled td.enabled {
 table.rrsets tr.disabled td.enabled:hover {
 	background-color: #ccd;
 }
-table.rrsets tr.delete td.ttl,
 table.rrsets tr.delete td.content,
-table.rrsets tr.delete td.enabled {
+table.rrsets tr.delete td.enabled,
+table.rrsets tr.delete td.actions {
+	background-color: #f2dede;
+}
+table.rrsets tr.rrset-delete td {
 	background-color: #f2dede;
 }
 table.rrsets tr.filtered {
