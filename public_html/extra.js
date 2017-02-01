@@ -181,6 +181,7 @@ $(function() {
 			// Get all rows in this rrset
 			var table = element.closest('table');
 			var rows = $('tr[data-rrsetnum="' + rrset.rrsetnum + '"]', table);
+			var primary_row = $('tr[data-rrsetnum="' + rrset.rrsetnum + '"].primary', table);
 			var rrsetnum = parseInt(rrset.rrsetnum, 10);
 			var rrsetchanged = false;
 			var valid = true;
@@ -203,39 +204,43 @@ $(function() {
 			$(strong).text(rrset_label + ':');
 			li.appendChild(strong);
 			update.records = [];
+			var activerows = 0;
 			// Loop through all resource records in this rrset.
 			rows.each(function(index) {
 				update.records[index] = {};
 				$(this).toggleClass('disabled', $('td.enabled select', this).val() == 'No');
 				if($(this).data('newrow')) {
-					// This is a newly-added row, simply show the values.
-					rrsetchanged = true;
-					var ttl = $('td.ttl input', this).val();
-					var content = $('td.content input', this).val();
-					var enabled = $('td.enabled select', this).val();
-					var comment = $('td.comment input', this).val();
-					li.appendChild(document.createTextNode(' '));
-					var span = document.createElement('span');
-					span.appendChild(document.createTextNode('Added new resource record, Content = '));
-					var em = document.createElement('em');
-					$(em).text(content);
-					span.appendChild(em);
-					span.appendChild(document.createTextNode(', Enabled = '));
-					var em = document.createElement('em');
-					$(em).text(enabled);
-					span.appendChild(em);
-					if(comment) {
-						console.log(comment);
-						span.appendChild(document.createTextNode(', Comment = "'));
+					if(!$(this).data('delete')) {
+						// This is a newly-added row, simply show the values.
+						rrsetchanged = true;
+						var ttl = $('td.ttl input', this).val();
+						var content = $('td.content input', this).val();
+						var enabled = $('td.enabled select', this).val();
+						var comment = $('td.comment input', this).val();
+						li.appendChild(document.createTextNode(' '));
+						var span = document.createElement('span');
+						span.appendChild(document.createTextNode('Added new resource record, Content = '));
 						var em = document.createElement('em');
-						$(em).text(comment);
+						$(em).text(content);
 						span.appendChild(em);
-						span.appendChild(document.createTextNode('"'));
+						span.appendChild(document.createTextNode(', Enabled = '));
+						var em = document.createElement('em');
+						$(em).text(enabled);
+						span.appendChild(em);
+						if(comment) {
+							console.log(comment);
+							span.appendChild(document.createTextNode(', Comment = "'));
+							var em = document.createElement('em');
+							$(em).text(comment);
+							span.appendChild(em);
+							span.appendChild(document.createTextNode('"'));
+						}
+						span.appendChild(document.createTextNode('.'));
+						li.appendChild(span);
+						update.records[index]['content'] = content;
+						update.records[index]['enabled'] = enabled;
+						activerows++;
 					}
-					span.appendChild(document.createTextNode('.'));
-					li.appendChild(span);
-					update.records[index]['content'] = content;
-					update.records[index]['enabled'] = enabled;
 				} else {
 					// This is an existing row - show the changes.
 					var rrspan = document.createElement('span');
@@ -299,6 +304,8 @@ $(function() {
 						$(span).addClass('text-warning');
 						rrspan.appendChild(span);
 						update.records[index]['delete'] = true;
+					} else {
+						activerows++;
 					}
 					if(rrchanged) {
 						rrsetchanged = true;
@@ -335,6 +342,22 @@ $(function() {
 					}
 				}
 			});
+			if(rrset.type == 'CNAME' && activerows > 1) {
+				valid = false;
+				li.appendChild(document.createTextNode(' '));
+				var span = document.createElement('span');
+				var strong = document.createElement('strong');
+				strong.appendChild(document.createTextNode('Error:'));
+				span.appendChild(strong);
+				span.appendChild(document.createTextNode(' Multiple records of singleton record type.'));
+				$(span).addClass('text-danger');
+				li.appendChild(span);
+			}
+			if(activerows == 0) {
+				primary_row.addClass('rrset-delete');
+			} else {
+				primary_row.removeClass('rrset-delete');
+			}
 			if(!valid) update.invalid = true;
 			if(rrsetchanged) {
 				var input = document.createElement('input');
@@ -365,8 +388,10 @@ $(function() {
 			// Check for RRset name collision across all RRsets
 			var collision = false;
 			var rrset_hash = {};
+			var singleton_hash = {};
 			$('#collisions_list').empty();
 			$('tbody tr.primary', table).each(function() {
+				if($(this).hasClass('rrset-delete')) return;
 				if($(this).data('editing')) {
 					var name = $('td.name input', this).val();
 					var type = $('td.type select', this).val();
@@ -382,6 +407,17 @@ $(function() {
 					collision = true;
 				}
 				rrset_hash[name + ' ' + type] = true;
+				if(singleton_hash.hasOwnProperty(name)) {
+					if(singleton_hash[name] || type == 'CNAME' || type == 'DNAME') {
+						// We have a singleton recordset that matches another recordset of the same name
+						var li = document.createElement('li');
+						$(li).text('Singleton type record exists with same name as other types for ' + name);
+						$(li).addClass('text-danger');
+						$('#collisions_list').append(li);
+						collision = true;
+					}
+				}
+				singleton_hash[name] = (type == 'CNAME' || type == 'DNAME');
 			});
 			$('#zonesubmit').attr('disabled', !allvalid || collision);
 			if($('#updates_list li').length == 0) {
@@ -455,6 +491,15 @@ $(function() {
 			tr.appendChild(td);
 			var td = document.createElement('td');
 			td.className = 'actions';
+			var button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'btn btn-default btn-xs delete-rr';
+			var span = document.createElement('span');
+			span.className = 'glyphicon glyphicon-trash';
+			button.appendChild(span);
+			button.appendChild(document.createTextNode(' Delete'));
+			$(button).on('click', function(){ delete_rr($(this)); });
+			td.appendChild(button);
 			tr.appendChild(td);
 			if(rows.length == 0) {
 				var td = document.createElement('td');
