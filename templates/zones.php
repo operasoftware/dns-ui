@@ -59,7 +59,7 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['forward'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name, ESC_URL))?>"><?php out(DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)))?></a></td>
+					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name, ESC_URL))?>"><?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?></a></td>
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->account)?></td>
 				</tr>

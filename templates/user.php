@@ -40,7 +40,7 @@ global $output_formatter;
 			<td class="nowrap"><?php out($changeset->change_date->format('Y-m-d H:i:s'))?></td>
 			<td><?php out($output_formatter->changeset_comment_format($changeset->comment), ESC_NONE) ?></td>
 			<td class="nowrap"><?php if($changeset->requester) { ?><a href="/users/<?php out($changeset->requester->uid)?>"><?php out($changeset->requester->name)?><?php } ?></td>
-			<td class="nowrap"><a href="/zones/<?php out($changeset->zone->name)?>"><?php out(idn_to_utf8($changeset->zone->name, 0, INTL_IDNA_VARIANT_UTS46))?></a></td>
+			<td class="nowrap"><a href="/zones/<?php out($changeset->zone->name)?>"><?php out(punycode_to_utf8($changeset->zone->name))?></a></td>
 			<td><?php out('-'.$changeset->deleted.'/+'.$changeset->added)?></td>
 			<td></td>
 		</tr>

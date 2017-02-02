@@ -45,7 +45,7 @@ if(isset($_FILES['zonefile'])) {
 }
 
 $page = new PageSection('base');
-$page->set('title', 'Import preview for '.DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)).' zone update');
+$page->set('title', 'Import preview for '.DNSZoneName::unqualify(punycode_to_utf8($zone->name)).' zone update');
 $page->set('content', $content);
 $page->set('alerts', $active_user->list_alerts());
 

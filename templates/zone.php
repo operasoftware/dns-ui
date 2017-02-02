@@ -31,7 +31,7 @@ $reverse = false;
 global $output_formatter;
 ?>
 <h1>
-	<?php out(DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)))?> zone
+	<?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?> zone
 	<?php if(substr($zone->name, -14) == '.in-addr.arpa.') { $reverse = true; ?>
 	<small>IPv4 reverse zone for <?php out(ipv4_reverse_zone_to_range($zone->name))?></small>
 	<?php } elseif(substr($zone->name, -10) == '.ip6.arpa.') { $reverse = true; ?>
@@ -81,8 +81,8 @@ global $output_formatter;
 						if($firstrow->disabled) $rowclasses[] = 'disabled';
 						if($rrsetnum > $maxperpage) $rowclasses[] = 'hidden';
 						?>
-					<tr data-name="<?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?>" data-type="<?php out($rrset->type)?>" data-rrsetnum="<?php out($rrsetnum)?>" class="<?php out(implode(' ', $rowclasses))?>">
-						<td class="name" rowspan="<?php out(count($rrs))?>"><?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?></td>
+					<tr data-name="<?php out(punycode_to_utf8($name))?>" data-type="<?php out($rrset->type)?>" data-rrsetnum="<?php out($rrsetnum)?>" class="<?php out(implode(' ', $rowclasses))?>">
+						<td class="name" rowspan="<?php out(count($rrs))?>"><?php out(punycode_to_utf8($name))?></td>
 						<td class="type" rowspan="<?php out(count($rrs))?>"><?php out($rrset->type)?></td>
 						<td class="ttl" rowspan="<?php out(count($rrs))?>"><?php out(DNSTime::abbreviate($rrset->ttl))?></td>
 						<?php
@@ -190,13 +190,13 @@ global $output_formatter;
 		$invalid_count = 0;
 		foreach($data->actions as $action) {
 			if($action->action == 'add') {
-				$fullname = idn_to_ascii(DNSName::canonify($action->name, $zone->name), 0, INTL_IDNA_VARIANT_UTS46);
+				$fullname = utf8_to_punycode(DNSName::canonify($action->name, $zone->name));
 				if(isset($rrsets[$fullname.' '.$action->type])) {
 					$invalid_count++;
 					$action->problem = "The record \"{$action->name} {$action->type}\" already exists in this zone.";
 				}
 			} elseif($action->action == 'update') {
-				$fullname = idn_to_ascii(DNSName::canonify($action->oldname, $zone->name), 0, INTL_IDNA_VARIANT_UTS46);
+				$fullname = utf8_to_punycode(DNSName::canonify($action->oldname, $zone->name));
 				if(!isset($rrsets[$fullname.' '.$action->oldtype])) {
 					$invalid_count++;
 					$action->problem = "The record \"{$action->name} {$action->type}\" no longer exists in this zone.";
@@ -229,7 +229,7 @@ global $output_formatter;
 						$current = array();
 						$current_comment = '';
 						if($action->action == 'update') {
-							$fullname = idn_to_ascii(DNSName::canonify($action->oldname, $zone->name), 0, INTL_IDNA_VARIANT_UTS46);
+							$fullname = utf8_to_punycode(DNSName::canonify($action->oldname, $zone->name));
 							if(isset($rrsets[$fullname.' '.$action->oldtype])) {
 								$current_rrset = $rrsets[$fullname.' '.$action->oldtype];
 								$current = $current_rrset->list_resource_records();
@@ -468,7 +468,7 @@ global $output_formatter;
 			<div class="input-group">
 				<div class="input-group-addon">*.</div>
 				<input type="text" id="zone_split_suffix" name="suffix" class="form-control" required>
-				<div class="input-group-addon">.<?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?></div>
+				<div class="input-group-addon">.<?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?></div>
 			</div>
 			<button type="submit" class="btn btn-primary">Split matching records into new zone…</button>
 		</form>

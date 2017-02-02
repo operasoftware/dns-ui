@@ -195,7 +195,7 @@ class API {
 			foreach($states as $state => $rrset) {
 				if($rrset) {
 					$c_data->{$state} = new StdClass;
-					$c_data->{$state}->name = idn_to_utf8($rrset->name, 0, INTL_IDNA_VARIANT_UTS46);
+					$c_data->{$state}->name = $rrset->name;
 					$c_data->{$state}->type = $rrset->type;
 					$c_data->{$state}->ttl = DNSTime::abbreviate($rrset->ttl);
 					$c_data->{$state}->rrs = array();

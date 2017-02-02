@@ -21,7 +21,7 @@ $suffix = $this->get('suffix');
 $split = $this->get('split');
 $cname_error = $this->get('cname_error');
 ?>
-<h2>Zone split of <?php out(idn_to_utf8(DNSZoneName::unqualify($newzonename), 0, INTL_IDNA_VARIANT_UTS46))?> from <?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?></h2>
+<h2>Zone split of <?php out(punycode_to_utf8(DNSZoneName::unqualify($newzonename)))?> from <?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?></h2>
 <form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/split">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<?php if(count($split) == 0) { ?>
@@ -54,8 +54,8 @@ $cname_error = $this->get('cname_error');
 				if($newname == '@' && $rrset->type == 'CNAME') $rowclasses[] = 'danger';
 				?>
 			<tr class="<?php out(implode(' ', $rowclasses))?>">
-				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?></strong><span class="text-muted">.<?php out(idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46))?></span></td>
-				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(idn_to_utf8($newname, 0, INTL_IDNA_VARIANT_UTS46))?></strong><span class="text-muted">.<?php out(idn_to_utf8(DNSZoneName::unqualify($newzonename), 0, INTL_IDNA_VARIANT_UTS46))?></span></td>
+				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(punycode_to_utf8($name))?></strong><span class="text-muted">.<?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?></span></td>
+				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(punycode_to_utf8($newname))?></strong><span class="text-muted">.<?php out(punycode_to_utf8(DNSZoneName::unqualify($newzonename)))?></span></td>
 				<td rowspan="<?php out(count($rrs))?>"><?php out($rrset->type)?></td>
 				<?php
 				$count = 0;

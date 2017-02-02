@@ -410,8 +410,8 @@ class Zone extends Record {
 		if(!is_object($update)) throw new BadData('Malformed update.');
 		if(!(isset($update->name) && isset($update->type))) throw new BadData('Malformed action.');
 		$change = new Change;
-		if(isset($update->name)) $update->name = idn_to_ascii(DNSName::canonify($update->name, $this->name), 0, INTL_IDNA_VARIANT_UTS46);
-		if(isset($update->oldname)) $update->oldname = idn_to_ascii(DNSName::canonify($update->oldname, $this->name), 0, INTL_IDNA_VARIANT_UTS46);
+		if(isset($update->name)) $update->name = utf8_to_punycode(DNSName::canonify($update->name, $this->name));
+		if(isset($update->oldname)) $update->oldname = utf8_to_punycode(DNSName::canonify($update->oldname, $this->name));
 		else {
 			$update->oldname = $update->name;
 			$update->oldtype = $update->type;
@@ -510,8 +510,8 @@ class Zone extends Record {
 			if(isset($config['email']['report_address'])) {
 				$mail = new Email;
 				$mail->add_recipient($config['email']['report_address'], $config['email']['report_name']);
-				$mail->subject = $revs_missing_count.' new DNS resource record'.($revs_missing_count == 1 ? '' : 's').' in '.idn_to_utf8($this->name, 0, INTL_IDNA_VARIANT_UTS46).' '.($revs_missing_count == 1 ? 'needs a reverse zone' : 'need reverse zones');
-				$mail->body = "The following records were added or updated in the ".idn_to_utf8($this->name, 0, INTL_IDNA_VARIANT_UTS46)." zone:\n\n";
+				$mail->subject = $revs_missing_count.' new DNS resource record'.($revs_missing_count == 1 ? '' : 's').' in '.punycode_to_utf8($this->name).' '.($revs_missing_count == 1 ? 'needs a reverse zone' : 'need reverse zones');
+				$mail->body = "The following records were added or updated in the ".punycode_to_utf8($this->name)." zone:\n\n";
 				foreach($revs_missing['A'] as $rev_missing) {
 					$mail->body .= "    A: {$rev_missing}\n";
 				}

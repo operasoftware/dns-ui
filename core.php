@@ -396,6 +396,14 @@ function ipv6_reverse_zone_to_subnet($zonename) {
 	return $result;
 }
 
+function punycode_to_utf8($string) {
+	return idn_to_utf8($string, 0, INTL_IDNA_VARIANT_UTS46);
+}
+
+function utf8_to_punycode($string) {
+	return idn_to_ascii($string, 0, INTL_IDNA_VARIANT_UTS46);
+}
+
 class OutputFormatter {
 	public function changeset_comment_format($text) {
 		return hesc($text);
