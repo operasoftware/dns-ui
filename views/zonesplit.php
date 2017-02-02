@@ -31,7 +31,7 @@ $rrsets = $zone->list_resource_record_sets();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['suffix'])) {
-		$newzonename = idn_to_ascii($_POST['suffix'], 0, INTL_IDNA_VARIANT_UTS46).'.'.$zone->name;
+		$newzonename = utf8_to_punycode($_POST['suffix']).'.'.$zone->name;
 		$split = array();
 		$cname_error = false;
 		foreach($rrsets as $rrset) {

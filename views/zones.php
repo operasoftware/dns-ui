@@ -27,7 +27,7 @@ $ns_templates = $template_dir->list_ns_templates();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['add_zone']) && $active_user->admin) {
-		$zonename = idn_to_ascii(rtrim(trim($_POST['name']), '.'), 0, INTL_IDNA_VARIANT_UTS46).'.';
+		$zonename = utf8_to_punycode(rtrim(trim($_POST['name']), '.')).'.';
 		$zone = new Zone;
 		$zone->name = $zonename;
 		$zone->account = trim($_POST['classification']);

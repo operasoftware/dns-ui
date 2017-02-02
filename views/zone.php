@@ -74,8 +74,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$mail->add_recipient(preg_replace('/^([^\.]+)\./', '$1@', trim($zone->soa->contact, '.')));
 			}
 			$mail->add_reply_to($active_user->email, $active_user->name);
-			$mail->subject = "DNS change requested for ".idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46)." zone by {$active_user->name}";
-			$mail->body = "{$active_user->name} ({$active_user->uid}) has requested a change to the ".idn_to_utf8(DNSZoneName::unqualify($zone->name), 0, INTL_IDNA_VARIANT_UTS46)." zone.\n\n";
+			$mail->subject = "DNS change requested for ".punycode_to_utf8(DNSZoneName::unqualify($zone->name))." zone by {$active_user->name}";
+			$mail->body = "{$active_user->name} ({$active_user->uid}) has requested a change to the ".punycode_to_utf8(DNSZoneName::unqualify($zone->name))." zone.\n\n";
 			$mail->body .= "See the changes here:\n\n  {$config['web']['baseurl']}/zones/".urlencode(DNSZoneName::unqualify($zone->name))."#pending";
 			$mail->send();
 			$alert = new UserAlert;
@@ -112,8 +112,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$mail = new Email;
 			$mail->add_recipient($update->author->email, $update->author->name);
 			$mail->add_reply_to($active_user->email, $active_user->name);
-			$mail->subject = "Approved: DNS change request #{$update->id} for ".idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)." zone";
-			$mail->body = "Your change request #{$update->id} for the ".idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)." zone was approved.";
+			$mail->subject = "Approved: DNS change request #{$update->id} for ".punycode_to_utf8($zone->name)." zone";
+			$mail->body = "Your change request #{$update->id} for the ".punycode_to_utf8($zone->name)." zone was approved.";
 			$mail->send();
 			redirect();
 		} catch(ResourceRecordInvalid $e) {
@@ -140,8 +140,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$mail = new Email;
 		$mail->add_recipient($update->author->email, $update->author->name);
 		$mail->add_reply_to($active_user->email, $active_user->name);
-		$mail->subject = "Rejected: DNS change request #{$update->id} for ".idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)." zone";
-		$mail->body = "Your change request #{$update->id} for the ".idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)." zone was rejected.";
+		$mail->subject = "Rejected: DNS change request #{$update->id} for ".punycode_to_utf8($zone->name)." zone";
+		$mail->body = "Your change request #{$update->id} for the ".punycode_to_utf8($zone->name)." zone was rejected.";
 		if($_POST['reject_reason']) {
 			$mail->body .= " The following reason was given:\n  $_POST[reject_reason]";
 		}
@@ -233,7 +233,7 @@ if(!isset($content)) {
 }
 
 $page = new PageSection('base');
-$page->set('title', DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)));
+$page->set('title', DNSZoneName::unqualify(punycode_to_utf8($zone->name)));
 $page->set('content', $content);
 $page->set('alerts', $active_user->list_alerts());
 

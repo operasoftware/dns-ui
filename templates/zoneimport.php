@@ -20,7 +20,7 @@ $checked = 'checked ';
 $count = 0;
 $limit = 2500;
 ?>
-<h1>Import preview for <?php out(DNSZoneName::unqualify(idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)))?> zone update</h1>
+<h1>Import preview for <?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?> zone update</h1>
 <?php if(count($modifications['add']) == 0 && count($modifications['update']) == 0 && count($modifications['delete']) == 0) { ?>
 <p>No changes have been made! <a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">Go back</a>.</p>
 <?php } else { ?>
