@@ -100,11 +100,15 @@ $(function() {
 		// Mark the row as deleted
 		function delete_rr(button) {
 			make_editable(button);
+			button.empty();
 			var tr = button.closest('tr');
 			if(tr.data('delete')) {
+				button.append($('<span>').addClass('glyphicon').addClass('glyphicon-trash'));
+				button.append(' Delete');
 				tr.removeClass('delete');
 				tr.data('delete', false);
 			} else {
+				button.text('Undelete');
 				tr.addClass('delete');
 				tr.data('delete', true);
 			}
