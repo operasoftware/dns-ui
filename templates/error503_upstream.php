@@ -21,11 +21,12 @@ $active_user = $this->get('active_user');
 <?php if(!is_null($active_user) && $active_user->admin) { ?>
 <p>Make sure that the following PowerDNS parameters are set correctly in <code>pdns.conf</code>:</p>
 <pre>webserver=yes
+webserver=yes
 webserver-address=...
 webserver-allow-from=...
 webserver-port=...
-experimental-json-interface=yes
-experimental-api-key=...</pre>
+api=yes
+api-key=...</pre>
 <p>Reload PowerDNS after making changes to this file.</p>
 <p>Also check the values set in the <code>[powerdns]</code> section of the DNS UI configuration file (<code>config/config.ini</code>).</p>
 <?php } ?>

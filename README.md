@@ -20,6 +20,13 @@ Compatibility
 
 The current version is only compatible with PowerDNS 4.1.0 and higher.
 
+PowerDNS 4.1 has not been released yet. You can use a build from master as long as it has at least the following fix:
+
+   https://github.com/PowerDNS/pdns/commit/b43f590376732a4351dfe77458470c4b88cb41a9
+
+As another alternative, you can use PowerDNS 3 with
+[Opera DNS UI v0.1](https://github.com/operasoftware/dns-ui/releases/tag/v0.1).
+
 Requirements
 ------------
 
@@ -37,11 +44,12 @@ Installation
 
 1.  Configure PowerDNS:
 
+        webserver=yes
         webserver-address=...
         webserver-allow-from=...
         webserver-port=...
-        experimental-json-interface=yes
-        experimental-api-key=...
+        api=yes
+        api-key=...
 
 2.  Clone this repo to somewhere *outside* of your default Apache document root.
 
