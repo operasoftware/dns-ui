@@ -209,6 +209,7 @@ $(function() {
 			li.appendChild(strong);
 			update.records = [];
 			var activerows = 0;
+			var enabledrows = 0;
 			// Loop through all resource records in this rrset.
 			rows.each(function(index) {
 				update.records[index] = {};
@@ -244,6 +245,7 @@ $(function() {
 						update.records[index]['content'] = content;
 						update.records[index]['enabled'] = enabled;
 						activerows++;
+						if(enabled == 'Yes') enabledrows++;
 					}
 				} else {
 					// This is an existing row - show the changes.
@@ -310,6 +312,7 @@ $(function() {
 						update.records[index]['delete'] = true;
 					} else {
 						activerows++;
+						if(update.records[index]['enabled'] == 'Yes') enabledrows++;
 					}
 					if(rrchanged) {
 						rrsetchanged = true;
@@ -346,7 +349,7 @@ $(function() {
 					}
 				}
 			});
-			if(rrset.type == 'CNAME' && activerows > 1) {
+			if(rrset.type == 'CNAME' && enabledrows > 1) {
 				valid = false;
 				li.appendChild(document.createTextNode(' '));
 				var span = document.createElement('span');
@@ -361,6 +364,11 @@ $(function() {
 				primary_row.addClass('rrset-delete');
 			} else {
 				primary_row.removeClass('rrset-delete');
+			}
+			if(enabledrows == 0) {
+				primary_row.addClass('rrset-disable');
+			} else {
+				primary_row.removeClass('rrset-disable');
 			}
 			if(!valid) update.invalid = true;
 			if(rrsetchanged) {
@@ -395,7 +403,7 @@ $(function() {
 			var singleton_hash = {};
 			$('#collisions_list').empty();
 			$('tbody tr.primary', table).each(function() {
-				if($(this).hasClass('rrset-delete')) return;
+				if($(this).hasClass('rrset-disable')) return;
 				if($(this).data('editing')) {
 					var name = $('td.name input', this).val();
 					var type = $('td.type select', this).val();
