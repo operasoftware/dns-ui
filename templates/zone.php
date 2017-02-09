@@ -78,7 +78,12 @@ global $output_formatter;
 						$name = DNSName::abbreviate($rrset->name, $zone->name);
 						$rowclasses = array('primary');
 						$firstrow = reset($rrs);
+						$alldisabled = true;
+						foreach($rrs as $rr) {
+							if(!$rr->disabled) $alldisabled = false;
+						}
 						if($firstrow->disabled) $rowclasses[] = 'disabled';
+						if($alldisabled) $rowclasses[] = 'rrset-disable';
 						if($rrsetnum > $maxperpage) $rowclasses[] = 'hidden';
 						?>
 					<tr data-name="<?php out(idn_to_utf8($name, 0, INTL_IDNA_VARIANT_UTS46))?>" data-type="<?php out($rrset->type)?>" data-rrsetnum="<?php out($rrsetnum)?>" class="<?php out(implode(' ', $rowclasses))?>">
