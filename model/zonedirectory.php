@@ -63,7 +63,6 @@ class ZoneDirectory extends DBDirectory {
 				$data->comments[] = $comment;
 			}
 		}
-		$data->soa_edit = 'INCEPTION-INCREMENT';
 		$data->soa_edit_api = 'INCEPTION-INCREMENT';
 		$data->account = $zone->account;
 		$response = $this->powerdns->post('zones', $data);
