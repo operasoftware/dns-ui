@@ -96,11 +96,13 @@ foreach($zones as $zone) {
 			</tbody>
 		</table>
 		<?php } ?>
+		<?php if($active_user->admin) { ?>
 		<div class="form-inline reverse_zone_prefill">
 			<label for="ipv4_zone_prefix">IPv4 prefix</label>
 			<input type="text" id="ipv4_zone_prefix" class="form-control" pattern="(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])(\.(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])){0,2}\.?" required>
 			<button type="button" id="ipv4_zone_create" class="btn btn-primary">Create zone from prefix</button>
 		</div>
+		<?php } ?>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="reverse6">
 		<h2 class="sr-only">Reverse zones IPv6</h2>
@@ -130,11 +132,13 @@ foreach($zones as $zone) {
 			</tbody>
 		</table>
 		<?php } ?>
+		<?php if($active_user->admin) { ?>
 		<div class="form-inline reverse_zone_prefill">
 			<label for="ipv6_zone_prefix">IPv6 prefix</label>
 			<input type="text" id="ipv6_zone_prefix" class="form-control" pattern="([0-9a-fA-F]{1,4})(:[0-9a-fA-F]{1,4}){0,6}\:?" required>
 			<button type="button" id="ipv6_zone_create" class="btn btn-primary">Create zone from prefix</button>
 		</div>
+		<?php } ?>
 	</div>
 	<?php if($active_user->admin) { ?>
 	<div role="tabpanel" class="tab-pane" id="create">
