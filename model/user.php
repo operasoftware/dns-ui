@@ -68,7 +68,7 @@ class User extends Record {
 	}
 
 	public function check_csrf_token($token) {
-		return $token == $this->get_csrf_token();
+		return $token === $this->get_csrf_token();
 	}
 
 	public function get_details_from_ldap() {
