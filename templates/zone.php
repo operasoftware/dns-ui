@@ -168,7 +168,7 @@ global $output_formatter;
 		</form>
 		<form method="post" action="/zones/<?php out($zone->name, ESC_URL)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
-			<div id="updates" style="display:none">
+			<div id="updates" class="hide">
 				<h3>Updates</h3>
 				<ul id="updates_list">
 				</ul>

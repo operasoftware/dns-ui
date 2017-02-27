@@ -94,6 +94,7 @@ $(function() {
 		$('#new_comment').on('change', function() { validate_new(); });
 		$('#new_add').on('click', function() { add_new(); });
 		$('#filter').on('keyup', function() { filter_recordsets(this.value); });
+		$('#updates').hide().removeClass('hide');
 		$('#zonesubmit').closest('form').on('submit', function() { $(window).off('beforeunload'); });
 		paginate(max_rrsetnum);
 
