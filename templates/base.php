@@ -16,6 +16,7 @@
 ##
 $web_config = $this->get('web_config');
 header('X-Frame-Options: DENY');
+header("Content-Security-Policy: default-src 'self'");
 ?>
 <!DOCTYPE html>
 <meta charset="utf-8"/>
