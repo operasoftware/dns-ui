@@ -24,7 +24,7 @@ $limit = 2500;
 <?php if(count($modifications['add']) == 0 && count($modifications['update']) == 0 && count($modifications['delete']) == 0) { ?>
 <p>No changes have been made! <a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">Go back</a>.</p>
 <?php } else { ?>
-<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zoneedit">
+<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<?php if(count($modifications['add']) > 0) { ?>
 	<h2>New resource recordsets</h2>
