@@ -382,11 +382,6 @@ class Zone extends Record {
 			$changeset->add_change($change);
 		}
 		$this->send_missing_reverse_zones_warning($revs_missing);
-		// Update serial for every reverse zone updated as a consequence of changes to this zone
-		// We wouldn't need to do this if not for https://github.com/PowerDNS/pdns/issues/3654
-		foreach($revs_updated as $rev) {
-			$rev->commit_changes();
-		}
 		// Create git commit for this change, including all affected reverse zones
 		$git_commit_comment = "Zone {$this->name} edited via DNS UI\n";
 		if(count($revs_updated) > 0) {
