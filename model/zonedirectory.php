@@ -139,18 +139,6 @@ class ZoneDirectory extends DBDirectory {
 		return $zones_by_pdns_id;
 	}
 
-	public function get_zone_by_pdns_id($pdns_id) {
-		$stmt = $this->database->prepare('SELECT * FROM zone WHERE pdns_id = ?');
-		$stmt->bindParam(1, $pdns_id, PDO::PARAM_STR);
-		$stmt->execute();
-		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			$zone = new Zone($row['id'], $row);
-		} else {
-			throw new ZoneNotFound;
-		}
-		return $zone;
-	}
-
 	public function get_zone_by_name($name) {
 		$stmt = $this->database->prepare('SELECT * FROM zone WHERE name = ?');
 		$stmt->bindParam(1, $name, PDO::PARAM_STR);
