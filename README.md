@@ -15,6 +15,18 @@ Features
 * Keeps a changelog of all DNS changes done through it.
 * (Optionally) export all zones as bind-format zone files and store changes in git.
 
+Demo
+----
+
+You can view the DNS UI in action on the [demonstration server](https://dnsui.xiven.com/).
+
+Use one of the following sets of username / password credentials to log in:
+
+* testuser / testuser - normal user with admin access granted to a few domains
+* testadmin / testadmin - admin user
+
+All data on this demonstration server is reset nightly at 00:00 UTC.
+
 Compatibility
 -------------
 
@@ -25,7 +37,7 @@ PowerDNS 4.1 has not been released yet. You can use a build from master as long 
    https://github.com/PowerDNS/pdns/commit/b43f590376732a4351dfe77458470c4b88cb41a9
 
 As another alternative, you can use PowerDNS 3 with
-[Opera DNS UI v0.1](https://github.com/operasoftware/dns-ui/releases/tag/v0.1).
+[Opera DNS UI v0.1.2](https://github.com/operasoftware/dns-ui/releases/tag/v0.1.2).
 
 Requirements
 ------------
