@@ -96,7 +96,10 @@ They will also be able to grant access under "User access" for any zone to any n
 Screenshots
 -----------
 
-![Edit multiple records in one batch](public_html/screenshot-zoneedit.png)
+### Editing multiple records in one batch
+![Editing multiple records in one batch](public_html/screenshot-zoneedit.png)
+
+### Comprehensive changelog of all changes
 ![Comprehensive changelog of all changes](public_html/screenshot-changelog.png)
 
 License
