@@ -93,6 +93,12 @@ Usage
 Anyone in the LDAP group defined under `admin_group_cn` in `config/config.ini` will be able to add and modify all zones.
 They will also be able to grant access under "User access" for any zone to any number of users.
 
+Screenshots
+-----------
+
+![Edit multiple records in one batch](public_html/screenshot-zoneedit.png)
+![Comprehensive changelog of all changes](public_html/screenshot-changelog.png)
+
 License
 -------
 
