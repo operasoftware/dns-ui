@@ -71,6 +71,7 @@ CREATE TABLE config (
     default_ns_template integer
 );
 ALTER TABLE ONLY config ADD CONSTRAINT config_pkey PRIMARY KEY (id);
+INSERT INTO "config" (id) VALUES (1);
 
 
 CREATE TABLE ns_template (
