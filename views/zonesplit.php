@@ -118,7 +118,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 $page = new PageSection('base');
 $page->set('title', 'Split preview for '.$zone->name);
 $page->set('content', $content);
-$page->set('alerts', $active_user->list_alerts());
+$page->set('alerts', $active_user->pop_alerts());
 
 echo $page->generate();
 

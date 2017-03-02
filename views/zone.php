@@ -235,6 +235,6 @@ if(!isset($content)) {
 $page = new PageSection('base');
 $page->set('title', DNSZoneName::unqualify(punycode_to_utf8($zone->name)));
 $page->set('content', $content);
-$page->set('alerts', $active_user->list_alerts());
+$page->set('alerts', $active_user->pop_alerts());
 
 echo $page->generate();

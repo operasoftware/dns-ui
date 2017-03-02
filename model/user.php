@@ -53,7 +53,7 @@ class User extends Record {
 	* List all alerts for this user *and* delete them.
 	* @return array of UserAlert objects
 	*/
-	public function list_alerts() {
+	public function pop_alerts() {
 		if(is_null($this->id)) throw new BadMethodCallException('User must be in directory before alerts can be listed');
 		$stmt = $this->database->prepare('SELECT * FROM user_alert WHERE user_id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);

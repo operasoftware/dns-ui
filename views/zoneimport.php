@@ -47,7 +47,7 @@ if(isset($_FILES['zonefile'])) {
 $page = new PageSection('base');
 $page->set('title', 'Import preview for '.DNSZoneName::unqualify(punycode_to_utf8($zone->name)).' zone update');
 $page->set('content', $content);
-$page->set('alerts', $active_user->list_alerts());
+$page->set('alerts', $active_user->pop_alerts());
 
 echo $page->generate();
 

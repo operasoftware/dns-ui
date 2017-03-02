@@ -65,6 +65,6 @@ $content->set('template', $template);
 $page = new PageSection('base');
 $page->set('title', strtoupper($type).' template: '.$name);
 $page->set('content', $content);
-$page->set('alerts', $active_user->list_alerts());
+$page->set('alerts', $active_user->pop_alerts());
 
 echo $page->generate();

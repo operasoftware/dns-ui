@@ -42,6 +42,6 @@ $content->set('changesets', $visible_changesets);
 $page = new PageSection('base');
 $page->set('title', $user->name);
 $page->set('content', $content);
-$page->set('alerts', $active_user->list_alerts());
+$page->set('alerts', $active_user->pop_alerts());
 
 echo $page->generate();
