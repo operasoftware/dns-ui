@@ -15,5 +15,8 @@
 ## limitations under the License.
 ##
 
+/**
+* Abstract class that represents a template of settings.
+*/
 abstract class Template extends Record {
 }

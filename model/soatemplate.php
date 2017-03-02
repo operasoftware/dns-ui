@@ -15,6 +15,12 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents a template of settings for a domain's SOA record.
+*/
 class SOATemplate extends Template {
+	/**
+	* Defines the database table that this object is stored in
+	*/
 	protected $table = 'soa_template';
 }

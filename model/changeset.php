@@ -15,9 +15,19 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents a set of changes that have been made to a zone.
+*/
 class ChangeSet extends Record {
-	private $changes;
+	/**
+	* Defines the database table that this object is stored in
+	*/
+	protected $table = 'changeset';
 
+	/**
+	* Add an individual change to this changeset
+	* @param Change $change to add
+	*/
 	public function add_change(Change $change) {
 		global $active_user;
 		$before = $change->before;
@@ -37,6 +47,10 @@ class ChangeSet extends Record {
 		$stmt->execute();
 	}
 
+	/**
+	* List all changes in this changeset
+	* @return array of Change objects
+	*/
 	public function list_changes() {
 		$stmt = $this->database->prepare('SELECT * FROM "change" WHERE changeset_id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);

@@ -15,6 +15,12 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents a set of changes that have been requested for a zone.
+*/
 class PendingUpdate extends Record {
+	/**
+	* Defines the database table that this object is stored in
+	*/
 	protected $table = 'pending_update';
 }

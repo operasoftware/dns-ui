@@ -15,5 +15,12 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents a change that has been made to a zone.
+*/
 class Change extends Record {
+	/**
+	* Defines the database table that this object is stored in
+	*/
+	protected $table = 'change';
 }

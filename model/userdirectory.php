@@ -15,8 +15,17 @@
 ## limitations under the License.
 ##
 
+/**
+* Class for reading/writing to the list of User objects in the database.
+*/
 class UserDirectory extends DBDirectory {
+	/**
+	* LDAP connection object
+	*/
 	private $ldap;
+	/**
+	* Avoid making multiple LDAP lookups on the same person by caching their details here
+	*/
 	private $cache_uid;
 
 	public function __construct() {
@@ -26,6 +35,10 @@ class UserDirectory extends DBDirectory {
 		$this->cache_uid = array();
 	}
 
+	/**
+	* Create the new user in the database.
+	* @param User $user object to add
+	*/
 	public function add_user(User $user) {
 		$stmt = $this->database->prepare('INSERT INTO "user" (uid, name, email, active, admin, auth_realm) VALUES (?, ?, ?, ?, ?, ?)');
 		$stmt->bindParam(1, $user->uid, PDO::PARAM_INT);
@@ -38,6 +51,12 @@ class UserDirectory extends DBDirectory {
 		$user->id = $this->database->lastInsertId('user_id_seq');
 	}
 
+	/**
+	* Get a user from the database by its ID.
+	* @param int $id of user
+	* @return User with specified ID
+	* @throws UserNotFoundException if no user with that ID exists
+	*/
 	public function get_user_by_id($id) {
 		$stmt = $this->database->prepare('SELECT * FROM "user" WHERE id = ?');
 		$stmt->bindParam(1, $id, PDO::PARAM_INT);
@@ -50,6 +69,13 @@ class UserDirectory extends DBDirectory {
 		return $user;
 	}
 
+	/**
+	* Get a user from the database by its uid. If it does not exist in the database, retrieve it
+	* from LDAP and store in the database.
+	* @param string $uid of user
+	* @return User with specified uid
+	* @throws UserNotFoundException if no user with that uid exists
+	*/
 	public function get_user_by_uid($uid) {
 		if(isset($this->cache_uid[$uid])) {
 			return $this->cache_uid[$uid];
@@ -70,6 +96,12 @@ class UserDirectory extends DBDirectory {
 		return $user;
 	}
 
+	/**
+	* List all users in the database.
+	* @param array $include list of extra data to include in response - currently unused
+	* @param array $filter list of field/value pairs to filter results on
+	* @return array of User objects
+	*/
 	public function list_users($include = array(), $filter = array()) {
 		// WARNING: The search query is not parameterized - be sure to properly escape all input
 		$fields = array('"user".*');

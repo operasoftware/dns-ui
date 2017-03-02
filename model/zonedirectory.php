@@ -15,8 +15,17 @@
 ## limitations under the License.
 ##
 
+/**
+* Class for reading/writing to the list of Zone objects in the database.
+*/
 class ZoneDirectory extends DBDirectory {
+	/**
+	* PowerDNS communication object
+	*/
 	private $powerdns;
+	/**
+	* Cache of zone data returned from PowerDNS
+	*/
 	private $powerdns_zones = null;
 
 	public function __construct() {
@@ -26,6 +35,10 @@ class ZoneDirectory extends DBDirectory {
 		$this->cache_uid = array();
 	}
 
+	/**
+	* Add a zone to the database.
+	* @param Zone $zone to be added
+	*/
 	public function add_zone(Zone $zone) {
 		$stmt = $this->database->prepare('INSERT INTO zone (pdns_id, name, serial, account) VALUES (?, ?, ?, ?)');
 		$stmt->bindParam(1, $zone->pdns_id, PDO::PARAM_STR);
@@ -36,6 +49,10 @@ class ZoneDirectory extends DBDirectory {
 		$zone->id = $this->database->lastInsertId('zone_id_seq');
 	}
 
+	/**
+	* Create a new zone in PowerDNS and add to the database.
+	* @param Zone $zone to be created
+	*/
 	public function create_zone($zone) {
 		$data = new StdClass;
 		$data->name = $zone->name;
@@ -77,6 +94,10 @@ class ZoneDirectory extends DBDirectory {
 		syslog_report(LOG_INFO, "zone={$zone->name};object=zone;action=add;status=succeeded");
 	}
 
+	/**
+	* List all zones in PowerDNS and update list in database to match.
+	* @return array of Zone objects indexed by pdns_id
+	*/
 	public function list_zones() {
 		$this->database->query('BEGIN WORK');
 		$this->database->query('LOCK TABLE zone');
@@ -139,6 +160,12 @@ class ZoneDirectory extends DBDirectory {
 		return $zones_by_pdns_id;
 	}
 
+	/**
+	* Fetch the zone matching the specific name.
+	* @param string $name of zone to fetch
+	* @return Zone object
+	* @throws ZoneNotFound if no zone exists with that name in the database
+	*/
 	public function get_zone_by_name($name) {
 		$stmt = $this->database->prepare('SELECT * FROM zone WHERE name = ?');
 		$stmt->bindParam(1, $name, PDO::PARAM_STR);
@@ -151,6 +178,10 @@ class ZoneDirectory extends DBDirectory {
 		return $zone;
 	}
 
+	/**
+	* Fetch the list of values for the "account" metadata field across all zones.
+	* @return array of string values
+	*/
 	public function list_accounts() {
 		$stmt = $this->database->prepare('SELECT DISTINCT(account) AS account FROM zone ORDER BY account');
 		$stmt->execute();
@@ -161,6 +192,13 @@ class ZoneDirectory extends DBDirectory {
 		return $accounts;
 	}
 
+	/**
+	* Check the list of zones to see if a suitable reverse zone exists for the forward record.
+	* @param string $type of DNS record
+	* @param string $address that DNS record points to
+	* @param array $revs_missing keep track of reverse zones that are missing
+	* @param array $revs_updated keep track of reverse zones that will be updated
+	*/
 	public function check_reverse_record_zone($type, $address, &$revs_missing, &$revs_notify) {
 		global $zone_dir, $active_user;
 
@@ -203,6 +241,11 @@ class ZoneDirectory extends DBDirectory {
 		return false;
 	}
 
+	/**
+	* Given a DNS name, remove the bottom-level subdomain from it.
+	* @param string $address DNS name
+	* @return bool true if any subdomain could be removed
+	*/
 	private function remove_subdomain(&$address) {
 		$dotpos = strpos($address, '.');
 		if($dotpos === false) return false;
@@ -210,6 +253,11 @@ class ZoneDirectory extends DBDirectory {
 		return true;
 	}
 
+	/**
+	* Export the listed zones to bind9 and add/commit to the git-tracked export
+	* @param array $zones to be exported and committed
+	* @param string $message commit message
+	*/
 	public function git_tracked_export(array $zones, $message) {
 		global $config, $active_user;
 		if($config['git_tracked_export']['enabled']) {

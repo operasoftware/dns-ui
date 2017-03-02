@@ -15,18 +15,39 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents a recordset comment within a zone.
+* Not stored in the local database.
+*/
 class Comment {
+	/**
+	* Store object-related data
+	*/
 	private $data;
 
+	/**
+	* Create the object based on data from PowerDNS (if provided).
+	* @param StdClass|null $data from PowerDNS
+	*/
 	public function __construct($data = null) {
 		if(is_null($data)) $data = new StdClass;
 		$this->data = $data;
 	}
 
+	/**
+	* Magic setter method - store data in local data object.
+	* @param string $field to update
+	* @param mixed $value to store in field
+	*/
 	public function __set($field, $value) {
 		$this->data->{$field} = $value;
 	}
 
+	/**
+	* Magic getter method - retrieve data from local data object.
+	* @param string $field to retrieve
+	* @return mixed data stored in field
+	*/
 	public function __get($field) {
 		if(isset($this->data->{$field})) return $this->data->{$field};
 		return null;

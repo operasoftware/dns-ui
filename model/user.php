@@ -15,10 +15,18 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents a user of this system.
+*/
 class User extends Record {
+	/**
+	* Defines the database table that this object is stored in
+	*/
 	protected $table = 'user';
+	/**
+	* LDAP connection object
+	*/
 	private $ldap;
-	private $group_cache = null;
 
 	public function __construct($id = null, $preload_data = array()) {
 		parent::__construct($id, $preload_data);
@@ -26,6 +34,10 @@ class User extends Record {
 		$this->ldap = $ldap;
 	}
 
+	/**
+	* Add an alert to be displayed to this user on their next normal page load.
+	* @param UserAlert $alert to be displayed
+	*/
 	public function add_alert(UserAlert $alert) {
 		if(is_null($this->id)) throw new BadMethodCallException('User must be in directory before alerts can be added');
 		$stmt = $this->database->prepare('INSERT INTO user_alert (user_id, class, content, escaping) VALUES (?, ?, ?, ?)');
@@ -37,6 +49,10 @@ class User extends Record {
 		$alert->id = $this->database->lastInsertId('user_alert_id_seq');
 	}
 
+	/**
+	* List all alerts for this user *and* delete them.
+	* @return array of UserAlert objects
+	*/
 	public function list_alerts() {
 		if(is_null($this->id)) throw new BadMethodCallException('User must be in directory before alerts can be listed');
 		$stmt = $this->database->prepare('SELECT * FROM user_alert WHERE user_id = ?');
@@ -54,10 +70,19 @@ class User extends Record {
 		return $alerts;
 	}
 
+	/**
+	* Return HTML containing this user's CSRF token for inclusion in a POST form.
+	* Also includes a random string of the same length to help guard against http://breachattack.com/
+	* @return string HTML
+	*/
 	public function get_csrf_field() {
 		return '<input type="hidden" name="csrf_token" value="'.hesc($this->get_csrf_token()).'"><!-- '.hash("sha512", mt_rand(0, mt_getrandmax())).' -->'."\n";
 	}
 
+	/**
+	* Return this user's CSRF token. Generate one if they do not yet have one.
+	* @return string CSRF token
+	*/
 	public function get_csrf_token() {
 		if(is_null($this->id)) throw new BadMethodCallException('User must be in directory before CSRF token can be generated');
 		if(!isset($this->data['csrf_token'])) {
@@ -67,10 +92,18 @@ class User extends Record {
 		return $this->data['csrf_token'];
 	}
 
+	/**
+	* Check the given string against this user's CSRF token.
+	* @return bool true on string match
+	*/
 	public function check_csrf_token($token) {
 		return $token === $this->get_csrf_token();
 	}
 
+	/**
+	* Retrieve this user's details from LDAP.
+	* @throws UserNotFoundException if the user is not found in LDAP
+	*/
 	public function get_details_from_ldap() {
 		global $config;
 		$attributes = array();
@@ -109,6 +142,11 @@ class User extends Record {
 		}
 	}
 
+	/**
+	* Return the access level of this user to the specified zone.
+	* @param Zone $zone to check for access
+	* @return string name of access level
+	*/
 	public function access_to(Zone $zone) {
 		$stmt = $this->database->prepare('SELECT level FROM zone_access WHERE user_id = ? AND zone_id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
@@ -121,6 +159,10 @@ class User extends Record {
 		}
 	}
 
+	/**
+	* List all zones that this user is an administrator of
+	* @return array of Zone objects
+	*/
 	public function list_admined_zones() {
 		global $zone_dir;
 		$zones = $zone_dir->list_zones();
@@ -131,6 +173,10 @@ class User extends Record {
 		return $admined_zones;
 	}
 
+	/**
+	* List all zones that this user has access to in some way
+	* @return array of Zone objects
+	*/
 	public function list_accessible_zones() {
 		global $zone_dir;
 		if($this->admin) {
@@ -141,6 +187,10 @@ class User extends Record {
 		return $zones;
 	}
 
+	/**
+	* List all changes that this user has made to any zones
+	* @return array of ChangeSet objects
+	*/
 	public function list_changesets() {
 		global $user_dir;
 		$stmt = $this->database->prepare('

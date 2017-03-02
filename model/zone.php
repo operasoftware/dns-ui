@@ -15,12 +15,33 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents a DNS zone.
+*/
 class Zone extends Record {
+	/**
+	* Defines the database table that this object is stored in
+	*/
 	protected $table = 'zone';
+	/**
+	* PowerDNS communication object
+	*/
 	private $powerdns;
+	/**
+	* List of resource record sets (RRsets) in the zone
+	*/
 	private $rrsets = null;
+	/**
+	* Details from the zone's SOA record
+	*/
 	private $soa = null;
+	/**
+	* A list of nameserver addresses for this zone
+	*/
 	private $nameservers = null;
+	/**
+	* List of changes to be applied to the zone when doing ->commit_changes()
+	*/
 	private $changes = array();
 
 	public function __construct($id = null, $preload_data = array()) {
@@ -29,6 +50,11 @@ class Zone extends Record {
 		$this->powerdns = $powerdns;
 	}
 
+	/**
+	* Magic getter method - if superior field requested, return User object of user's superior.
+	* @param string $field to retrieve
+	* @return mixed data stored in field
+	*/
 	public function &__get($field) {
 		switch($field) {
 		case 'soa':
@@ -42,6 +68,11 @@ class Zone extends Record {
 		}
 	}
 
+	/**
+	* Magic setter method - special handling of nameservers attribute.
+	* @param string $field to update
+	* @param mixed $value to store in field
+	*/
 	public function __set($field, $value) {
 		switch($field) {
 		case 'nameservers':
@@ -52,16 +83,29 @@ class Zone extends Record {
 		}
 	}
 
+	/**
+	* Add a resource record set (RRset) to this zone
+	* @param ResourceRecordSet $rrset to add
+	*/
 	public function add_resource_record_set(ResourceRecordSet $rrset) {
 		$this->add_or_update_resource_record_set($rrset);
 		syslog_report(LOG_INFO, "zone={$this->name};object=rrset;action=add;name={$rrset->name}");
 	}
 
+	/**
+	* Update an existing resource record set (RRset) in this zone.
+	* @param ResourceRecordSet $rrset updated data
+	*/
 	public function update_resource_record_set(ResourceRecordSet $rrset) {
 		$this->add_or_update_resource_record_set($rrset);
 		syslog_report(LOG_INFO, "zone={$this->name};object=rrset;action=update;name={$rrset->name}");
 	}
 
+	/**
+	* Add or update a resource record set (RRset) in this zone.
+	* Generates the update to be sent to the PowerDNS API and stores it ready for sending.
+	* @param ResourceRecordSet $rrset data
+	*/
 	public function add_or_update_resource_record_set(ResourceRecordSet $rrset) {
 		$this->rrsets[$rrset->name.' '.$rrset->type] = $rrset;
 		$change = new StdClass;
@@ -92,6 +136,11 @@ class Zone extends Record {
 		$this->changes[] = $change;
 	}
 
+	/**
+	* Delete a resource record set (RRset) from this zone.
+	* Generates the update to be sent to the PowerDNS API and stores it ready for sending.
+	* @param ResourceRecordSet $rrset to be deleted
+	*/
 	public function delete_resource_record_set(ResourceRecordSet $rrset) {
 		unset($this->rrsets[$rrset->name.' '.$rrset->type]);
 		$change = new StdClass;
@@ -104,6 +153,10 @@ class Zone extends Record {
 		syslog_report(LOG_INFO, "zone={$this->name};object=rrset;action=delete;name={$rrset->name}");
 	}
 
+	/**
+	* Send all stored changes to the PowerDNS API.
+	* @throws ResourceRecordInvalid if update failed
+	*/
 	public function commit_changes() {
 		$patch = new StdClass;
 		$patch->rrsets = $this->changes;
@@ -118,10 +171,17 @@ class Zone extends Record {
 		syslog_report(LOG_INFO, "zone={$this->name};object=zone;action=update;status=succeeded");
 	}
 
+	/**
+	* Tell PowerDNS API to trigger a notify for this zone.
+	*/
 	public function send_notify() {
 		$this->powerdns->put('zones/'.urlencode($this->pdns_id).'/notify', '');
 	}
 
+	/**
+	* Tell PowerDNS API to update the "account" field for this zone and update local DB also.
+	* @param string $account new value
+	*/
 	public function update_account($account) {
 		$this->account = $account;
 		$update = new StdClass;
@@ -134,6 +194,12 @@ class Zone extends Record {
 		$stmt->execute();
 	}
 
+	/**
+	* List all resource record sets (RRsets) in this zone.
+	* Fetch and parse the data from the PowerDNS API if we do not yet have it.
+	* Also parse data from SOA RRset and store results in $this->soa.
+	* @return array of ResourceRecordSet objects
+	*/
 	public function &list_resource_record_sets() {
 		if(is_null($this->rrsets)) {
 			$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id));
@@ -192,6 +258,10 @@ class Zone extends Record {
 		return $this->rrsets;
 	}
 
+	/**
+	* Add a ChangeSet to the database for this zone.
+	* @param ChangeSet $changeset containing changes to be added
+	*/
 	public function add_changeset(ChangeSet $changeset) {
 		global $active_user;
 		$comment = $changeset->comment;
@@ -205,6 +275,10 @@ class Zone extends Record {
 		$changeset->id = $this->database->lastInsertId('changeset_id_seq');
 	}
 
+	/**
+	* List all ChangeSet objects associated with this zone.
+	* @return array of ChangeSet objects
+	*/
 	public function list_changesets() {
 		global $user_dir;
 		$stmt = $this->database->prepare('SELECT * FROM "changeset" WHERE zone_id = ? ORDER BY id DESC');
@@ -220,6 +294,11 @@ class Zone extends Record {
 		return $changesets;
 	}
 
+	/**
+	* Fetch a specific ChangeSet object for this zone by its ID.
+	* @param int $id of the ChangeSet
+	* @return ChangeSet matching the specified ID
+	*/
 	public function get_changeset_by_id($id) {
 		global $user_dir;
 		$stmt = $this->database->prepare('SELECT * FROM "changeset" WHERE zone_id = ? AND id = ?');
@@ -234,6 +313,10 @@ class Zone extends Record {
 		throw new ChangeSetNotFound;
 	}
 
+	/**
+	* Add an access rule for this zone, granting user access.
+	* @param ZoneAccess $access rule to add
+	*/
 	public function add_access(ZoneAccess $access) {
 		$stmt = $this->database->prepare('INSERT INTO zone_access (zone_id, user_id, level) VALUES (?, ?, ?)');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
@@ -247,6 +330,10 @@ class Zone extends Record {
 		}
 	}
 
+	/**
+	* Revoke a user's access to this zone.
+	* @param User $user to revoke access for
+	*/
 	public function delete_access(User $user) {
 		$stmt = $this->database->prepare('DELETE FROM zone_access WHERE zone_id = ? AND user_id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
@@ -254,6 +341,10 @@ class Zone extends Record {
 		$stmt->execute();
 	}
 
+	/**
+	* List all access rule applied to this zone.
+	* @return array of ZoneAccess objects
+	*/
 	public function list_access() {
 		$stmt = $this->database->prepare('SELECT user_id, level FROM zone_access WHERE zone_id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
@@ -268,6 +359,10 @@ class Zone extends Record {
 		return $access;
 	}
 
+	/**
+	* Export the entire zone in bind9 zone file format.
+	* @return string exported zone
+	*/
 	public function export_as_bind9_format() {
 		$this->rrsets = null;
 		$rrsets = $this->list_resource_record_sets();
@@ -295,6 +390,10 @@ class Zone extends Record {
 		return $output;
 	}
 
+	/**
+	* Add a requested (pending) update to this zone.
+	* @param string $update JSON-encoded update
+	*/
 	public function add_pending_update($update) {
 		global $active_user;
 		$stmt = $this->database->prepare('INSERT INTO pending_update (zone_id, author_id, request_date, raw_data) VALUES (?, ?, NOW(), ?)');
@@ -304,6 +403,10 @@ class Zone extends Record {
 		$stmt->execute();
 	}
 
+	/**
+	* Delete a requested (pending) update from this zone.
+	* @param PendingUpdate $update to delete
+	*/
 	public function delete_pending_update(PendingUpdate $update) {
 		$stmt = $this->database->prepare('DELETE FROM pending_update WHERE zone_id = ? AND id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
@@ -311,6 +414,11 @@ class Zone extends Record {
 		$stmt->execute();
 	}
 
+	/**
+	* Fetch a specific pending update for this zone by its ID.
+	* @param PendingUpdate $update to delete
+	* @throws PendingUpdateNotFound if no update exists with the specified ID
+	*/
 	public function get_pending_update_by_id($id) {
 		$stmt = $this->database->prepare('SELECT * FROM pending_update WHERE zone_id = ? AND id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
@@ -326,6 +434,10 @@ class Zone extends Record {
 		throw new PendingUpdateNotFound;
 	}
 
+	/**
+	* List all pending updates for this zone.
+	* @return array of PendingUpdate objects
+	*/
 	public function list_pending_updates() {
 		$stmt = $this->database->prepare('SELECT * FROM pending_update WHERE zone_id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
@@ -341,6 +453,10 @@ class Zone extends Record {
 		return $updates;
 	}
 
+	/**
+	* Given a JSON-encoded string with a list of changes to be made to a zone, process and perform those changes.
+	* @param string $update JSON-encoded list of changes
+	*/
 	public function process_bulk_json_rrset_update($update, $author = null) {
 		global $active_user, $config, $zone_dir;
 		$rrsets = $this->list_resource_record_sets();
@@ -400,6 +516,13 @@ class Zone extends Record {
 		$active_user->add_alert($alert);
 	}
 
+	/**
+	* Process an RRset update provided by the UI or API and add the relevant changes to this zone.
+	* @param StdClass $update changes to be made
+	* @param array $trash keep track of RRsets that should be deleted as the result of a rename
+	* @param array $revs_missing keep track of reverse zones that are missing
+	* @param array $revs_updated keep track of reverse zones that will be updated
+	*/
 	private function process_rrset_action($update, &$trash, &$revs_missing, &$revs_updated) {
 		global $active_user, $zone_dir;
 		if(!is_object($update)) throw new BadData('Malformed update.');
@@ -497,6 +620,11 @@ class Zone extends Record {
 		return $change;
 	}
 
+	/**
+	* Send emails to the configured report address notifying them of records that were modified
+	* where we are unable to auto-create a reverse entry due to missing reverse zones.
+	* @param array $revs_missing lists of A and AAAA records affected
+	*/
 	private function send_missing_reverse_zones_warning($revs_missing) {
 		global $config;
 		$revs_missing_count = count($revs_missing['A']) + count($revs_missing['AAAA']);
@@ -527,14 +655,41 @@ class Zone extends Record {
 }
 
 class SOA {
+	/**
+	* Entire text content of the SOA record
+	*/
 	public $content;
+	/**
+	* TTL of the SOA record
+	*/
 	public $ttl;
+	/**
+	* 1st field in the SOA Record - primary nameserver
+	*/
 	public $primary_ns;
+	/**
+	* 2nd field in the SOA Record - contact address
+	*/
 	public $contact;
+	/**
+	* 3rd field in the SOA Record - zone serial
+	*/
 	public $serial;
+	/**
+	* 4th field in the SOA Record - refresh interval
+	*/
 	public $refresh;
+	/**
+	* 5th field in the SOA Record - retry interval
+	*/
 	public $retry;
+	/**
+	* 6th field in the SOA Record - expiry interval
+	*/
 	public $expiry;
+	/**
+	* 7th field in the SOA Record - default (NXDOMAIN) ttl
+	*/
 	public $default_ttl;
 }
 

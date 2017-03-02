@@ -15,7 +15,15 @@
 ## limitations under the License.
 ##
 
+/**
+* Class for reading/writing to the list of Template (SOATemplate & NSTemplate) objects in the database.
+* Actually stored in separate tables for each type.
+*/
 class TemplateDirectory extends DBDirectory {
+	/**
+	* Create the new template in the database.
+	* @param Template $template object to add
+	*/
 	public function add_template(Template $template) {
 		switch(get_class($template)) {
 		case 'SOATemplate':
@@ -41,6 +49,10 @@ class TemplateDirectory extends DBDirectory {
 		}
 	}
 
+	/**
+	* List all templates of type SOATemplate in the database.
+	* @return array of SOATemplate objects
+	*/
 	public function list_soa_templates() {
 		$stmt = $this->database->prepare('
 			SELECT soa_template.*, CASE WHEN config.id IS NULL THEN 0 ELSE 1 END AS default
@@ -56,6 +68,10 @@ class TemplateDirectory extends DBDirectory {
 		return $templates;
 	}
 
+	/**
+	* List all templates of type NSTemplate in the database.
+	* @return array of NSTemplate objects
+	*/
 	public function list_ns_templates() {
 		$stmt = $this->database->prepare('
 			SELECT ns_template.*, CASE WHEN config.id IS NULL THEN 0 ELSE 1 END AS default
@@ -71,14 +87,20 @@ class TemplateDirectory extends DBDirectory {
 		return $templates;
 	}
 
-	public function get_soa_template_by_id($name) {
+	/**
+	* Get an SOATemplate from the database by its id.
+	* @param string $id of template
+	* @return SOATemplate with specified id
+	* @throws TemplateNotFound if no SOATemplate with that id exists
+	*/
+	public function get_soa_template_by_id($id) {
 		$stmt = $this->database->prepare('
 			SELECT soa_template.*, CASE WHEN config.id IS NULL THEN 0 ELSE 1 END AS default
 			FROM soa_template
 			LEFT JOIN config ON config.default_soa_template = soa_template.id
 			WHERE soa_template.id = ?
 		');
-		$stmt->bindParam(1, $name, PDO::PARAM_INT);
+		$stmt->bindParam(1, $id, PDO::PARAM_INT);
 		$stmt->execute();
 		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			return new SOATemplate($row['id'], $row);
@@ -87,14 +109,20 @@ class TemplateDirectory extends DBDirectory {
 		}
 	}
 
-	public function get_ns_template_by_id($name) {
+	/**
+	* Get an NSTemplate from the database by its id.
+	* @param string $id of template
+	* @return NSTemplate with specified id
+	* @throws TemplateNotFound if no NSTemplate with that id exists
+	*/
+	public function get_ns_template_by_id($id) {
 		$stmt = $this->database->prepare('
 			SELECT ns_template.*, CASE WHEN config.id IS NULL THEN 0 ELSE 1 END AS default
 			FROM ns_template
 			LEFT JOIN config ON config.default_ns_template = ns_template.id
 			WHERE ns_template.id = ?
 		');
-		$stmt->bindParam(1, $name, PDO::PARAM_INT);
+		$stmt->bindParam(1, $id, PDO::PARAM_INT);
 		$stmt->execute();
 		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			return new NSTemplate($row['id'], $row);
@@ -103,6 +131,12 @@ class TemplateDirectory extends DBDirectory {
 		}
 	}
 
+	/**
+	* Get an SOATemplate from the database by its name.
+	* @param string $name of template
+	* @return SOATemplate with specified name
+	* @throws TemplateNotFound if no SOATemplate with that name exists
+	*/
 	public function get_soa_template_by_name($name) {
 		$stmt = $this->database->prepare('
 			SELECT soa_template.*, CASE WHEN config.id IS NULL THEN 0 ELSE 1 END AS default
@@ -119,6 +153,12 @@ class TemplateDirectory extends DBDirectory {
 		}
 	}
 
+	/**
+	* Get an NSTemplate from the database by its name.
+	* @param string $name of template
+	* @return NSTemplate with specified name
+	* @throws TemplateNotFound if no NSTemplate with that name exists
+	*/
 	public function get_ns_template_by_name($name) {
 		$stmt = $this->database->prepare('
 			SELECT ns_template.*, CASE WHEN config.id IS NULL THEN 0 ELSE 1 END AS default
@@ -135,6 +175,10 @@ class TemplateDirectory extends DBDirectory {
 		}
 	}
 
+	/**
+	* Set the provided template as the default for its type.
+	* @param Template $template to be set as default
+	*/
 	public function set_default_template(Template $template) {
 		switch(get_class($template)) {
 		case 'SOATemplate':
@@ -148,6 +192,10 @@ class TemplateDirectory extends DBDirectory {
 		$stmt->execute();
 	}
 
+	/**
+	* Delete the template from the database.
+	* @param Template $template to be deleted
+	*/
 	public function delete_template(Template $template) {
 		switch(get_class($template)) {
 		case 'SOATemplate':

@@ -15,6 +15,9 @@
 ## limitations under the License.
 ##
 
+/**
+* Class that represents an access rule granted a user access to a zone.
+*/
 class ZoneAccess extends Record {
 	protected $table = 'zone_access';
 }
