@@ -633,8 +633,8 @@ class Zone extends Record {
 			if(isset($config['email']['report_address'])) {
 				$mail = new Email;
 				$mail->add_recipient($config['email']['report_address'], $config['email']['report_name']);
-				$mail->subject = $revs_missing_count.' new DNS resource record'.($revs_missing_count == 1 ? '' : 's').' in '.punycode_to_utf8($this->name).' '.($revs_missing_count == 1 ? 'needs a reverse zone' : 'need reverse zones');
-				$mail->body = "The following records were added or updated in the ".punycode_to_utf8($this->name)." zone:\n\n";
+				$mail->subject = $revs_missing_count.' new DNS resource record'.($revs_missing_count == 1 ? '' : 's').' in '.DNSZoneName::unqualify(punycode_to_utf8($this->name)).' '.($revs_missing_count == 1 ? 'needs a reverse zone' : 'need reverse zones');
+				$mail->body = "The following records were added or updated in the ".DNSZoneName::unqualify(punycode_to_utf8($this->name))." zone:\n\n";
 				foreach($revs_missing['A'] as $rev_missing) {
 					$mail->body .= "    A: {$rev_missing}\n";
 				}
