@@ -122,7 +122,7 @@ class API {
 			$rrs_data->records = array();
 			foreach($rrset->list_resource_records() as $rr) {
 				$rr_data = new StdClass;
-				$rr_data->content = DNSContent::decode($rr->content, $rrset->type);
+				$rr_data->content = DNSContent::decode($rr->content, $rrset->type, $zone_name);
 				$rr_data->enabled = !$rr->disabled;
 				$rrs_data->records[] = $rr_data;
 			}
@@ -203,7 +203,7 @@ class API {
 					$rrs = $rrset->list_resource_records();
 					foreach($rrs as $rr) {
 						$rr_data = new StdClass;
-						$rr_data->content = DNSContent::decode($rr->content, $rr->type);
+						$rr_data->content = DNSContent::decode($rr->content, $rr->type, $zone_name);
 						$rr_data->enabled = !$rr->disabled;
 						$c_data->{$state}->rrs[] = $rr_data;
 					}

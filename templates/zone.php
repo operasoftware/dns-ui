@@ -52,7 +52,7 @@ global $output_formatter;
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="records">
 		<h2 class="sr-only">Resource records</h2>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zoneedit" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zoneedit" data-zone="<?php out(punycode_to_utf8($zone->name))?>" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<nav></nav>
 			<table class="table table-bordered table-condensed table-hover stickyHeader rrsets">
@@ -104,9 +104,25 @@ global $output_formatter;
 								}
 								out('>', ESC_NONE);
 							}
-							$rr->content = DNSContent::decode($rr->content, $rrset->type);
+							$rr->content = DNSContent::decode($rr->content, $rrset->type, $zone->name);
 							?>
-						<td class="content"><?php out($rr->content)?></td>
+						<td class="content"><?php
+							out($rr->content);
+							switch($rrset->type) {
+							case 'CNAME':
+							case 'DNAME':
+							case 'NS':
+							case 'PTR':
+							case 'MX':
+							case 'SRV':
+								if(substr($rr->content, -1) == '@') {
+									?><span class="zone-hint"><?php out("{$zone->name}");?></span><?php
+								} elseif(substr($rr->content, -1) != '.') {
+									?><span class="zone-hint"><?php out(".{$zone->name}");?></span><?php
+								}
+								break;
+							}
+						?></td>
 						<td class="enabled"><?php out($rr->disabled ? 'No' : 'Yes')?></td>
 						<td class="actions">
 							<button type="button" class="btn btn-default btn-xs delete-rr"><span class="glyphicon glyphicon-trash"></span> Delete</button>

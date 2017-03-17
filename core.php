@@ -247,7 +247,7 @@ class DNSTime {
 }
 
 class DNSContent {
-	public static function encode($content, $type) {
+	public static function encode($content, $type, $zonename) {
 		switch($type) {
 		case 'SOA':
 			$parts = preg_split('/\s/', $content);
@@ -260,13 +260,41 @@ class DNSContent {
 		case 'TXT':
 			$content = '"'.str_replace('"', '\\"', str_replace('\\', '\\\\', $content)).'"';
 			break;
+		case 'MX':
+			$parts = preg_split('/\s+/', $content, 2);
+			$content = $parts[0].' '.DNSName::canonify($parts[1], $zonename);
+			break;
+		case 'SRV':
+			$parts = preg_split('/\s+/', $content, 4);
+			$content = $parts[0].' '.$parts[1].' '.$parts[2].' '.DNSName::canonify($parts[3], $zonename);
+			break;
+		case 'CNAME':
+		case 'DNAME':
+		case 'NS':
+		case 'PTR':
+			$content = DNSName::canonify($content, $zonename);
+			break;
 		}
 		return $content;
 	}
-	public static function decode($content, $type) {
+	public static function decode($content, $type, $zonename) {
 		switch($type) {
 		case 'TXT':
 			$content = str_replace('\\\\', '\\', str_replace('\\"', '"', substr($content, 1, -1)));
+			break;
+		case 'MX':
+			$parts = preg_split('/\s+/', $content, 2);
+			$content = $parts[0].' '.DNSName::abbreviate($parts[1], $zonename);
+			break;
+		case 'SRV':
+			$parts = preg_split('/\s+/', $content, 4);
+			$content = $parts[0].' '.$parts[1].' '.$parts[2].' '.DNSName::abbreviate($parts[3], $zonename);
+			break;
+		case 'CNAME':
+		case 'DNAME':
+		case 'NS':
+		case 'PTR':
+			$content = DNSName::abbreviate($content, $zonename);
 			break;
 		}
 		return $content;
@@ -284,51 +312,8 @@ class DNSContent {
 			$out .= $spacer.str_pad(DNSTime::abbreviate($parts[6]), 11)."; default ttl\n";
 			$out .= $spacer.")\n";
 			return $out;
-		case 'MX':
-			$parts = preg_split('/\s+/', $content, 2);
-			$out = $parts[0].' '.DNSName::abbreviate($parts[1], $zonename);
-			return $out;
-		case 'SRV':
-			$parts = preg_split('/\s+/', $content, 4);
-			$out = $parts[0].' '.$parts[1].' '.$parts[2].' '.DNSName::abbreviate($parts[3], $zonename);
-			return $out;
-		case 'CNAME':
-		case 'DNAME':
-		case 'NS':
-		case 'PTR':
-			return DNSName::abbreviate($content, $zonename);
-		case 'A':
-		case 'AAAA':
-		case 'TXT':
 		default:
-			return $content;
-		}
-	}
-	public static function from_bind9($content, $type, $zonename) {
-		switch($type) {
-		case 'SOA':
-			$parts = preg_split('/\s+/', $content);
-			$spacer = str_repeat(' ', 45);
-			$out = DNSName::canonify($parts[0], $zonename).' '.$parts[1]." ".$parts[2]." ".DNSTime::expand($parts[3])." ".DNSTime::expand($parts[4])." ".DNSTime::expand($parts[5])." ".DNSTime::expand($parts[6]);
-			return $out;
-		case 'MX':
-			$parts = preg_split('/\s+/', $content, 2);
-			$out = $parts[0].' '.DNSName::canonify($parts[1], $zonename);
-			return $out;
-		case 'SRV':
-			$parts = preg_split('/\s+/', $content, 4);
-			$out = $parts[0].' '.$parts[1].' '.$parts[2].' '.DNSName::canonify($parts[3], $zonename);
-			return $out;
-		case 'CNAME':
-		case 'DNAME':
-		case 'NS':
-		case 'PTR':
-			return DNSName::canonify($content, $zonename);
-		case 'A':
-		case 'AAAA':
-		case 'TXT':
-		default:
-			return $content;
+			return DNSContent::encode($content, $type, $zonename);
 		}
 	}
 }
