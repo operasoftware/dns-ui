@@ -154,6 +154,7 @@ $(function() {
 
 		// Convert the table cell content into a text input
 		function inputify(element) {
+			$('span.zone-hint', element).remove();
 			var text = element.text();
 			var input = document.createElement('input');
 			input.type = 'text';
@@ -227,7 +228,7 @@ $(function() {
 						var span = document.createElement('span');
 						span.appendChild(document.createTextNode('Added new resource record, Content = '));
 						var em = document.createElement('em');
-						$(em).text(content);
+						display_value(em, content, 'content', update.type);
 						span.appendChild(em);
 						span.appendChild(document.createTextNode(', Enabled = '));
 						var em = document.createElement('em');
@@ -281,13 +282,12 @@ $(function() {
 							var span = document.createElement('span');
 							$(span).text(ucname + ' changed from ');
 							var em = document.createElement('em');
-							$(em).text($(this).parent().data('oldvalue') || '""');
+							display_value(em, $(this).parent().data('oldvalue'), this.parentNode.className, update.type);
 							span.appendChild(em);
 							span.appendChild(document.createTextNode(' to '));
 							var em = document.createElement('em');
-							$(em).text($(this).val() || '""');
+							display_value(em, $(this).val(), this.parentNode.className, update.type);
 							span.appendChild(em);
-							span.appendChild(document.createTextNode('.'));
 							rrspan.appendChild(span);
 						}
 						switch(this.parentNode.className) {
@@ -439,6 +439,36 @@ $(function() {
 			} else {
 				$('#updates').show(200);
 				$(window).on('beforeunload', function() { return 'You have unsaved changes.'; });
+			}
+		}
+
+		/*
+		* Display the specified value inside the provided element. Show "" if the value is empty.
+		* Do some special processing for some cases.
+		*/
+		function display_value(element, value, value_type, record_type) {
+			$(element).text(value || '""');
+			if(value_type == 'content') {
+				switch(record_type) {
+				case 'CNAME':
+				case 'DNAME':
+				case 'NS':
+				case 'PTR':
+				case 'MX':
+				case 'SRV':
+					// Make it clear that without a trailing . we will automatically append
+					// the domain name to the content for these record types
+					if(value.endsWith('@')) {
+						var strong = document.createElement('strong');
+						$(strong).text(form.data('zone')).addClass('zone-hint');
+						element.appendChild(strong);
+					} else if(!value.endsWith('.')) {
+						var strong = document.createElement('strong');
+						$(strong).text('.' + form.data('zone')).addClass('zone-hint');
+						element.appendChild(strong);
+					}
+					break;
+				}
 			}
 		}
 

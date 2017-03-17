@@ -187,6 +187,13 @@ del {
 .nowrap {
 	white-space: nowrap;
 }
+.zone-hint {
+	color: #bbb;
+}
+td:hover .zone-hint {
+	color: #999;
+}
+
 div.stickyHeader {
 	position: fixed;
 	top: 51px;

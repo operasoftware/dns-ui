@@ -195,7 +195,7 @@ function import_bind9_zonefile($zone, $lines, $comment_handling) {
 				$ttl = DNSTime::expand($record->ttl);
 				$type = $record->type;
 				try {
-					$content = DNSContent::encode(DNSContent::from_bind9($record->content, $type, $zone->name), $type);
+					$content = DNSContent::encode($record->content, $type, $zone->name);
 				} catch(ErrorException $e) {
 					if($disabled) {
 						// We tried to parse something that looked like a commented-out record, but it was probably just a comment
@@ -414,7 +414,7 @@ function build_json($action, $rrset, $zonename) {
 		$data->records = array();
 		foreach($rrset->list_resource_records() as $rr) {
 			$rr_data = new StdClass;
-			$rr_data->content = DNSContent::decode($rr->content, $rrset->type);
+			$rr_data->content = DNSContent::decode($rr->content, $rrset->type, $zonename);
 			$rr_data->enabled = $rr->disabled ? 'No' : 'Yes';
 			$data->records[] = $rr_data;
 		}

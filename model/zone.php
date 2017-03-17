@@ -549,10 +549,8 @@ class Zone extends Record {
 			$trash[$update->name.' '.$update->type] = false;
 			foreach($update->records as $record) {
 				if(!(isset($record->content) && isset($record->enabled))) throw new BadData('Malformed record.');
-				$record->content = DNSContent::encode($record->content, $update->type);
+				$record->content = DNSContent::encode($record->content, $update->type, $this->name);
 				$rr = new ResourceRecord;
-				$rr->name = $update->name;
-				$rr->type = $update->type;
 				$rr->content = $record->content;
 				$rr->disabled = ($record->enabled === 'No' || $record->enabled === false);
 				$rr->{'set-ptr'} = $rr->disabled ? false : $zone_dir->check_reverse_record_zone($rr->type, $rr->content, $revs_missing, $revs_updated);
@@ -586,10 +584,8 @@ class Zone extends Record {
 			foreach($update->records as $record) {
 				if(!empty($record->delete)) continue;
 				$record_count++;
-				$record->content = DNSContent::encode($record->content, $update->type);
+				$record->content = DNSContent::encode($record->content, $update->type, $this->name);
 				$rr = new ResourceRecord;
-				$rr->name = $update->name;
-				$rr->type = $update->type;
 				$rr->content = $record->content;
 				$rr->disabled = ($record->enabled === 'No' || $record->enabled === false);
 				$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rr->type, $rr->content, $revs_missing, $revs_updated);

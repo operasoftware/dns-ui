@@ -70,7 +70,7 @@ $cname_error = $this->get('cname_error');
 						}
 						out('>', ESC_NONE);
 					}
-					$rr->content = DNSContent::decode($rr->content, $rrset->type);
+					$rr->content = DNSContent::decode($rr->content, $rrset->type, $zone->name);
 					?>
 				<td><?php out(DNSTime::abbreviate($rr->ttl))?></td>
 				<td><?php out($rr->content)?></td>
