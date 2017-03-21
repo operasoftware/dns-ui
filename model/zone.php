@@ -214,7 +214,7 @@ class Zone extends Record {
 					if($aname == $bname) {
 						if($a->type == 'NS' && $b->type != 'NS') return -1;
 						if($b->type == 'NS' && $a->type != 'NS') return 1;
-						return 0;
+						return strcasecmp($a->type, $b->type);
 					} else {
 						return strnatcasecmp($aname, $bname);
 					}
