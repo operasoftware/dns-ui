@@ -246,14 +246,13 @@ global $output_formatter;
 						<p class="alert alert-danger"><?php out($action->problem)?></p>
 						<?php } ?>
 						<?php if($action->action == 'add') { ?>
-						<h4>Add RRSet: <tt><?php out($action->name.' '.$action->type)?></tt></h4>
+						<h4>Add RRSet: <tt><?php out($action->name.' '.$action->type.', TTL: '.$action->ttl)?></tt></h4>
 						<?php } else { ?>
-						<h4>Update RRSet: <tt><?php show_diff($action->oldname.' '.$action->oldtype, $action->name.' '.$action->type)?></tt></h4>
+						<h4>Update RRSet: <tt><?php show_diff($action->oldname.' '.$action->oldtype, $action->name.' '.$action->type.', TTL: '.$action->ttl)?></tt></h4>
 						<?php } ?>
 						<table class="table table-condensed">
 							<thead>
 								<tr>
-									<th>TTL</th>
 									<th>Content</th>
 									<th>Enabled</th>
 								</tr>
@@ -272,7 +271,6 @@ global $output_formatter;
 									if($rr_match && !isset($new_record->delete)) {
 										?>
 										<tr>
-											<td><?php show_diff(DNSTime::abbreviate($record->ttl), $new_record->ttl)?></td>
 											<td><?php out($record->content)?></td>
 											<td><?php show_diff($record->disabled ? 'No' : 'Yes', $new_record->enabled)?></td>
 										</tr>
@@ -280,7 +278,6 @@ global $output_formatter;
 									} else {
 										?>
 										<tr>
-											<td><del><?php out($record->ttl)?></del></td>
 											<td><del><?php out($record->content)?></del></td>
 											<td><del><?php out($record->disabled ? 'No' : 'Yes')?></del></td>
 										</tr>
@@ -291,13 +288,11 @@ global $output_formatter;
 								<?php foreach($action->records as $record) { ?>
 								<?php if(isset($record->delete)) { ?>
 								<tr>
-									<td><del><?php out($record->ttl)?></del></td>
 									<td><del><?php out($record->content)?></del></td>
 									<td><del><?php out($record->enabled)?></del></td>
 								</tr>
 								<?php } else { ?>
 								<tr>
-									<td><ins><?php out($record->ttl)?></ins></td>
 									<td><ins><?php out($record->content)?></ins></td>
 									<td><ins><?php out($record->enabled)?></ins></td>
 								</tr>
