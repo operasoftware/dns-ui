@@ -95,7 +95,8 @@ $(function() {
 		$('#new_add').on('click', function() { add_new(); });
 		$('#filter').on('keyup', function() { filter_recordsets(this.value); });
 		$('#updates').hide().removeClass('hide');
-		$('#zonesubmit').closest('form').on('submit', function() { $(window).off('beforeunload'); });
+		$('#zonesubmit[type="submit"]').closest('form').on('submit', function() { $(window).off('beforeunload'); });
+		$('#zonesubmit[type="button"]').on('click', function(e) { submit_zone_update(e); });
 		paginate(max_rrsetnum);
 
 		// Mark the row as deleted
@@ -574,6 +575,33 @@ $(function() {
 			$('#new_comment').val('');
 
 			$('#new_name').focus();
+		}
+
+		function submit_zone_update(event) {
+			$('#errors').empty();
+			var actions = [];
+			$('input[name="updates[]"]', $(event.target).closest('form')).each(function() {
+				actions.push(JSON.parse(this.value));
+			})
+			$.ajax({
+				url: "/api/v2/zones/" + encodeURIComponent(form.data('zone')),
+				method: "PATCH",
+				data: JSON.stringify({actions: actions, comment: $('#comment').val()}),
+				contentType: "application/json",
+				dataType: "json"
+			}).done(function() {
+				$(window).off('beforeunload');
+				window.location.href = window.location.pathname;
+			}).fail(function(response) {
+				data = JSON.parse(response.responseText);
+				for(var i = 0, error; error = data.errors[i]; i++) {
+					$('#errors').append(
+						$('<div>').addClass('alert').addClass('alert-danger').append(
+							$('<strong>').text(error.userMessage + ': ')
+						).append(error.internalMessage)
+					);
+				}
+			});
 		}
 
 		function paginate(total) {
