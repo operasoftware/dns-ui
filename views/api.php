@@ -145,6 +145,7 @@ class API {
 		if(!$active_user->admin && !$active_user->access_to($zone)) throw new AccessDenied;
 		$json = file_get_contents('php://input');
 		$zone->process_bulk_json_rrset_update($json);
+		$this->output(null);
 	}
 
 	public function zone_changes($zone_name) {

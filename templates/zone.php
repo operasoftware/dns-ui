@@ -192,8 +192,9 @@ global $output_formatter;
 				</ul>
 				<input type="hidden" name="serial" value="<?php out($zone->soa->serial)?>">
 				<div class="form-group"><label for="comment">Update comment</label><input type="text" id="comment" name="comment" class="form-control"></div>
+				<div id="errors"></div>
 				<?php if($active_user->admin || $active_user->access_to($zone) == 'administrator') { ?>
-				<p><button type="submit" id="zonesubmit" name="update_rrs" value="1" class="btn btn-primary">Save changes</button></p>
+				<p><button type="button" id="zonesubmit" name="update_rrs" value="1" class="btn btn-primary">Save changes</button></p>
 				<?php } else { ?>
 				<p><button type="submit" id="zonesubmit" name="update_rrs" value="1" class="btn btn-primary">Request changes</button></p>
 				<?php } ?>
