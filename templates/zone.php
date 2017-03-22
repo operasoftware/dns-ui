@@ -238,6 +238,7 @@ global $output_formatter;
 							if(isset($rrsets[$fullname.' '.$action->oldtype])) {
 								$current_rrset = $rrsets[$fullname.' '.$action->oldtype];
 								$current = $current_rrset->list_resource_records();
+								$current_ttl = DNSTime::abbreviate($current_rrset->ttl);
 								$current_comment = $current_rrset->merge_comment_text();
 							}
 						}
@@ -246,9 +247,9 @@ global $output_formatter;
 						<p class="alert alert-danger"><?php out($action->problem)?></p>
 						<?php } ?>
 						<?php if($action->action == 'add') { ?>
-						<h4>Add RRSet: <tt><?php out($action->name.' '.$action->type.', TTL: '.$action->ttl)?></tt></h4>
+						<h4>Add RRSet: <tt><?php out($action->name.' '.$action->type)?></tt>, TTL: <?php out($action->ttl)?></h4>
 						<?php } else { ?>
-						<h4>Update RRSet: <tt><?php show_diff($action->oldname.' '.$action->oldtype, $action->name.' '.$action->type.', TTL: '.$action->ttl)?></tt></h4>
+						<h4>Update RRSet: <tt><?php show_diff($action->oldname.' '.$action->oldtype, $action->name.' '.$action->type)?></tt>, TTL: <?php show_diff($current_ttl, $action->ttl)?></h4>
 						<?php } ?>
 						<table class="table table-condensed">
 							<thead>
