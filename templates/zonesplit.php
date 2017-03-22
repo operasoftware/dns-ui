@@ -57,6 +57,7 @@ $cname_error = $this->get('cname_error');
 				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(punycode_to_utf8($name))?></strong><span class="text-muted">.<?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?></span></td>
 				<td class="align-right nowrap" rowspan="<?php out(count($rrs))?>"><strong><?php out(punycode_to_utf8($newname))?></strong><span class="text-muted">.<?php out(punycode_to_utf8(DNSZoneName::unqualify($newzonename)))?></span></td>
 				<td rowspan="<?php out(count($rrs))?>"><?php out($rrset->type)?></td>
+				<td rowspan="<?php out(count($rrs))?>"><?php out(DNSTime::abbreviate($rrset->ttl))?></td>
 				<?php
 				$count = 0;
 				foreach($rrs as $rr) {
@@ -72,7 +73,6 @@ $cname_error = $this->get('cname_error');
 					}
 					$rr->content = DNSContent::decode($rr->content, $rrset->type);
 					?>
-				<td><?php out(DNSTime::abbreviate($rr->ttl))?></td>
 				<td><?php out($rr->content)?></td>
 				<td><?php out($rr->disabled ? 'No' : 'Yes')?></td>
 					<?php
