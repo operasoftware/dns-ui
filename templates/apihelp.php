@@ -37,19 +37,19 @@
 <h5>Response content</h5>
 <?php syntax_highlight('[
     {
-        "name": "1.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa",
+        "name": "1.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.",
         "serial": 2016021000
     },
     {
-        "name": "2.0.192.in-addr.arpa",
+        "name": "2.0.192.in-addr.arpa.",
         "serial": 2016022301
     },
     {
-        "name": "example.com",
+        "name": "example.com.",
         "serial": 2016020200
     },
     {
-        "name": "xn--n8j843nygt.com",
+        "name": "xn--n8j843nygt.com.",
         "serial": 2016032204
     }
 ]', 'javascript')?>
