@@ -41,7 +41,7 @@
         "serial": 2016021000
     },
     {
-        "name": "1.1.1.in-addr.arpa",
+        "name": "2.0.192.in-addr.arpa",
         "serial": 2016022301
     },
     {
@@ -63,10 +63,10 @@
 <h3 id="zones-name-get">GET /api/v2/zones/{name}</h3>
 <p>Returns all data regarding the named zone.</p>
 <h4>Example</h4>
-<pre>GET /api/v2/zones/example.com</pre>
+<pre>GET /api/v2/zones/example.com.</pre>
 <h5>Response content</h5>
 <?php syntax_highlight('{
-    "name": "example.com",
+    "name": "example.com.",
     "serial": 2016020200,
     "rrsets": [
         {
@@ -75,7 +75,7 @@
             "ttl": "1H",
             "records": [
                 {
-                    "content": "ns.example.net hostmaster.example.com 2016020200 28800 7200 604800 86400",
+                    "content": "ns.example.net. hostmaster.example.com. 2016020200 28800 7200 604800 86400",
                     "enabled": true
                 }
             ],
@@ -87,11 +87,11 @@
             "ttl": "1H",
             "records": [
                 {
-                    "content": "ns1.example.net",
+                    "content": "ns1.example.net.",
                     "enabled": true
                 },
                 {
-                    "content": "ns2.example.net",
+                    "content": "ns2.example.net.",
                     "enabled": true
                 }
             ],
@@ -103,7 +103,7 @@
             "ttl": "1H",
             "records": [
                 {
-                    "content": "1.1.1.1",
+                    "content": "192.0.2.1",
                     "enabled": true
                 }
             ],
@@ -143,7 +143,7 @@
 	<li><code>delete</code> - remove an existing resource recordset</li>
 </ul>
 <h4>Example</h4>
-<pre>PATCH /api/v2/zones/example.com</pre>
+<pre>PATCH /api/v2/zones/example.com.</pre>
 <h5>Request content</h5>
 <?php syntax_highlight('{
 	"actions": [
@@ -170,11 +170,11 @@
 			"comment": "Issue 1232",
 			"records": [
 				{
-					"content": "1.1.1.1",
+					"content": "192.0.2.1",
 					"enabled": true
 				},
 				{
-					"content": "1.1.1.2",
+					"content": "192.0.2.2",
 					"enabled": true
 				}
 			]
@@ -190,7 +190,7 @@
 <h3 id="zones-name-changes-get">GET /api/v2/zones/{name}/changes</h3>
 <p>Returns all changelog entries for the named zone.</p>
 <h4>Example</h4>
-<pre>GET /api/v2/zones/example.com/changes</pre>
+<pre>GET /api/v2/zones/example.com./changes</pre>
 <h5>Response content</h5>
 <?php syntax_highlight('[
     {
@@ -213,7 +213,7 @@
 <h3 id="zones-name-changes-id-get">GET /api/v2/zones/{name}/changes/{id}</h3>
 <p>Returns full change information for a specific changeset within the named zone.</p>
 <h4>Example</h4>
-<pre>GET /api/v2/zones/example.com/changes/207</pre>
+<pre>GET /api/v2/zones/example.com./changes/207</pre>
 <h5>Response content</h5>
 <?php syntax_highlight('{
     "id": 207,
@@ -225,24 +225,24 @@
     "changes": [
         {
             "before": {
-                "name": "record3.example.com",
+                "name": "record3.example.com.",
                 "type": "A",
                 "ttl": "1H",
                 "rrs": [
                     {
-                        "content": "1.1.1.1",
+                        "content": "192.0.2.1",
                         "enabled": true
                     }
                 ],
                 "comment": "API test"
             },
             "after": {
-                "name": "record3.example.com",
+                "name": "record3.example.com.",
                 "type": "A",
                 "ttl": "1H",
                 "rrs": [
                     {
-                        "content": "1.1.1.1",
+                        "content": "192.0.2.1",
                         "enabled": false
                     }
                 ],
