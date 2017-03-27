@@ -95,8 +95,7 @@ $(function() {
 		$('#new_add').on('click', function() { add_new(); });
 		$('#filter').on('keyup', function() { filter_recordsets(this.value); });
 		$('#updates').hide().removeClass('hide');
-		$('#zonesubmit[type="submit"]').closest('form').on('submit', function() { $(window).off('beforeunload'); });
-		$('#zonesubmit[type="button"]').on('click', function(e) { submit_zone_update(e); });
+		$('#zonesubmit').on('click', function(e) { submit_zone_update(e); });
 		paginate(max_rrsetnum);
 
 		// Mark the row as deleted
@@ -578,6 +577,10 @@ $(function() {
 		}
 
 		function submit_zone_update(event) {
+			if($(event.target).val() == 'request') {
+				$(window).off('beforeunload');
+				return;
+			}
 			$('#errors').empty();
 			var actions = [];
 			$('input[name="updates[]"]', $(event.target).closest('form')).each(function() {
@@ -602,6 +605,7 @@ $(function() {
 					);
 				}
 			});
+			event.preventDefault();
 		}
 
 		function paginate(total) {
