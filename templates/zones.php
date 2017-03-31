@@ -148,7 +148,7 @@ foreach($zones as $zone) {
 			<div class="form-group">
 				<label for="name" class="col-sm-2 control-label">Zone name</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" id="name" name="name" required pattern="\S+" maxlength="255">
+					<input type="text" class="form-control" id="name" name="name" required pattern="\S*[^\r\n\t\f .]\.?" maxlength="255">
 				</div>
 			</div>
 			<div class="form-group">
