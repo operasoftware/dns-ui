@@ -153,6 +153,7 @@ $limit = 2500;
 		It is recommended that you run this import multiple times until all changes have been imported.
 	</p>
 	<?php } ?>
+	<div class="form-group"><label for="comment">Update comment</label><input type="text" id="comment" name="comment" class="form-control"></div>
 	<p>
 		<button type="submit" name="update_rrs" value="1" class="btn btn-primary">Confirm selected changes</button>
 		<a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="btn btn-default">Cancel import</a>
