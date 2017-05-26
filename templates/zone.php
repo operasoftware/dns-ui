@@ -310,7 +310,7 @@ global $output_formatter;
 					}
 					?>
 					</ul>
-					<p>Change comment: <q><?php out($data->comment)?></q></p>
+					<p>Change comment: <q><?php out(isset($data->comment) ? $data->comment : "")?></q></p>
 				</div>
 			</div>
 		</form>
