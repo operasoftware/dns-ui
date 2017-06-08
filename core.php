@@ -194,15 +194,15 @@ class DNSName {
 	public static function abbreviate($name, $zonename) {
 		if(strrpos($name, $zonename) === strlen($name) - strlen($zonename)) {
 			$name = substr($name, 0, -1 - strlen($zonename));
-			if($name == '') return '@';
+			if($name === '') return '@';
 			else return $name;
 		} else {
 			return $name;
 		}
 	}
 	public static function canonify($name, $zonename) {
-		if($name == '@') return $zonename;
-		if(substr($name, -1) == '.') return $name;
+		if($name === '@') return $zonename;
+		if(substr($name, -1) === '.') return $name;
 		return "$name.$zonename";
 	}
 }
