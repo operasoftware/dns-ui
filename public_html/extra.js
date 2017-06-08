@@ -193,12 +193,12 @@ $(function() {
 			var update = {};
 			if(rows.first().data('newrrset')) {
 				update.action = 'add';
-				update.name = rrset.name = $('td.name input', rows).val();
-				update.type = rrset.type = $('td.type select', rows).val();
+				update.name = rrset.name = String($('td.name input', rows).val());
+				update.type = rrset.type = String($('td.type select', rows).val());
 			} else {
 				update.action = 'update';
-				update.oldname = rrset.name;
-				update.oldtype = rrset.type;
+				update.oldname = String(rrset.name);
+				update.oldtype = String(rrset.type);
 			}
 			update.comment = $('td.comment input', rows).val();
 			var li = document.createElement('li');
