@@ -519,6 +519,8 @@ $(function() {
 				// Add this rr to the existing rrset
 				$('td.name, td.type, td.ttl, td.comment', rows).prop('rowspan', function(i, rs) { return rs + 1; });
 				var rrsetnum = rows.data('rrsetnum');
+				// Show rrset if it is currently hidden
+				rows.removeClass('hidden');
 			}
 			tr.dataset.name = name;
 			tr.dataset.type = type;
