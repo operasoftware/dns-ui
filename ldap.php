@@ -17,22 +17,27 @@
 
 class LDAP {
 	private $conn;
-	private $hostname;
+	private $host;
+	private $starttls;
 	private $bind_dn;
 	private $bind_password;
 
-	public function __construct($hostname, $bind_dn, $bind_password) {
+	public function __construct($host, $starttls, $bind_dn, $bind_password) {
 		$this->conn = null;
-		$this->hostname = $hostname;
+		$this->host = $host;
+		$this->starttls = $starttls;
 		$this->bind_dn = $bind_dn;
 		$this->bind_password = $bind_password;
 	}
 
 	private function connect() {
-		$this->conn = ldap_connect($this->hostname);
-		if(!ldap_start_tls($this->conn)) throw new RuntimeException('Could not initiate TLS connection to LDAP server');
+		$this->conn = ldap_connect($this->host);
+		if($this->conn === false) throw new LDAPConnectionFailureException('Invalid LDAP connection settings');
+		if($this->starttls) {
+			if(!ldap_start_tls($this->conn)) throw new LDAPConnectionFailureException('Could not initiate TLS connection to LDAP server');
+		}
 		if(!empty($this->bind_dn)) {
-			ldap_bind($this->conn, $this->bind_dn, $this->bind_password);
+			if(!ldap_bind($this->conn, $this->bind_dn, $this->bind_password)) throw new LDAPConnectionFailureException('Could not bind to LDAP server');
 		}
 	}
 
@@ -78,3 +83,5 @@ class LDAP {
 		return $str;
 	}
 }
+
+class LDAPConnectionFailureException extends RuntimeException {}

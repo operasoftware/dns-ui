@@ -37,7 +37,12 @@ require('ldap.php');
 require('powerdns.php');
 require('email.php');
 
-$ldap = new LDAP($config['ldap']['hostname'], $config['ldap']['bind_dn'], $config['ldap']['bind_password']);
+$ldap = new LDAP(
+	isset($config['ldap']['host']) ? $config['ldap']['host'] : $config['ldap']['hostname'],
+	isset($config['ldap']['starttls']) ? $config['ldap']['starttls'] : 1,
+	$config['ldap']['bind_dn'],
+	$config['ldap']['bind_password']
+);
 setup_database();
 
 // Convert all non-fatal errors into exceptions
