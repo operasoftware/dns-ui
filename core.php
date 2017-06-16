@@ -194,7 +194,7 @@ class DNSName {
 	public static function abbreviate($name, $zonename) {
 		if(strrpos($name, $zonename) === strlen($name) - strlen($zonename)) {
 			$name = substr($name, 0, -1 - strlen($zonename));
-			if($name === '') return '@';
+			if($name === '' || $name === false) return '@';
 			else return $name;
 		} else {
 			return $name;
