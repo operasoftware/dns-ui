@@ -30,14 +30,10 @@ All data on this demonstration server is reset nightly at 00:00 UTC.
 Compatibility
 -------------
 
-The current version is only compatible with PowerDNS 4.1.0 and higher.
+The current version is only compatible with PowerDNS 4.0.4 and higher. Previous 4.0.x versions suffer from a critical API bug related to TTL values.
 
-PowerDNS 4.1 has not been released yet. You can use a build from master as long as it has at least the following fix:
-
-   https://github.com/PowerDNS/pdns/commit/b43f590376732a4351dfe77458470c4b88cb41a9
-
-As another alternative, you can use PowerDNS 3 with
-[Opera DNS UI v0.1.2](https://github.com/operasoftware/dns-ui/releases/tag/v0.1.2).
+As another option, you can use PowerDNS 3 with
+[Opera DNS UI v0.1.3](https://github.com/operasoftware/dns-ui/releases/tag/v0.1.3), but the 0.1 version of the DNS UI will not receive any new features or non-critical fixes.
 
 Requirements
 ------------
@@ -49,7 +45,7 @@ Requirements
 * PHP LDAP extension
 * PHP PDO_PGSQL extension
 * PostgreSQL database
-* PowerDNS authoritative server (>= 4.1.0)
+* PowerDNS authoritative server (>= 4.0.4)
 
 Installation
 ------------
