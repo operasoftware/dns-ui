@@ -317,8 +317,10 @@ class DNSContent {
 			$out .= $spacer.str_pad(DNSTime::abbreviate($parts[6]), 11)."; default ttl\n";
 			$out .= $spacer.")\n";
 			return $out;
+		case 'TXT':
+			return $content;
 		default:
-			return DNSContent::encode($content, $type, $zonename);
+			return DNSContent::decode($content, $type, $zonename);
 		}
 	}
 }
