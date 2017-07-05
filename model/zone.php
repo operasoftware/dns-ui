@@ -374,15 +374,9 @@ class Zone extends Record {
 				$row .= str_pad(DNSTime::abbreviate($rrset->ttl), 6)." ";
 				$row .= str_pad($rrset->type, 6)." ";
 				$row .= str_pad(DNSContent::bind9_format($rr->content, $rrset->type, $this->name), 30);
-				$comments = $rrset->list_comments();
-				if(count($comments) > 0) {
-					$row .= " ; ";
-					$count = 0;
-					foreach($comments as $comment) {
-						$count++;
-						if($count > 1) $row .= " ";
-						$row .= $comment->content;
-					}
+				$comments = $rrset->merge_comment_text();
+				if($comments !== '') {
+					$row .= " ; $comments";
 				}
 				$output .= trim($row)."\n";
 			}
