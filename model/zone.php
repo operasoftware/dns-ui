@@ -205,6 +205,7 @@ class Zone extends Record {
 			$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id));
 			$this->rrsets = array();
 			$this->nameservers = array();
+			$possible_bad_data = array();
 			usort($data->rrsets,
 				function($a, $b) {
 					if($a->type == 'SOA' && $b->type != 'SOA') return -1;
@@ -221,16 +222,29 @@ class Zone extends Record {
 				}
 			);
 			foreach($data->rrsets as $recordset) {
-				$rrset = new ResourceRecordSet;
-				$rrset->name = $recordset->name;
-				$rrset->type = $recordset->type;
-				$rrset->ttl = $recordset->ttl;
-				$this->rrsets[$recordset->name.' '.$recordset->type] = $rrset;
+				if(isset($this->rrsets[$recordset->name.' '.$recordset->type])) {
+					// This is not supposed to happen - ordinarily there would only be 1 object in the JSON data for each
+					// name/type combination (1 per RRSet), but in some cases PowerDNS sends comments and RRs for an RRSet
+					// separated into multiple objects in the JSON data with the comments object having a TTL of 0.
+					// Despite many attempts I have been unable to find what triggers this, so am adding this workaround.
+					$this->rrsets[$recordset->name.' '.$recordset->type]->ttl = max($this->rrsets[$recordset->name.' '.$recordset->type]->ttl, $recordset->ttl);
+				} else {
+					$rrset = new ResourceRecordSet;
+					$rrset->name = $recordset->name;
+					$rrset->type = $recordset->type;
+					$rrset->ttl = $recordset->ttl;
+					$this->rrsets[$recordset->name.' '.$recordset->type] = $rrset;
+				}
 				usort($recordset->records,
 					function($a, $b) {
 						return strnatcasecmp($a->content, $b->content);
 					}
 				);
+				if(count($recordset->records) == 0) {
+					// This is a workaround for bad data in the PowerDNS database - should a comment exist for an RRset that
+					// doesn't exist in the records table, we should remove it from our list
+					$possible_bad_data[$recordset->name.' '.$recordset->type] = true;
+				}
 				foreach($recordset->records as $record) {
 					if($recordset->type == 'SOA') {
 						// ns1.oslo.osa hostmaster.oslo.osa 2015112300 10800 3600 604800 3600
@@ -252,6 +266,13 @@ class Zone extends Record {
 				}
 				foreach($recordset->comments as $comment) {
 					$this->rrsets[$recordset->name.' '.$recordset->type]->add_comment(new Comment($comment));
+				}
+			}
+			foreach($possible_bad_data as $key => $null) {
+				if(count($this->rrsets[$key]->list_resource_records()) == 0) {
+					// RRset still has no RRs
+					unset($this->rrsets[$key]);
+					error_log("Stray comment for $key in zone {$this->name}");
 				}
 			}
 		}
