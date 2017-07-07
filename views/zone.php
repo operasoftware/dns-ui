@@ -62,16 +62,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		} else {
 			$zone->add_pending_update(json_encode($json));
 			$mail = new Email;
-			$admins = 0;
+			// Mail SOA contact and administrators about pending update
+			$mail->add_recipient(preg_replace('/^([^\.]+)\./', '$1@', trim($zone->soa->contact, '.')));
 			foreach($zone->list_access() as $access) {
 				if($access->level == 'administrator') {
-					$admins++;
 					$mail->add_recipient($access->user->email, $access->user->name);
 				}
-			}
-			if($admins == 0) {
-				// Fall back to SOA contact field
-				$mail->add_recipient(preg_replace('/^([^\.]+)\./', '$1@', trim($zone->soa->contact, '.')));
 			}
 			$mail->add_reply_to($active_user->email, $active_user->name);
 			$mail->subject = "DNS change requested for ".idn_to_utf8($zone->name, 0, INTL_IDNA_VARIANT_UTS46)." zone by {$active_user->name}";
