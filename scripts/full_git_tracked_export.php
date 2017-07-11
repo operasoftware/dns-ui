@@ -52,6 +52,7 @@ foreach($zones as $zone) {
 $original_dir = getcwd();
 if(chdir($config['git_tracked_export']['path'])) {
 	foreach($zone_exports as $name => $export) {
+		$name = DNSZoneName::unqualify($name);
 		$fh = fopen($name, 'w');
 		fwrite($fh, $export);
 		fclose($fh);

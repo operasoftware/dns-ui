@@ -265,11 +265,11 @@ class ZoneDirectory extends DBDirectory {
 			if(chdir($config['git_tracked_export']['path'])) {
 				foreach($zones as $zone) {
 					$bind9_output = $zone->export_as_bind9_format();
-					$outfile = $zone->name;
+					$outfile = DNSZoneName::unqualify($zone->name);
 					$fh = fopen($outfile, 'w');
 					fwrite($fh, $bind9_output);
 					fclose($fh);
-					exec('LANG=en_US.UTF-8 git add '.escapeshellarg($zone->name));
+					exec('LANG=en_US.UTF-8 git add '.escapeshellarg($outfile));
 				}
 				exec('LANG=en_US.UTF-8 git commit --author '.escapeshellarg($active_user->name.' <'.$active_user->email.'>').' -m '.escapeshellarg($message));
 			}
