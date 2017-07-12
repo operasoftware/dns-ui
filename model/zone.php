@@ -568,7 +568,7 @@ class Zone extends Record {
 				$rr = new ResourceRecord;
 				$rr->content = $record->content;
 				$rr->disabled = ($record->enabled === 'No' || $record->enabled === false);
-				$rr->{'set-ptr'} = $rr->disabled ? false : $zone_dir->check_reverse_record_zone($rr->type, $rr->content, $revs_missing, $revs_updated);
+				$rr->{'set-ptr'} = $rr->disabled ? false : $zone_dir->check_reverse_record_zone($rrset->type, $rr->content, $revs_missing, $revs_updated);
 				$rrset->add_resource_record($rr);
 			}
 			if(isset($update->comment)) {
