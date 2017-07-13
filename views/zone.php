@@ -210,6 +210,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 $local_zone_suffixes = explode(' ', $config['dns']['local_zone_suffixes']);
 $local_zone = false;
 foreach($local_zone_suffixes as $suffix) {
+	$suffix = rtrim($suffix, '.').'.';
 	if(substr($zone->name, 0 - strlen($suffix)) == $suffix) $local_zone = true;
 }
 
