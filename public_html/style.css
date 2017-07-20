@@ -163,6 +163,9 @@ table.changelog tbody tr {
 table.changelog tbody tr.changeset {
 	cursor: default;
 }
+table.changelog table td.content {
+	word-break: break-all;
+}
 
 input[type=text]:focus:invalid, input[type=email]:focus:invalid, select:focus:invalid, textarea:focus:invalid {
 	box-shadow: 0 0 5px #d45252;

@@ -984,14 +984,14 @@ $(function() {
 									}
 								}
 								if(rr_match) {
-									var td = $('<td>');
+									var td = $('<td>').addClass('content');
 									show_diff(td, rr.content, after_rr.content);
 									tr.append(td);
 									var td = $('<td>');
 									show_diff(td, rr.enabled ? 'Yes' : 'No', after_rr.enabled ? 'Yes' : 'No');
 									tr.append(td);
 								} else {
-									tr.append($('<td>').append($('<del>').append(rr.content)));
+									tr.append($('<td>').addClass('content').append($('<del>').append(rr.content)));
 									tr.append($('<td>').append($('<del>').append(rr.enabled ? 'Yes' : 'No')));
 								}
 								tbody.append(tr);
@@ -1000,7 +1000,7 @@ $(function() {
 						if(change.after) {
 							for(j = 0; rr = change.after.rrs[j]; j++) {
 								var tr = $('<tr>');
-								tr.append($('<td>').append($('<ins>').append(rr.content)));
+								tr.append($('<td>').addClass('content').append($('<ins>').append(rr.content)));
 								tr.append($('<td>').append($('<ins>').append(rr.enabled ? 'Yes' : 'No')));
 								tbody.append(tr);
 							}
