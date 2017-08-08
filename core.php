@@ -15,6 +15,8 @@
 ## limitations under the License.
 ##
 
+global $config, $ldap, $database, $powerdns, $user_dir, $zone_dir, $template_dir;
+
 chdir(dirname(__FILE__));
 mb_internal_encoding('UTF-8');
 setlocale(LC_CTYPE, "en_US.UTF-8");
@@ -57,9 +59,6 @@ function autoload_model($classname) {
 	$filename = path_join($base_path, 'model', $classname.'.php');
 	if(file_exists($filename)) {
 		include($filename);
-	} else {
-		eval("class $classname {}");
-		throw new InvalidArgumentException("Attempted to load a class $classname that did not exist.");
 	}
 }
 
