@@ -207,6 +207,7 @@ class DNSName {
 	public static function canonify($name, $zonename) {
 		if($name === '@') return $zonename;
 		if(substr($name, -1) === '.') return $name;
+		if($zonename == '.') return "$name.";
 		return "$name.$zonename";
 	}
 }

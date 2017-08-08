@@ -1,0 +1,7 @@
+<phpunit bootstrap="core.php" processIsolation="false" backupGlobals="false">
+  <testsuites>
+    <testsuite name="dnsui">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
