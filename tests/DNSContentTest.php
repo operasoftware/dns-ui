@@ -14,7 +14,7 @@ final class DNSContentTest extends Testcase {
 	}
 	public function testEncodeTxt() {
 		// TXT should be escaped and quoted
-		$this->assertEquals('"hello \"world\""', DNSContent::encode('hello "world"', 'TXT', 'example.com.'));
+		$this->assertEquals('"hello \"world\" \\\\"', DNSContent::encode('hello "world" \\', 'TXT', 'example.com.'));
 	}
 	public function testEncodeMx() {
 		// MX hostname should be canonified
@@ -41,7 +41,7 @@ final class DNSContentTest extends Testcase {
 
 	public function testDecodeTxt() {
 		// TXT should be unquoted and unescaped
-		$this->assertEquals('hello "world"', DNSContent::decode('"hello \"world\""', 'TXT', 'example.com.'));
+		$this->assertEquals('hello "world" \\', DNSContent::decode('"hello \"world\" \\\\"', 'TXT', 'example.com.'));
 	}
 	public function testDecodeMx() {
 		// MX hostname should be abbreviated
@@ -79,7 +79,7 @@ final class DNSContentTest extends Testcase {
 	}
 	public function testBind9FormatTxt() {
 		// TXT records should be untouched (assumes already encoded)
-		$this->assertEquals('"hello \"world\""', DNSContent::bind9_format('"hello \"world\""', 'TXT', 'example.com.'));
+		$this->assertEquals('"hello \"world\" \\\\"', DNSContent::bind9_format('"hello \"world\" \\\\"', 'TXT', 'example.com.'));
 	}
 	public function testBind9FormatA() {
 		// A records should be untouched
