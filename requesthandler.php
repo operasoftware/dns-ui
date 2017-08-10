@@ -57,11 +57,7 @@ $router->handle_request($relative_request_url);
 if(isset($router->view)) {
 	$view = path_join($base_path, 'views', $router->view.'.php');
 	if(file_exists($view)) {
-		if($active_user->auth_realm == 'LDAP') {
-			require($view);
-		} else {
-			require('views/error403.php');
-		}
+		require($view);
 	} else {
 		throw new Exception("View file $view missing.");
 	}
