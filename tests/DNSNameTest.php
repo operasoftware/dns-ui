@@ -15,6 +15,8 @@ final class DNSNameTest extends Testcase {
 		$this->assertEquals('foobar.example.com.', DNSName::abbreviate('foobar.example.com.', 'example.org.'));
 		// Non-matching domain (partial match)
 		$this->assertEquals('foobar.example.com.', DNSName::abbreviate('foobar.example.com.', 'test.com.'));
+		// Non-matching domain (substring match)
+		$this->assertEquals('foobar.example.com.', DNSName::abbreviate('foobar.example.com.', 'bar.example.com.'));
 		// Domain root
 		$this->assertEquals('@', DNSName::abbreviate('foobar.example.com.', 'foobar.example.com.'));
 	}
