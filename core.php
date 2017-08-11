@@ -318,7 +318,18 @@ class DNSContent {
 			$out .= $spacer.")\n";
 			return $out;
 		case 'TXT':
-			return $content;
+			$content = self::decode($content, $type, $zonename);
+			$split = array();
+			while($content !== false) {
+				// Using mb_strcut to ensure that multi-byte characters are not cut in half
+				// (mb_substr would give 255 chars instead of 255 bytes)
+				$split[] = mb_strcut($content, 0, 255);
+				$content = mb_strcut($content, 255);
+			}
+			foreach($split as &$line) {
+				$line = self::encode($line, $type, $zonename);
+			}
+			return implode(" ", $split);
 		default:
 			return DNSContent::decode($content, $type, $zonename);
 		}

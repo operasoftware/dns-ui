@@ -78,8 +78,21 @@ final class DNSContentTest extends Testcase {
 		$this->assertEquals($nice_format, DNSContent::bind9_format('ns1.example.com. hostmaster.example.com. 2017080806 10800 3600 1209600 3600', 'SOA', 'example.com.'));
 	}
 	public function testBind9FormatTxt() {
-		// TXT records should be untouched (assumes already encoded)
+		// TXT record encoding should be untouched (should already be encoded)
 		$this->assertEquals('"hello \"world\" \\\\"', DNSContent::bind9_format('"hello \"world\" \\\\"', 'TXT', 'example.com.'));
+		// TXT records should be split at 255 bytes
+		$this->assertEquals(
+			'"0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'.
+			'0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'.
+			'0123456789012345678901234567890123456789012345678901234" "567890123456789012345678901234567890123456789"',
+			DNSContent::bind9_format('"'.str_repeat("0123456789", 30).'"', 'TXT', 'example.com.')
+		);
+		$this->assertEquals(
+			'"\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789'.
+			'\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789'.
+			'\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\123456789\\\\1234" "56789\\\\123456789\\\\123456789\\\\123456789\\\\123456789"',
+			DNSContent::bind9_format('"'.str_repeat("\\123456789", 30).'"', 'TXT', 'example.com.')
+		);
 	}
 	public function testBind9FormatA() {
 		// A records should be untouched
