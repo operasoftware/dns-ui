@@ -213,8 +213,8 @@ $(function() {
 			var activerows = 0;
 			var enabledrows = 0;
 			// Loop through all resource records in this rrset.
-			rows.each(function(index) {
-				update.records[index] = {};
+			rows.each(function() {
+				var record = {};
 				$(this).toggleClass('disabled', $('td.enabled select', this).val() == 'No');
 				if($(this).data('newrow')) {
 					if(!$(this).data('delete')) {
@@ -244,8 +244,9 @@ $(function() {
 						}
 						span.appendChild(document.createTextNode('.'));
 						li.appendChild(span);
-						update.records[index]['content'] = content;
-						update.records[index]['enabled'] = enabled;
+						record['content'] = content;
+						record['enabled'] = enabled;
+						update.records.push(record);
 						activerows++;
 						if(enabled == 'Yes') enabledrows++;
 					}
@@ -299,7 +300,7 @@ $(function() {
 							break;
 						case 'content':
 						case 'enabled':
-							update.records[index][this.parentNode.className] = $(this).val();
+							record[this.parentNode.className] = $(this).val();
 							break;
 						}
 					});
@@ -310,15 +311,16 @@ $(function() {
 						$(span).text('Resource record deleted.');
 						$(span).addClass('text-warning');
 						rrspan.appendChild(span);
-						update.records[index]['delete'] = true;
+						record['delete'] = true;
 					} else {
 						activerows++;
-						if(update.records[index]['enabled'] == 'Yes') enabledrows++;
+						if(record['enabled'] == 'Yes') enabledrows++;
 					}
 					if(rrchanged) {
 						rrsetchanged = true;
 						li.appendChild(rrspan);
 					}
+					update.records.push(record);
 				}
 				if(!form.data('local-zone') && (update.type == 'A' || update.type == 'AAAA') && valid) {
 					var local_ip = false;
