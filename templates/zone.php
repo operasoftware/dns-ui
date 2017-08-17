@@ -251,6 +251,7 @@ global $output_formatter;
 					<?php
 					foreach($data->actions as $action) {
 						$current = array();
+						$current_ttl = '';
 						$current_comment = '';
 						if($action->action == 'update') {
 							$fullname = utf8_to_punycode(DNSName::canonify($action->oldname, $zone->name));
