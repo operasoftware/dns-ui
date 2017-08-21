@@ -68,6 +68,7 @@ function setup_database() {
 	$database = new PDO($config['database']['dsn'], $config['database']['username'], $config['database']['password']);
 	$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$powerdns = new PowerDNS($config['powerdns']['api_url'], $config['powerdns']['api_key']);
+	$migration_dir = new MigrationDirectory;
 	$user_dir = new UserDirectory;
 	$zone_dir = new ZoneDirectory;
 	$template_dir = new TemplateDirectory;

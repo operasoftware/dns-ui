@@ -66,22 +66,18 @@ Installation
         createuser -P dnsui-user
         createdb -O dnsui-user dnsui-db
 
-4.  Import the database schema from `schema.sql`:
-
-        psql -U dnsui-user dnsui-db < schema.sql
-
-5.  Add the following directives to your Apache configuration (eg. virtual host config):
+4.  Add the following directives to your Apache configuration (eg. virtual host config):
 
         DocumentRoot /path/to/dnsui/public_html
         DirectoryIndex init.php
         FallbackResource /init.php
 
-6.  Set up authnz_ldap for your virtual host (or any other authentication module that will pass on an Auth-user
+5.  Set up authnz_ldap for your virtual host (or any other authentication module that will pass on an Auth-user
     variable to the application).
 
-7.  Copy the file `config/config-sample.ini` to `config/config.ini` and edit the settings as required.
+6.  Copy the file `config/config-sample.ini` to `config/config.ini` and edit the settings as required.
 
-8.  Set `scripts/ldap_update.php` to run on a regular cron job.
+7.  Set `scripts/ldap_update.php` to run on a regular cron job.
 
 Usage
 -----
