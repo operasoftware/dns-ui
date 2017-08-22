@@ -15,7 +15,7 @@
 ## limitations under the License.
 ##
 
-global $config, $ldap, $database, $powerdns, $user_dir, $zone_dir, $template_dir;
+global $config, $ldap, $database, $powerdns, $user_dir, $zone_dir, $template_dir, $replication_type_dir;
 
 chdir(dirname(__FILE__));
 mb_internal_encoding('UTF-8');
@@ -64,7 +64,7 @@ function autoload_model($classname) {
 
 // Setup database connection and models
 function setup_database() {
-	global $config, $database, $powerdns, $user_dir, $zone_dir, $template_dir;
+	global $config, $database, $powerdns, $user_dir, $zone_dir, $template_dir, $replication_type_dir;
 	$database = new PDO($config['database']['dsn'], $config['database']['username'], $config['database']['password']);
 	$database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	$powerdns = new PowerDNS($config['powerdns']['api_url'], $config['powerdns']['api_key']);
@@ -72,6 +72,7 @@ function setup_database() {
 	$user_dir = new UserDirectory;
 	$zone_dir = new ZoneDirectory;
 	$template_dir = new TemplateDirectory;
+	$replication_type_dir = new ReplicationTypeDirectory;
 }
 
 /**

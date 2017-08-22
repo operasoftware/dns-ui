@@ -22,6 +22,7 @@ usort($zones, function($a, $b) {
 	return strnatcasecmp($aname, $bname);
 });
 
+$replication_types = $replication_type_dir->list_replication_types();
 $soa_templates = $template_dir->list_soa_templates();
 $ns_templates = $template_dir->list_ns_templates();
 
@@ -35,7 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone = new Zone;
 			$zone->name = $zonename;
 			$zone->account = trim($_POST['classification']);
-			$zone->kind = 'Master';
+			$zone->kind = $_POST['kind'];
 			$zone->nameservers = array();
 			foreach(preg_split('/[,\s]+/', $_POST['nameservers']) as $nameserver) {
 				$zone->nameservers[] = $nameserver;
@@ -63,6 +64,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 if(!isset($content)) {
 	$content = new PageSection('zones');
 	$content->set('zones', $zones);
+	$content->set('replication_types', $replication_types);
 	$content->set('soa_templates', $soa_templates);
 	$content->set('ns_templates', $ns_templates);
 }

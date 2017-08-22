@@ -33,6 +33,7 @@ $changesets = $zone->list_changesets();
 $access = $zone->list_access();
 $accounts = $zone_dir->list_accounts();
 $allusers = $user_dir->list_users();
+$replication_types = $replication_type_dir->list_replication_types();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['update_rrs'])) {
@@ -148,7 +149,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$active_user->add_alert($alert);
 		redirect();
 	} elseif(isset($_POST['update_zone']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator')) {
-		$zone->update_account($_POST['classification']);
+		$zone->kind = $_POST['kind'];
+		$zone->account = $_POST['classification'];
+		$zone->update();
 		$primary_ns = $_POST['primary_ns'];
 		$contact = $_POST['contact'];
 		$refresh = DNSTime::expand($_POST['refresh']);
@@ -223,6 +226,7 @@ if(!isset($content)) {
 	$content->set('access', $access);
 	$content->set('accounts', $accounts);
 	$content->set('allusers', $allusers);
+	$content->set('replication_types', $replication_types);
 	$content->set('local_zone', $local_zone);
 	$content->set('local_ipv4_ranges', $config['dns']['local_ipv4_ranges']);
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);

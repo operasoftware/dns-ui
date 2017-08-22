@@ -16,6 +16,7 @@
 ##
 $active_user = $this->get('active_user');
 $zones = $this->get('zones');
+$replication_types = $this->get('replication_types');
 $soa_templates = $this->get('soa_templates');
 $ns_templates = $this->get('ns_templates');
 $zone_types = array('forward' => array(), 'reverse4' => array(), 'reverse6' => array());
@@ -53,6 +54,7 @@ foreach($zones as $zone) {
 				<tr>
 					<th>Zone name</th>
 					<th>Serial</th>
+					<th>Replication type</th>
 					<th>Classification</th>
 				</tr>
 			</thead>
@@ -61,6 +63,7 @@ foreach($zones as $zone) {
 				<tr>
 					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name, ESC_URL))?>"><?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?></a></td>
 					<td><?php out($zone->serial)?></td>
+					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
 				</tr>
 				<?php } ?>
@@ -80,6 +83,7 @@ foreach($zones as $zone) {
 					<th>IPv4 prefix</th>
 					<th>Subnet</th>
 					<th>Serial</th>
+					<th>Replication type</th>
 					<th>Classification</th>
 				</tr>
 			</thead>
@@ -90,6 +94,7 @@ foreach($zones as $zone) {
 					<td><?php out(ipv4_reverse_zone_to_range($zone->name))?></td>
 					<td><?php out(ipv4_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>
+					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
 				</tr>
 				<?php } ?>
@@ -116,6 +121,7 @@ foreach($zones as $zone) {
 					<th>IPv6 prefix</th>
 					<th>Subnet</th>
 					<th>Serial</th>
+					<th>Replication type</th>
 					<th>Classification</th>
 				</tr>
 			</thead>
@@ -126,6 +132,7 @@ foreach($zones as $zone) {
 					<td><tt><?php out(ipv6_reverse_zone_to_range($zone->name))?></tt></td>
 					<td><?php out(ipv6_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>
+					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
 				</tr>
 				<?php } ?>
@@ -152,7 +159,18 @@ foreach($zones as $zone) {
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="classification" class="col-sm-2 control-label">Zone classification</label>
+				<label for="kind" class="col-sm-2 control-label">Replication type</label>
+				<div class="col-sm-10">
+					<select name="kind" class="form-control" required>
+						<option value=""></option>
+						<?php foreach($replication_types as $type) { ?>
+						<option value="<?php out($type->name)?>"<?php if($type->default) out(' selected')?>><?php out($type->name)?></option>
+						<?php } ?>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="classification" class="col-sm-2 control-label">Classification</label>
 				<div class="col-sm-10">
 					<input type="text" class="form-control" id="classification" name="classification" required list="account_list" maxlength="40">
 					<datalist id="account_list">

@@ -22,6 +22,7 @@ $changesets = $this->get('changesets');
 $access = $this->get('access');
 $accounts = $this->get('accounts');
 $allusers = $this->get('allusers');
+$replication_types = $this->get('replication_types');
 $local_zone = $this->get('local_zone');
 $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
@@ -326,7 +327,7 @@ global $output_formatter;
 					}
 					?>
 					</ul>
-					<p>Change comment: <q><?php out(isset($data->comment) ? $data->comment : "")?></q></p>
+					<p>Change comment: <q><?php out(isset($data->comment) ? $data->comment : '')?></q></p>
 				</div>
 			</div>
 		</form>
@@ -337,7 +338,17 @@ global $output_formatter;
 		<h2 class="sr-only">Zone configuration</h2>
 		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="form-horizontal zoneeditsoa">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
-			<h3>Zone classification</h3>
+			<h3>Zone settings</h3>
+			<div class="form-group">
+				<label for="kind" class="col-sm-2 control-label">Replication type</label>
+				<div class="col-sm-10">
+					<select name="kind" class="form-control" required>
+						<?php foreach($replication_types as $type) { ?>
+						<option value="<?php out($type->name)?>"<?php if($zone->kind == $type->name) out(' selected')?>><?php out($type->name)?></option>
+						<?php } ?>
+					</select>
+				</div>
+			</div>
 			<div class="form-group">
 				<label for="classification" class="col-sm-2 control-label">Classification</label>
 				<div class="col-sm-10">

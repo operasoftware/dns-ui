@@ -115,6 +115,7 @@ class ZoneDirectory extends DBDirectory {
 					$zone = new Zone;
 					$zone->pdns_id = $pdns_zone->id;
 					$zone->name = $pdns_zone->name;
+					$zone->kind = $pdns_zone->kind;
 					$zone->serial = $pdns_zone->serial;
 					$zone->account = $pdns_zone->account;
 					$this->add_zone($zone);
@@ -125,6 +126,13 @@ class ZoneDirectory extends DBDirectory {
 						$zones_by_pdns_id[$pdns_zone->id]->serial = $pdns_zone->serial;
 						$stmt = $this->database->prepare('UPDATE zone SET serial = ? WHERE id = ?');
 						$stmt->bindParam(1, $pdns_zone->serial, PDO::PARAM_INT);
+						$stmt->bindParam(2, $zones_by_pdns_id[$pdns_zone->id]->id, PDO::PARAM_INT);
+						$stmt->execute();
+					}
+					if($zones_by_pdns_id[$pdns_zone->id]->kind != $pdns_zone->kind) {
+						$zones_by_pdns_id[$pdns_zone->id]->kind = $pdns_zone->kind;
+						$stmt = $this->database->prepare('UPDATE zone SET kind = ? WHERE id = ?');
+						$stmt->bindParam(1, $pdns_zone->kind, PDO::PARAM_STR);
 						$stmt->bindParam(2, $zones_by_pdns_id[$pdns_zone->id]->id, PDO::PARAM_INT);
 						$stmt->execute();
 					}

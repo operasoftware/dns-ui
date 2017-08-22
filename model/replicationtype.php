@@ -15,22 +15,12 @@
 ## limitations under the License.
 ##
 
-$routes = array(
-	'/' => 'home',
-	'/api/v2' => 'api',
-	'/api/v2/{objects}' => 'api',
-	'/api/v2/{objects}/{id}' => 'api',
-	'/api/v2/{objects}/{id}/{subobjects}' => 'api',
-	'/api/v2/{objects}/{id}/{subobjects}/{subid}' => 'api',
-	'/settings' => 'settings',
-	'/templates' => 'templates',
-	'/templates/{type}' => 'templates',
-	'/templates/{type}/{name}' => 'template',
-	'/users' => 'users',
-	'/users/{uid}' => 'user',
-	'/zones' => 'zones',
-	'/zones/{name}' => 'zone',
-	'/zones/{name}/import' => 'zoneimport',
-	'/zones/{name}/export' => 'zoneexport',
-	'/zones/{name}/split' => 'zonesplit',
-);
+/**
+* Class that represents a zone replication type.
+*/
+class ReplicationType extends Record {
+	/**
+	* Defines the database table that this object is stored in
+	*/
+	protected $table = 'replication_type';
+}

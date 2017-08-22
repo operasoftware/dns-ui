@@ -179,19 +179,15 @@ class Zone extends Record {
 	}
 
 	/**
-	* Tell PowerDNS API to update the "account" field for this zone and update local DB also.
+	* Tell PowerDNS API to update this zone and update local DB also.
 	* @param string $account new value
 	*/
-	public function update_account($account) {
-		$this->account = $account;
+	public function update() {
 		$update = new StdClass;
-		$update->kind = 'master';
-		$update->account = $account;
+		$update->kind = $this->kind;
+		$update->account = $this->account;
 		$this->powerdns->put('zones/'.urlencode($this->pdns_id), $update);
-		$stmt = $this->database->prepare('UPDATE zone SET account = ? WHERE id = ?');
-		$stmt->bindParam(1, $this->account, PDO::PARAM_STR);
-		$stmt->bindParam(2, $this->id, PDO::PARAM_INT);
-		$stmt->execute();
+		parent::update();
 	}
 
 	/**

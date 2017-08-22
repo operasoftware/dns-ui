@@ -32,6 +32,7 @@ class PageSection {
 			$this->data->menu_items['Templates'] = array();
 			$this->data->menu_items['Templates']['SOA templates'] = '/templates/soa';
 			$this->data->menu_items['Templates']['Nameserver templates'] = '/templates/ns';
+			$this->data->menu_items['Settings'] = '/settings';
 		}
 		$this->data->relative_request_url = $relative_request_url;
 		$this->data->active_user = $active_user;

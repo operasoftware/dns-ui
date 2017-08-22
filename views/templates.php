@@ -50,13 +50,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$active_user->add_alert($alert);
 	} elseif(isset($_POST['set_default_soa_template'])) {
 		$template = $template_dir->get_soa_template_by_id($_POST['set_default_soa_template']);
-		$template_dir->set_default_template($template);
+		$template_dir->set_default_soa_template($template);
 		$alert = new UserAlert;
 		$alert->content = "New SOA default set.";
 		$active_user->add_alert($alert);
 	} elseif(isset($_POST['set_default_ns_template'])) {
 		$template = $template_dir->get_ns_template_by_id($_POST['set_default_ns_template']);
-		$template_dir->set_default_template($template);
+		$template_dir->set_default_ns_template($template);
 		$alert = new UserAlert;
 		$alert->content = "New NS default set.";
 		$active_user->add_alert($alert);

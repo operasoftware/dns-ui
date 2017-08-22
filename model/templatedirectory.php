@@ -89,7 +89,7 @@ class TemplateDirectory extends DBDirectory {
 
 	/**
 	* Get an SOATemplate from the database by its id.
-	* @param string $id of template
+	* @param int $id of template
 	* @return SOATemplate with specified id
 	* @throws TemplateNotFound if no SOATemplate with that id exists
 	*/
@@ -111,7 +111,7 @@ class TemplateDirectory extends DBDirectory {
 
 	/**
 	* Get an NSTemplate from the database by its id.
-	* @param string $id of template
+	* @param int $id of template
 	* @return NSTemplate with specified id
 	* @throws TemplateNotFound if no NSTemplate with that id exists
 	*/
@@ -176,19 +176,30 @@ class TemplateDirectory extends DBDirectory {
 	}
 
 	/**
-	* Set the provided template as the default for its type.
-	* @param Template $template to be set as default
+	* Set the provided SOA template as the default.
+	* @param SOATemplate $template to be set as default
 	*/
-	public function set_default_template(Template $template) {
-		switch(get_class($template)) {
-		case 'SOATemplate':
-			$stmt = $this->database->prepare('UPDATE config SET default_soa_template = ?');
-			break;
-		case 'NSTemplate':
-			$stmt = $this->database->prepare('UPDATE config SET default_ns_template = ?');
-			break;
+	public function set_default_soa_template(SOATemplate $template = null) {
+		$stmt = $this->database->prepare('UPDATE config SET default_soa_template = ?');
+		if(is_null($template)) {
+			$stmt->bindParam(1, $template, PDO::PARAM_INT);
+		} else {
+			$stmt->bindParam(1, $template->id, PDO::PARAM_INT);
 		}
-		$stmt->bindParam(1, $template->id, PDO::PARAM_INT);
+		$stmt->execute();
+	}
+
+	/**
+	* Set the provided NS template as the default.
+	* @param NSTemplate $template to be set as default
+	*/
+	public function set_default_ns_template(NSTemplate $template = null) {
+		$stmt = $this->database->prepare('UPDATE config SET default_ns_template = ?');
+		if(is_null($template)) {
+			$stmt->bindParam(1, $template, PDO::PARAM_INT);
+		} else {
+			$stmt->bindParam(1, $template->id, PDO::PARAM_INT);
+		}
 		$stmt->execute();
 	}
 
