@@ -149,6 +149,7 @@ global $output_formatter;
 								they are better than no client-side validation at all.
 								-->
 								<?php if($reverse) { ?>
+								<option value="CNAME" data-content-pattern="\S+">CNAME</option>
 								<?php if($active_user->admin) { ?>
 								<option value="NS" data-content-pattern="\S*">NS</option>
 								<?php } ?>
@@ -163,6 +164,7 @@ global $output_formatter;
 								<?php } ?>
 								<option value="LOC" data-content-pattern="[0-9]{1,2} ([0-9]{1,3} ([0-9]{1,2}(\.[0-9]{1,3})?)?)? [NS] [0-9]{1,2} ([0-9]{1,3} ([0-9]{1,2}(\.[0-9]{1,3})?)?)? [EW] -?[0-9]+(\.[0-9]{1,2})?m?( [0-9]+(\.[0-9]{1,2})?m?( [0-9]+(\.[0-9]{1,2})?m?( [0-9]+(\.[0-9]{1,2})?m?)))">LOC</option>
 								<option value="MX" data-content-pattern="[0-9]+\s+\S+">MX</option>
+								<option value="PTR" data-content-pattern="\S+">PTR</option>
 								<option value="SRV" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+\S+">SRV</option>
 								<option value="SSHFP" data-content-pattern="[0-4]\s+[0-2]\s+[0-9a-f]+">SSHFP</option>
 								<option value="TXT" data-content-pattern=".*">TXT</option>
