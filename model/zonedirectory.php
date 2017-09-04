@@ -273,7 +273,7 @@ class ZoneDirectory extends DBDirectory {
 			if(chdir($config['git_tracked_export']['path'])) {
 				foreach($zones as $zone) {
 					$bind9_output = $zone->export_as_bind9_format();
-					$outfile = DNSZoneName::unqualify($zone->name);
+					$outfile = urlencode(DNSZoneName::unqualify($zone->name));
 					$fh = fopen($outfile, 'w');
 					fwrite($fh, $bind9_output);
 					fclose($fh);

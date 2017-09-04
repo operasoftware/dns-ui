@@ -38,7 +38,7 @@ As another option, you can use PowerDNS 3 with
 Requirements
 ------------
 
-* Apache 2.2 or higher
+* Apache 2.2.18 or higher
 * PHP 5.6 or higher
 * PHP intl (Internationalization Functions) extension
 * PHP JSON extension
@@ -71,6 +71,7 @@ Installation
         DocumentRoot /path/to/dnsui/public_html
         DirectoryIndex init.php
         FallbackResource /init.php
+        AllowEncodedSlashes NoDecode
 
 5.  Set up authnz_ldap for your virtual host (or any other authentication module that will pass on an Auth-user
     variable to the application).

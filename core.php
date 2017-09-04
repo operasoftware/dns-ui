@@ -353,6 +353,7 @@ function ipv6_address_expand($address) {
 function ipv4_reverse_zone_to_range($zonename) {
 	// eg. 3.2.1.in-addr.arpa.
 	$result = substr($zonename, 0, -14); // Chop off .in-addr.arpa. = 3.2.1
+	if(!preg_match('/^[0-9\.]*$/', $result)) return "";
 	$result = explode('.', $result);     // Split by .              = 3, 2, 1
 	$result = array_reverse($result);    // Reverse chunks          = 1, 2, 3
 	$result = implode('.', $result).'.'; // Combine with .          = 1.2.3.
@@ -362,6 +363,7 @@ function ipv4_reverse_zone_to_range($zonename) {
 function ipv4_reverse_zone_to_subnet($zonename) {
 	// eg. 3.2.1.in-addr.arpa.
 	$result = substr($zonename, 0, -14);   // Chop off .in-addr.arpa. = 3.2.1
+	if(!preg_match('/^[0-9\.]*$/', $result)) return "";
 	$result = explode('.', $result);       // Split by .              = 3, 2, 1
 	$result = array_reverse($result);      // Reverse chunks          = 1, 2, 3
 	$prefix_len = count($result) * 8;
@@ -374,6 +376,7 @@ function ipv4_reverse_zone_to_subnet($zonename) {
 function ipv6_reverse_zone_to_range($zonename) {
 	// eg. 2.2.8.b.d.0.1.0.0.2.ip6.arpa.
 	$result = substr($zonename, 0, -10);      // Chop off .ip6.arpa.        = 2.2.8.b.d.0.1.0.0.2
+	if(!preg_match('/^[0-9a-f\.]*$/i', $result)) return "";
 	$result = explode('.', $result);          // Split by . separators      = 2, 2, 8, b, d, 0, 1, 0, 0, 2
 	$result = array_reverse($result);         // Reverse chunks             = 2, 0, 0, 1, 0, d, b, 8, 2, 2
 	$result = implode('', $result);           // Combine into single string = 20010db822
@@ -387,6 +390,7 @@ function ipv6_reverse_zone_to_range($zonename) {
 function ipv6_reverse_zone_to_subnet($zonename) {
 	// eg. 2.2.8.b.d.0.1.0.0.2.ip6.arpa.
 	$result = substr($zonename, 0, -10);      // Chop off .ip6.arpa.        = 2.2.8.b.d.0.1.0.0.2
+	if(!preg_match('/^[0-9a-f\.]*$/i', $result)) return "";
 	$result = explode('.', $result);          // Split by . separators      = 2, 2, 8, b, d, 0, 1, 0, 0, 2
 	$result = array_reverse($result);         // Reverse chunks             = 2, 0, 0, 1, 0, d, b, 8, 2, 2
 	$result = implode('', $result);           // Combine into single string = 20010db822
