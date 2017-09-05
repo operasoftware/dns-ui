@@ -530,7 +530,7 @@ global $output_formatter;
 					<td class="nowrap"><?php out($changeset->change_date->format('Y-m-d H:i:s'))?></td>
 					<td><?php out($output_formatter->changeset_comment_format($changeset->comment), ESC_NONE) ?></td>
 					<td class="nowrap"><?php if($changeset->requester) { ?><a href="/users/<?php out($changeset->requester->uid)?>"><?php out($changeset->requester->name)?><?php } ?></td>
-					<td class="nowrap"><a href="/users/<?php out($changeset->author->uid)?>"><?php out($changeset->author->name)?></td>
+					<td class="nowrap"><a href="/users/<?php out($changeset->author->uid, ESC_URL)?>"><?php out($changeset->author->name)?></td>
 					<td><?php out('-'.$changeset->deleted.'/+'.$changeset->added)?></td>
 					<td></td>
 				</tr>
