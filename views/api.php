@@ -144,8 +144,8 @@ class API {
 		$zone = $zone_dir->get_zone_by_name($zone_name);
 		if(!$active_user->admin && !$active_user->access_to($zone)) throw new AccessDenied;
 		$json = file_get_contents('php://input');
-		$zone->process_bulk_json_rrset_update($json);
-		$this->output(null);
+		$changeid = $zone->process_bulk_json_rrset_update($json);
+		$this->output($changeid);
 	}
 
 	public function zone_changes($zone_name) {

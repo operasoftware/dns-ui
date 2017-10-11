@@ -525,6 +525,7 @@ class Zone extends Record {
 		$alert = new UserAlert;
 		$alert->content = "Zone updated successfully.";
 		$active_user->add_alert($alert);
+		return array("change_id" => $changeset->id);
 	}
 
 	/**
