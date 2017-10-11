@@ -467,6 +467,7 @@ class Zone extends Record {
 	/**
 	* Given a JSON-encoded string with a list of changes to be made to a zone, process and perform those changes.
 	* @param string $update JSON-encoded list of changes
+	* @return array with data ptr zone changes and the changeset->id
 	*/
 	public function process_bulk_json_rrset_update($update, $author = null) {
 		global $active_user, $config, $zone_dir;
@@ -525,7 +526,12 @@ class Zone extends Record {
 		$alert = new UserAlert;
 		$alert->content = "Zone updated successfully.";
 		$active_user->add_alert($alert);
-		return array("zone" => $this->name,"changelog_id" => $changeset->id, "missing_ptr_zone" => $revs_missing, "updated_ptr_zone" => $revs_updated );
+
+		return array(
+				"missing_ptr_zone" => $revs_missing, 
+				"updated_ptr_zone" => $revs_updated,
+				"changes_id" => $changeset->id
+			    );
 	}
 
 	/**
