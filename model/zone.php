@@ -536,7 +536,6 @@ class Zone extends Record {
 	* @param array $revs_updated keep track of reverse zones that will be updated
 	*/
 	private function process_rrset_action($update, &$trash, &$revs_missing, &$revs_updated) {
-
 		global $active_user, $zone_dir;
 		if(!is_object($update)) throw new BadData('Malformed update.');
 		if(!(isset($update->name) && isset($update->type))) throw new BadData('Malformed action.');
