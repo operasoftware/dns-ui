@@ -525,7 +525,7 @@ class Zone extends Record {
 		$alert = new UserAlert;
 		$alert->content = "Zone updated successfully.";
 		$active_user->add_alert($alert);
-		return array("change_id" => $changeset->id);
+		return array("zone" => $this->name,"changelog_id" => $changeset->id, "missing_ptr_zone" => $revs_missing, "updated_ptr_zone" => $revs_updated );
 	}
 
 	/**
@@ -536,6 +536,7 @@ class Zone extends Record {
 	* @param array $revs_updated keep track of reverse zones that will be updated
 	*/
 	private function process_rrset_action($update, &$trash, &$revs_missing, &$revs_updated) {
+
 		global $active_user, $zone_dir;
 		if(!is_object($update)) throw new BadData('Malformed update.');
 		if(!(isset($update->name) && isset($update->type))) throw new BadData('Malformed action.');

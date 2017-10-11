@@ -207,7 +207,7 @@ class ZoneDirectory extends DBDirectory {
 	* @param array $revs_missing keep track of reverse zones that are missing
 	* @param array $revs_updated keep track of reverse zones that will be updated
 	*/
-	public function check_reverse_record_zone($type, $address, &$revs_missing, &$revs_notify) {
+	public function check_reverse_record_zone($type, $address, &$revs_missing, &$revs_updated) {
 		global $zone_dir, $active_user;
 
 		if($type == 'A') {
@@ -236,7 +236,7 @@ class ZoneDirectory extends DBDirectory {
 					}
 				}
 				// Add reverse zone to list of zones to send a notify for
-				$revs_notify[$reverse_zone->pdns_id] = $reverse_zone;
+				$revs_updated[$reverse_zone->pdns_id] = $reverse_zone;
 				return true;
 			} catch(ZoneNotFound $e) {
 			}
