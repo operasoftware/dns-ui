@@ -43,7 +43,7 @@ $cname_error = $this->get('cname_error');
 			<?php
 			$rrsetnum = 0;
 			foreach($split as $rrset) {
-				if($rrset->type == 'NS') continue;
+				if($rrset->type == 'NS' && $rrset->name == $newzonename) continue;
 				$rrsetnum++;
 				$rrs = $rrset->list_resource_records();
 				$name = DNSName::abbreviate($rrset->name, $zone->name);

@@ -36,7 +36,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$cname_error = false;
 		foreach($rrsets as $rrset) {
 			if((stripos($rrset->name, '.'.$newzonename) === strlen($rrset->name) - strlen('.'.$newzonename)
-				|| $rrset->name == $newzonename) && $rrset->type != 'SOA' && $rrset->type != 'NS') {
+				|| ($rrset->name == $newzonename && $rrset->type != 'NS')) && $rrset->type != 'SOA') {
 				if($rrset->name == $newzonename && $rrset->type == 'CNAME') {
 					$cname_error = true;
 					$alert = new UserAlert;
