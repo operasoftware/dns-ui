@@ -26,7 +26,7 @@ $cname_error = $this->get('cname_error');
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<?php if(count($split) == 0) { ?>
 	<p>No records match this pattern.</p>
-	<p><a href="/zones/<?php out($zone->name, ESC_URL)?>" class="btn btn-default">Go back</a></p>
+	<p><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="btn btn-default">Go back</a></p>
 	<?php } else { ?>
 	<table class="table table-bordered table-condensed table-hover stickyHeader">
 		<thead>
