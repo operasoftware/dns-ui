@@ -187,7 +187,8 @@ class Zone extends Record {
 		$update = new StdClass;
 		$update->kind = $this->kind;
 		$update->account = $this->account;
-		$this->powerdns->put('zones/'.urlencode($this->pdns_id), $update);
+		$update->dnssec = (bool)$this->dnssec;
+		$response = $this->powerdns->put('zones/'.urlencode($this->pdns_id), $update);
 		parent::update();
 	}
 

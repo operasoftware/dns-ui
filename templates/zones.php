@@ -56,6 +56,7 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
+					<th>DNSSEC</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -65,6 +66,7 @@ foreach($zones as $zone) {
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
+					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 				</tr>
 				<?php } ?>
 			</tbody>
@@ -85,6 +87,7 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
+					<th>DNSSEC</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -96,6 +99,7 @@ foreach($zones as $zone) {
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
+					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 				</tr>
 				<?php } ?>
 			</tbody>
@@ -123,6 +127,7 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
+					<th>DNSSEC</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -134,6 +139,7 @@ foreach($zones as $zone) {
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
+					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 				</tr>
 				<?php } ?>
 			</tbody>
@@ -178,6 +184,18 @@ foreach($zones as $zone) {
 						<option value="<?php out($account)?>"><?php out($account)?></option>
 						<?php } ?>
 					</datalist>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
+				<div class="col-sm-10">
+					<?php if($active_user->admin) { ?>
+					<div class="checkbox">
+						<label><input type="checkbox" id="dnssec" name="dnssec" value="1"<?php if($zone->dnssec) out(' checked')?>> Enabled</label>
+					</div>
+					<?php } else { ?>
+					<p class="form-control-static"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></p>
+					<?php } ?>
 				</div>
 			</div>
 			<fieldset>

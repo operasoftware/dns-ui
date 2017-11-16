@@ -346,7 +346,7 @@ global $output_formatter;
 				<label for="kind" class="col-sm-2 control-label">Replication type</label>
 				<div class="col-sm-10">
 					<?php if($active_user->admin) { ?>
-					<select name="kind" class="form-control" required>
+					<select id="kind" name="kind" class="form-control" required>
 						<?php foreach($replication_types as $type) { ?>
 						<option value="<?php out($type->name)?>"<?php if($zone->kind == $type->name) out(' selected')?>><?php out($type->name)?></option>
 						<?php } ?>
@@ -368,6 +368,18 @@ global $output_formatter;
 					</datalist>
 					<?php } else { ?>
 					<p class="form-control-static"><?php out($zone->account)?></p>
+					<?php } ?>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
+				<div class="col-sm-10">
+					<?php if($active_user->admin) { ?>
+					<div class="checkbox">
+						<label><input type="checkbox" id="dnssec" name="dnssec" value="1"<?php if($zone->dnssec) out(' checked')?>> Enabled</label>
+					</div>
+					<?php } else { ?>
+					<p class="form-control-static"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></p>
 					<?php } ?>
 				</div>
 			</div>

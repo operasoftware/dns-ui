@@ -40,12 +40,13 @@ class ZoneDirectory extends DBDirectory {
 	* @param Zone $zone to be added
 	*/
 	public function add_zone(Zone $zone) {
-		$stmt = $this->database->prepare('INSERT INTO zone (pdns_id, name, serial, kind, account) VALUES (?, ?, ?, ?, ?)');
+		$stmt = $this->database->prepare('INSERT INTO zone (pdns_id, name, serial, kind, account, dnssec) VALUES (?, ?, ?, ?, ?, ?)');
 		$stmt->bindParam(1, $zone->pdns_id, PDO::PARAM_STR);
 		$stmt->bindParam(2, $zone->name, PDO::PARAM_STR);
 		$stmt->bindParam(3, $zone->serial, PDO::PARAM_INT);
 		$stmt->bindParam(4, $zone->kind, PDO::PARAM_STR);
 		$stmt->bindParam(5, $zone->account, PDO::PARAM_STR);
+		$stmt->bindParam(6, $zone->dnssec, PDO::PARAM_INT);
 		$stmt->execute();
 		$zone->id = $this->database->lastInsertId('zone_id_seq');
 	}
@@ -86,6 +87,7 @@ class ZoneDirectory extends DBDirectory {
 		}
 		$data->soa_edit_api = 'INCEPTION-INCREMENT';
 		$data->account = $zone->account;
+		$data->dnssec = (bool)$zone->dnssec;
 		$response = $this->powerdns->post('zones', $data);
 		$zone->pdns_id = $response->id;
 		$zone->serial = $response->serial;
@@ -119,30 +121,20 @@ class ZoneDirectory extends DBDirectory {
 					$zone->kind = $pdns_zone->kind;
 					$zone->serial = $pdns_zone->serial;
 					$zone->account = $pdns_zone->account;
+					$zone->dnssec = $pdns_zone->dnssec;
 					$this->add_zone($zone);
 					$zones_by_pdns_id[$zone->pdns_id] = $zone;
 					$current_zones[$zone->pdns_id] = true;
 				} else {
-					if($zones_by_pdns_id[$pdns_zone->id]->serial != $pdns_zone->serial) {
-						$zones_by_pdns_id[$pdns_zone->id]->serial = $pdns_zone->serial;
-						$stmt = $this->database->prepare('UPDATE zone SET serial = ? WHERE id = ?');
-						$stmt->bindParam(1, $pdns_zone->serial, PDO::PARAM_INT);
-						$stmt->bindParam(2, $zones_by_pdns_id[$pdns_zone->id]->id, PDO::PARAM_INT);
-						$stmt->execute();
-					}
-					if($zones_by_pdns_id[$pdns_zone->id]->kind != $pdns_zone->kind) {
-						$zones_by_pdns_id[$pdns_zone->id]->kind = $pdns_zone->kind;
-						$stmt = $this->database->prepare('UPDATE zone SET kind = ? WHERE id = ?');
-						$stmt->bindParam(1, $pdns_zone->kind, PDO::PARAM_STR);
-						$stmt->bindParam(2, $zones_by_pdns_id[$pdns_zone->id]->id, PDO::PARAM_INT);
-						$stmt->execute();
-					}
-					if($zones_by_pdns_id[$pdns_zone->id]->account != $pdns_zone->account) {
-						$zones_by_pdns_id[$pdns_zone->id]->account = $pdns_zone->account;
-						$stmt = $this->database->prepare('UPDATE zone SET account = ? WHERE id = ?');
-						$stmt->bindParam(1, $pdns_zone->account, PDO::PARAM_STR);
-						$stmt->bindParam(2, $zones_by_pdns_id[$pdns_zone->id]->id, PDO::PARAM_INT);
-						$stmt->execute();
+					$fields = array('serial' => PDO::PARAM_INT, 'kind' => PDO::PARAM_STR, 'account' => PDO::PARAM_STR, 'dnssec' => PDO::PARAM_INT);
+					foreach($fields as $field => $type) {
+						if($zones_by_pdns_id[$pdns_zone->id]->{$field} != $pdns_zone->{$field}) {
+							$zones_by_pdns_id[$pdns_zone->id]->{$field} = $pdns_zone->{$field};
+							$stmt = $this->database->prepare('UPDATE zone SET '.$field.' = ? WHERE id = ?');
+							$stmt->bindParam(1, $pdns_zone->{$field}, $type);
+							$stmt->bindParam(2, $zones_by_pdns_id[$pdns_zone->id]->id, PDO::PARAM_INT);
+							$stmt->execute();
+						}
 					}
 					$current_zones[$pdns_zone->id] = true;
 					if(!$zones_by_pdns_id[$pdns_zone->id]->active) {
