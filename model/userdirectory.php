@@ -47,8 +47,13 @@ class UserDirectory extends DBDirectory {
 		$stmt->bindParam(4, $user->active, PDO::PARAM_INT);
 		$stmt->bindParam(5, $user->admin, PDO::PARAM_INT);
 		$stmt->bindParam(6, $user->auth_realm, PDO::PARAM_INT);
-		$stmt->execute();
-		$user->id = $this->database->lastInsertId('user_id_seq');
+		try {
+			$stmt->execute();
+			$user->id = $this->database->lastInsertId('user_id_seq');
+		} catch(PDOException $e) {
+			if($e->getCode() == 23505) throw new UserAlreadyExistsException('A user already exists with uid '.$user->uid);
+			throw $e;
+		}
 	}
 
 	/**
@@ -133,3 +138,4 @@ class UserDirectory extends DBDirectory {
 }
 
 class UserNotFoundException extends Exception {}
+class UserAlreadyExistsException extends Exception {}

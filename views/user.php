@@ -22,6 +22,20 @@ try {
 	die;
 }
 
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+	if(isset($_POST['update_user']) && $active_user->admin) {
+		$user->name = $_POST['name'];
+		$user->email = $_POST['email'];
+		$user->active = isset($_POST['active']) ? 1 : 0;
+		$user->admin = isset($_POST['admin']) ? 1 : 0;
+		$user->update();
+		$alert = new UserAlert;
+		$alert->content = "User '{$user->uid}' updated.";
+		$alert->class = 'success';
+		$active_user->add_alert($alert);
+		redirect();
+	}
+}
 $changesets = $user->list_changesets();
 $zones = $active_user->list_accessible_zones();
 $visible_changesets = array();

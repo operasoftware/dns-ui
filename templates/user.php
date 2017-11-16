@@ -14,11 +14,56 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 ##
+$active_user = $this->get('active_user');
 $user = $this->get('user');
 $changesets = $this->get('changesets');
 global $output_formatter;
 ?>
 <h1><span class="glyphicon glyphicon-user" title="User"></span> <?php out($user->name)?> <small>(<?php out($user->uid)?>)</small></h1>
+<?php if($active_user->admin && $user->auth_realm === 'local') { ?>
+<form method="post" action="/users/<?php out($user->uid, ESC_URL)?>" class="form-horizontal">
+	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+	<div class="form-group">
+		<label for="uid" class="col-sm-2 control-label">User ID</label>
+		<div class="col-sm-10">
+			<p class="form-control-static"><?php out($user->uid)?></p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="name" class="col-sm-2 control-label">Full name</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" id="name" name="name" required pattern=".*\S+.*" maxlength="255" value="<?php out($user->name)?>">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="email" class="col-sm-2 control-label">Email address</label>
+		<div class="col-sm-10">
+			<input type="email" class="form-control" id="email" name="email" required maxlength="255" value="<?php out($user->email)?>">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Status</label>
+		<div class="col-sm-10">
+			<div class="checkbox">
+				<label><input type="checkbox" id="active" name="active"<?php if($user->active) out(' checked')?>>Active</label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">Roles</label>
+		<div class="col-sm-10">
+			<div class="checkbox">
+				<label><input type="checkbox" id="admin" name="admin"<?php if($user->admin) out(' checked')?>>Administrator</label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-primary" name="update_user" value="1">Update user</button>
+		</div>
+	</div>
+</form>
+<?php } ?>
 <h2>Activity</h2>
 <?php if(count($changesets) == 0) { ?>
 <p>No activity yet.</p>
