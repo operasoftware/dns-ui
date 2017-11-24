@@ -40,11 +40,12 @@ class ZoneDirectory extends DBDirectory {
 	* @param Zone $zone to be added
 	*/
 	public function add_zone(Zone $zone) {
-		$stmt = $this->database->prepare('INSERT INTO zone (pdns_id, name, serial, account) VALUES (?, ?, ?, ?)');
+		$stmt = $this->database->prepare('INSERT INTO zone (pdns_id, name, serial, kind, account) VALUES (?, ?, ?, ?, ?)');
 		$stmt->bindParam(1, $zone->pdns_id, PDO::PARAM_STR);
 		$stmt->bindParam(2, $zone->name, PDO::PARAM_STR);
 		$stmt->bindParam(3, $zone->serial, PDO::PARAM_INT);
-		$stmt->bindParam(4, $zone->account, PDO::PARAM_STR);
+		$stmt->bindParam(4, $zone->kind, PDO::PARAM_STR);
+		$stmt->bindParam(5, $zone->account, PDO::PARAM_STR);
 		$stmt->execute();
 		$zone->id = $this->database->lastInsertId('zone_id_seq');
 	}
