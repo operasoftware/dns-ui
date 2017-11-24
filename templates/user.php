@@ -20,6 +20,7 @@ $changesets = $this->get('changesets');
 global $output_formatter;
 ?>
 <h1><span class="glyphicon glyphicon-user" title="User"></span> <?php out($user->name)?> <small>(<?php out($user->uid)?>)</small></h1>
+<h2>User details</h2>
 <?php if($active_user->admin && $user->auth_realm === 'local') { ?>
 <form method="post" action="/users/<?php out($user->uid, ESC_URL)?>" class="form-horizontal">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
@@ -63,6 +64,15 @@ global $output_formatter;
 		</div>
 	</div>
 </form>
+<?php } else { ?>
+<dl class="dl-horizontal">
+	<dt>User ID</dt>
+	<dd><?php out($user->uid)?></dd>
+	<dt>Full name</dt>
+	<dd><?php out($user->name)?></dd>
+	<dt>Email address</dt>
+	<dd><?php out($user->email)?></dd>
+</dl>
 <?php } ?>
 <h2>Activity</h2>
 <?php if(count($changesets) == 0) { ?>
