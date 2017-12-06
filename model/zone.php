@@ -517,7 +517,7 @@ class Zone extends Record {
 				$git_commit_comment .= "* {$rev->name}\n";
 			}
 		}
-		$git_commit_comment .= "\n{$config['web']['baseurl']}/zones/".urlencode($this->name).'#changelog#'.$changeset->id;
+		$git_commit_comment .= "\n{$config['web']['baseurl']}/zones/".urlencode(DNSZoneName::unqualify($this->name)).'#changelog#'.$changeset->id;
 		if(!empty($update->comment)) {
 			$git_commit_comment .= "\nChange comment: {$update->comment}";
 		}
