@@ -158,6 +158,7 @@ class Zone extends Record {
 	* @throws ResourceRecordInvalid if update failed
 	*/
 	public function commit_changes() {
+		usort($this->changes, function($a, $b) { return strcmp($a->changetype, $b->changetype); });
 		$patch = new StdClass;
 		$patch->rrsets = $this->changes;
 		//echo 'PATCH: <pre>'.hesc(json_encode($patch, JSON_PRETTY_PRINT)).'</pre>';die;
