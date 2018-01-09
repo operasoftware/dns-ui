@@ -27,6 +27,7 @@ $local_zone = $this->get('local_zone');
 $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
 $soa_templates = $this->get('soa_templates');
+$dnssec_enabled = $this->get('dnssec_enabled');
 $maxperpage = 1000;
 $reverse = false;
 global $output_formatter;
@@ -371,6 +372,7 @@ global $output_formatter;
 					<?php } ?>
 				</div>
 			</div>
+			<?php if($dnssec_enabled) { ?>
 			<div class="form-group">
 				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
 				<div class="col-sm-10">
@@ -383,6 +385,7 @@ global $output_formatter;
 					<?php } ?>
 				</div>
 			</div>
+			<?php } ?>
 			<h3>Start of authority (SOA)</h3>
 			<?php if($active_user->admin) { ?>
 			<div class="form-group">

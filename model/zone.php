@@ -184,10 +184,13 @@ class Zone extends Record {
 	* @param string $account new value
 	*/
 	public function update() {
+		global $config;
 		$update = new StdClass;
 		$update->kind = $this->kind;
 		$update->account = $this->account;
-		$update->dnssec = (bool)$this->dnssec;
+		if(isset($config['dns']['dnssec']) && $config['dns']['dnssec'] == 1) {
+			$update->dnssec = (bool)$this->dnssec;
+		}
 		$response = $this->powerdns->put('zones/'.urlencode($this->pdns_id), $update);
 		parent::update();
 	}

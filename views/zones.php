@@ -68,6 +68,7 @@ if(!isset($content)) {
 	$content->set('replication_types', $replication_types);
 	$content->set('soa_templates', $soa_templates);
 	$content->set('ns_templates', $ns_templates);
+	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
 }
 
 $page = new PageSection('base');

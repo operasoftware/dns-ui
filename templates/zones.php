@@ -19,6 +19,7 @@ $zones = $this->get('zones');
 $replication_types = $this->get('replication_types');
 $soa_templates = $this->get('soa_templates');
 $ns_templates = $this->get('ns_templates');
+$dnssec_enabled = $this->get('dnssec_enabled');
 $zone_types = array('forward' => array(), 'reverse4' => array(), 'reverse6' => array());
 $accounts = array();
 foreach($zones as $zone) {
@@ -56,7 +57,9 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
+					<?php if($dnssec_enabled) { ?>
 					<th>DNSSEC</th>
+					<?php } ?>
 				</tr>
 			</thead>
 			<tbody>
@@ -66,7 +69,9 @@ foreach($zones as $zone) {
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
+					<?php if($dnssec_enabled) { ?>
 					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
+					<?php } ?>
 				</tr>
 				<?php } ?>
 			</tbody>
@@ -87,7 +92,9 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
+					<?php if($dnssec_enabled) { ?>
 					<th>DNSSEC</th>
+					<?php } ?>
 				</tr>
 			</thead>
 			<tbody>
@@ -99,7 +106,9 @@ foreach($zones as $zone) {
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
+					<?php if($dnssec_enabled) { ?>
 					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
+					<?php } ?>
 				</tr>
 				<?php } ?>
 			</tbody>
@@ -127,7 +136,9 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
+					<?php if($dnssec_enabled) { ?>
 					<th>DNSSEC</th>
+					<?php } ?>
 				</tr>
 			</thead>
 			<tbody>
@@ -139,7 +150,9 @@ foreach($zones as $zone) {
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
+					<?php if($dnssec_enabled) { ?>
 					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
+					<?php } ?>
 				</tr>
 				<?php } ?>
 			</tbody>
@@ -186,6 +199,7 @@ foreach($zones as $zone) {
 					</datalist>
 				</div>
 			</div>
+			<?php if($dnssec_enabled) { ?>
 			<div class="form-group">
 				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
 				<div class="col-sm-10">
@@ -198,6 +212,7 @@ foreach($zones as $zone) {
 					<?php } ?>
 				</div>
 			</div>
+			<?php } ?>
 			<fieldset>
 				<legend>SOA</legend>
 				<div class="form-group">

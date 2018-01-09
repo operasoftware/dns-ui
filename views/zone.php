@@ -232,6 +232,7 @@ if(!isset($content)) {
 	$content->set('local_ipv4_ranges', $config['dns']['local_ipv4_ranges']);
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);
 	$content->set('soa_templates', $template_dir->list_soa_templates());
+	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
 }
 
 $page = new PageSection('base');
