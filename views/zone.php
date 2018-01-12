@@ -27,7 +27,27 @@ if(!$active_user->admin && !$active_user->access_to($zone)) {
 	exit;
 }
 
-$rrsets = $zone->list_resource_record_sets();
+$deletion = $zone->get_delete_request();
+try {
+	$rrsets = $zone->list_resource_record_sets();
+} catch(ZoneNotFoundInPowerDNS $e) {
+	if($active_user->admin) {
+		$content = new PageSection('zonedeleted');
+		$content->set('zone', $zone);
+		$content->set('deletion', $deletion);
+
+		$page = new PageSection('base');
+		$page->set('title', DNSZoneName::unqualify(punycode_to_utf8($zone->name)));
+		$page->set('content', $content);
+		$page->set('alerts', $active_user->pop_alerts());
+
+		echo $page->generate();
+		exit;
+	} else {
+		require('views/error404.php');
+		exit;
+	}
+}
 $pending = $zone->list_pending_updates();
 $changesets = $zone->list_changesets();
 $access = $zone->list_access();
@@ -182,6 +202,29 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$json->actions = array($update);
 			$zone->process_bulk_json_rrset_update(json_encode($json));
 		}
+	} elseif(isset($_POST['request_delete_zone']) && $active_user->admin) {
+		$zone->add_delete_request();
+		$mail = new Email;
+		// Mail SOA contact about deletion request
+		$mail->add_recipient(preg_replace('/^([^\.]+)\./', '$1@', trim($zone->soa->contact, '.')));
+		$mail->add_reply_to($active_user->email, $active_user->name);
+		$mail->subject = "DNS zone deletion request for ".punycode_to_utf8(DNSZoneName::unqualify($zone->name))." zone by {$active_user->name}";
+		$mail->body = "{$active_user->name} ({$active_user->uid}) has requested the deletion of the ".punycode_to_utf8(DNSZoneName::unqualify($zone->name))." zone.\n\n";
+		$mail->body .= "Approve or reject the change here:\n\n  {$config['web']['baseurl']}/zones/".urlencode(DNSZoneName::unqualify($zone->name))."#tools";
+		$mail->send();
+		$alert = new UserAlert;
+		$alert->content = "The zone deletion has been requested and is awaiting approval.";
+		$active_user->add_alert($alert);
+		redirect();
+	} elseif(isset($_POST['cancel_delete_zone']) && $active_user->admin) {
+		$zone->cancel_delete_request();
+		redirect();
+	} elseif(isset($_POST['confirm_delete_zone']) && $active_user->admin) {
+		$zone->confirm_delete_request();
+		$alert = new UserAlert;
+		$alert->content = "Zone deleted.";
+		$active_user->add_alert($alert);
+		redirect();
 	} elseif(isset($_POST['add_access']) && $active_user->admin) {
 		try {
 			$zoneaccess = new ZoneAccess;
@@ -233,6 +276,7 @@ if(!isset($content)) {
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);
 	$content->set('soa_templates', $template_dir->list_soa_templates());
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
+	$content->set('deletion', $deletion);
 }
 
 $page = new PageSection('base');

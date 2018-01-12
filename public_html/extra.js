@@ -1039,6 +1039,23 @@ $(function() {
 		}
 	});
 
+	// Add delete zone confirmation checkbox
+	$('form.zonedelete').each(function() {
+		var form = $(this);
+		$('label', form).hide();
+		$('button.btn-danger', form).on('click', function(e) {
+			if($('input:checkbox:checked', form).length == 0) {
+				$('label', form).show('fast');
+				$('button span', form).hide('fast');
+				$(this).prop('disabled', true);
+				e.preventDefault();
+			}
+		});
+		$('input:checkbox', form).on('click', function(e) {
+			$('button.btn-danger', form).prop('disabled', !this.checked);
+		});
+	});
+
 	// Add filter functionality for zone list tables
 	$('table.zonelist').each(function() {
 		var table = $(this);

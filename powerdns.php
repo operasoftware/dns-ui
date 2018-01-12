@@ -49,4 +49,9 @@ class PowerDNS extends PestJSON {
     	$headers['X-API-Key'] = $this->api_key;
         return parent::patch($url, $data, $headers);
     }
+
+    public function delete($url, $headers = array()) {
+    	$headers['X-API-Key'] = $this->api_key;
+        return parent::delete($url, $headers);
+    }
 }

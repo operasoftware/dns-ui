@@ -196,6 +196,9 @@ del {
 td:hover .zone-hint {
 	color: #999;
 }
+pre.source {
+	max-height: 30em;
+}
 
 div.stickyHeader {
 	position: fixed;

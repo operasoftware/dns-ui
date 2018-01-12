@@ -22,7 +22,7 @@ class MigrationDirectory extends DBDirectory {
 	/**
 	* Increment this constant to activate a new migration from the migrations directory
 	*/
-	const LAST_MIGRATION = 4;
+	const LAST_MIGRATION = 5;
 
 	public function __construct() {
 		parent::__construct();

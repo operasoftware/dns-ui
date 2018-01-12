@@ -51,7 +51,7 @@ class Zone extends Record {
 	}
 
 	/**
-	* Magic getter method - if superior field requested, return User object of user's superior.
+	* Magic getter method with special cases for soa and nameservers.
 	* @param string $field to retrieve
 	* @return mixed data stored in field
 	*/
@@ -203,9 +203,13 @@ class Zone extends Record {
 	*/
 	public function &list_resource_record_sets() {
 		if(is_null($this->rrsets)) {
-			$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id));
 			$this->rrsets = array();
 			$this->nameservers = array();
+			try {
+				$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id));
+			} catch(Pest_InvalidRecord $e) {
+				throw new ZoneNotFoundInPowerDNS;
+			}
 			$possible_bad_data = array();
 			usort($data->rrsets,
 				function($a, $b) {
@@ -470,6 +474,76 @@ class Zone extends Record {
 	}
 
 	/**
+	* Add a deletion request for this zone.
+	*/
+	public function add_delete_request() {
+		global $active_user;
+		$stmt = $this->database->prepare('INSERT INTO zone_delete (zone_id, requester_id, request_date) VALUES (?, ?, NOW())');
+		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
+		$stmt->bindParam(2, $active_user->id, PDO::PARAM_INT);
+		try {
+			$stmt->execute();
+		} catch(PDOException $e) {
+			if($e->getCode() == 23505) return;
+			throw $e;
+		}
+	}
+
+	/**
+	* Get the deletion request for this zone (if any).
+	*/
+	public function get_delete_request() {
+		global $active_user;
+		$stmt = $this->database->prepare('SELECT * FROM zone_delete WHERE zone_id = ?');
+		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
+		$stmt->execute();
+		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			$row['requester'] = new User($row['requester_id']);
+			$row['request_date'] = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['request_date']);
+			if(!is_null($row['confirmer_id'])) {
+				$row['confirmer'] = new User($row['confirmer_id']);
+				$row['confirm_date'] = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['confirm_date']);
+			}
+			return $row;
+		}
+		return null;
+	}
+
+	/**
+	* Cancel the deletion request for this zone.
+	*/
+	public function cancel_delete_request() {
+		global $active_user;
+		$stmt = $this->database->prepare('DELETE FROM zone_delete WHERE zone_id = ? AND confirm_date IS NULL');
+		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
+		$stmt->execute();
+	}
+
+	/**
+	* Confirm the deletion request for this zone.
+	*/
+	public function confirm_delete_request() {
+		global $active_user, $zone_dir;
+		$stmt = $this->database->prepare('SELECT requester_id FROM zone_delete WHERE zone_id = ?');
+		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
+		$stmt->execute();
+		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			if($row['requester_id'] != $active_user->id) {
+				$zone_export = $this->export_as_bind9_format();
+				$stmt = $this->database->prepare('UPDATE zone_delete SET confirmer_id = ?, confirm_date = NOW(), zone_export = ? WHERE zone_id = ?');
+				$stmt->bindParam(1, $active_user->id, PDO::PARAM_INT);
+				$stmt->bindParam(2, $zone_export, PDO::PARAM_LOB);
+				$stmt->bindParam(3, $this->id, PDO::PARAM_INT);
+				$stmt->execute();
+				if($stmt->rowCount() == 1) {
+					$this->powerdns->delete('zones/'.urlencode($this->pdns_id));
+					$zone_dir->git_tracked_delete($this, 'Zone '.$this->name.' deleted via DNS UI');
+				}
+			}
+		}
+	}
+
+	/**
 	* Given a JSON-encoded string with a list of changes to be made to a zone, process and perform those changes.
 	* @param string $update JSON-encoded list of changes
 	*/
@@ -705,5 +779,6 @@ class SOA {
 	public $default_ttl;
 }
 
+class ZoneNotFoundInPowerDNS extends RuntimeException {}
 class ChangeSetNotFound extends RuntimeException {}
 class PendingUpdateNotFound extends RuntimeException {}

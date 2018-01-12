@@ -277,6 +277,24 @@ class ZoneDirectory extends DBDirectory {
 			chdir($original_dir);
 		}
 	}
+
+	/**
+	* Remove the specified zone from the git-tracked export
+	* @param Zone $zone to be removed
+	* @param string $message commit message
+	*/
+	public function git_tracked_delete(Zone $zone, $message) {
+		global $config, $active_user;
+		if($config['git_tracked_export']['enabled']) {
+			$original_dir = getcwd();
+			if(chdir($config['git_tracked_export']['path'])) {
+				$outfile = urlencode(DNSZoneName::unqualify($zone->name));
+				exec('LANG=en_US.UTF-8 git rm '.escapeshellarg($outfile));
+				exec('LANG=en_US.UTF-8 git commit --author '.escapeshellarg($active_user->name.' <'.$active_user->email.'>').' -m '.escapeshellarg($message));
+			}
+			chdir($original_dir);
+		}
+	}
 }
 
 class ZoneNotFound extends RuntimeException {};

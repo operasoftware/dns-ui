@@ -28,6 +28,7 @@ $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
 $soa_templates = $this->get('soa_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
+$deletion = $this->get('deletion');
 $maxperpage = 1000;
 $reverse = false;
 global $output_formatter;
@@ -46,7 +47,7 @@ global $output_formatter;
 	<li role="presentation"><a href="#soa" aria-controls="soa" role="tab" data-toggle="tab">Zone configuration</a></li>
 	<li role="presentation"><a href="#import" aria-controls="import" role="tab" data-toggle="tab">Export / Import</a></li>
 	<?php if($active_user->admin) { ?>
-	<li role="presentation"><a href="#tools" aria-controls="tools" role="tab" data-toggle="tab">Tools</a></li>
+	<li role="presentation"><a href="#tools" aria-controls="tools" role="tab" data-toggle="tab">Tools<?php if(!is_null($deletion)) { ?> <span class="badge">!</span><?php } ?></a></li>
 	<?php } ?>
 	<li role="presentation"><a href="#changelog" aria-controls="changelog" role="tab" data-toggle="tab">Changelog</a></li>
 	<li role="presentation"><a href="#access" aria-controls="access" role="tab" data-toggle="tab">User access</a></li>
@@ -526,6 +527,39 @@ global $output_formatter;
 			</div>
 			<button type="submit" class="btn btn-primary">Split matching records into new zone…</button>
 		</form>
+		<h3>Delete zone</h3>
+		<?php if(is_null($deletion)) { ?>
+		<p>Permanently delete a zone from the DNS server and archive it. Zone deletion requires confirmation from another user.</p>
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zonedelete form-inline">
+			<p>
+				<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+				<div class="checkbox"><label><input type="checkbox" name="request_delete_zone" value="1"> Confirm zone deletion request</label></div>
+				<button type="submit" class="btn btn-danger">Request zone deletion<span>…</span></button>
+			</p>
+		</form>
+		<?php } elseif(is_null($deletion['confirm_date'])) { ?>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h4 class="panel-title">Deletion request pending</h4>
+			</div>
+			<div class="panel-body">
+				<p><a href="/users/<?php out($deletion['requester']->uid, ESC_URL)?>"><?php out($deletion['requester']->name)?></a> has requested that this zone be deleted from the DNS server. This request must be confirmed by another administrator.</p>
+				<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zonedelete form-inline">
+					<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+					<button type="submit" class="btn btn-default" name="cancel_delete_zone" value="1">Abort request</button>
+					<?php if($deletion['requester']->id != $active_user->id) { ?>
+					<div class="checkbox"><label><input type="checkbox" name="confirm_delete_zone" value="1"> Confirm zone deletion</label></div>
+					<button type="submit" class="btn btn-danger">Delete zone<span>…</span></button>
+					<?php } ?>
+				</form>
+			</div>
+		</div>
+		<?php } ?>
+		<?php if($zone->kind == 'Master') { ?>
+		<div class="alert alert-warning">
+			<strong>Warning:</strong> Deleting a zone that uses master/slave replication will not delete the zone from the slave server(s).
+		</div>
+		<?php } ?>
 	</div>
 	<?php } ?>
 	<div role="tabpanel" class="tab-pane" id="changelog">
