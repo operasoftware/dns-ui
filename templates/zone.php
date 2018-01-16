@@ -554,6 +554,16 @@ global $output_formatter;
 				</form>
 			</div>
 		</div>
+		<?php } else { ?>
+		<div class="alert alert-warning">
+			<p>This zone was previously deleted on <?php out($deletion['confirm_date']->format('Y-m-d H:i:s'))?> by <a href="/users/<?php out($deletion['requester']->uid, ESC_URL)?>"><?php out($deletion['requester']->name)?></a> and <a href="/users/<?php out($deletion['confirmer']->uid, ESC_URL)?>"><?php out($deletion['confirmer']->name)?></a>.</p>
+			<p>This is a snapshot of the zone's contents prior to its deletion.</p>
+			<pre class="source"><?php out($deletion['zone_export'])?></pre>
+			<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zonedelete form-inline">
+				<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+				<button type="submit" class="btn btn-default" name="remove_delete_record" value="1">Remove snapshot</button>
+			</form>
+		</div>
 		<?php } ?>
 		<?php if($zone->kind == 'Master') { ?>
 		<div class="alert alert-warning">

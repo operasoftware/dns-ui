@@ -47,8 +47,22 @@ class ZoneDirectory extends DBDirectory {
 		$stmt->bindParam(4, $zone->kind, PDO::PARAM_STR);
 		$stmt->bindParam(5, $zone->account, PDO::PARAM_STR);
 		$stmt->bindParam(6, $zone->dnssec, PDO::PARAM_INT);
-		$stmt->execute();
-		$zone->id = $this->database->lastInsertId('zone_id_seq');
+		try {
+			$stmt->execute();
+			$zone->id = $this->database->lastInsertId('zone_id_seq');
+		} catch(PDOException $e) {
+			if($e->getCode() == 23505) {
+				// Zone already exists in the database
+				$stmt = $this->database->prepare('SELECT id FROM zone WHERE name = ?');
+				$stmt->bindParam(1, $name, PDO::PARAM_STR);
+				$stmt->execute();
+				if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+					$zone->id = $row['id'];
+				}
+			} else {
+				throw $e;
+			}
+		}
 	}
 
 	/**

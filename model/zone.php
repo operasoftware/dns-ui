@@ -493,7 +493,6 @@ class Zone extends Record {
 	* Get the deletion request for this zone (if any).
 	*/
 	public function get_delete_request() {
-		global $active_user;
 		$stmt = $this->database->prepare('SELECT * FROM zone_delete WHERE zone_id = ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
 		$stmt->execute();
@@ -513,7 +512,6 @@ class Zone extends Record {
 	* Cancel the deletion request for this zone.
 	*/
 	public function cancel_delete_request() {
-		global $active_user;
 		$stmt = $this->database->prepare('DELETE FROM zone_delete WHERE zone_id = ? AND confirm_date IS NULL');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
 		$stmt->execute();
@@ -541,6 +539,65 @@ class Zone extends Record {
 				}
 			}
 		}
+	}
+
+	/**
+	* Remove the deletion record for this zone.
+	*/
+	public function remove_delete_record() {
+		$stmt = $this->database->prepare('DELETE FROM zone_delete WHERE zone_id = ? AND confirm_date IS NOT NULL');
+		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
+		$stmt->execute();
+	}
+
+	/**
+	* Restore a deleted zone.
+	*/
+	public function restore() {
+		global $zone_dir;
+		$deletion = $this->get_delete_request();
+		$zonefile = new BindZonefile($deletion['zone_export']);
+		$rrsets = $zonefile->parse_into_rrsets($this, true);
+		$data = new StdClass;
+		$data->name = $this->name;
+		$data->kind = $this->kind;
+		$data->nameservers = array();
+		$data->rrsets = array();
+		foreach($rrsets as $rrset) {
+			$recordset = new StdClass;
+			$recordset->name = $rrset->name;
+			$recordset->type = $rrset->type;
+			$recordset->ttl = $rrset->ttl;
+			$recordset->records = array();
+			$recordset->comments = array();
+			foreach($rrset->list_resource_records() as $rr) {
+				$record = new StdClass;
+				$record->content = $rr->content;
+				$record->disabled = $rr->disabled;
+				$recordset->records[] = $record;
+			}
+			foreach($rrset->list_comments() as $c) {
+				$comment = new StdClass;
+				$comment->name = $c->name;
+				$comment->type = $c->type;
+				$comment->content = $c->content;
+				$comment->account = $c->account;
+				$comment->modified_at = $c->modified_at;
+				$recordset->comments[] = $comment;
+			}
+			$data->rrsets[] = $recordset;
+		}
+		$data->soa_edit_api = 'INCEPTION-INCREMENT';
+		$data->account = $this->account;
+		$data->dnssec = (bool)$this->dnssec;
+		$response = $this->powerdns->post('zones', $data);
+		$this->pdns_id = $response->id;
+		$this->serial = $response->serial;
+		$this->send_notify();
+		$zone_dir->git_tracked_export(array($this), 'Zone '.$this->name.' restored via DNS UI');
+		$stmt = $this->database->prepare('DELETE FROM zone_delete WHERE zone_id = ? AND confirm_date IS NOT NULL');
+		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
+		$stmt->execute();
 	}
 
 	/**

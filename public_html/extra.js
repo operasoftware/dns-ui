@@ -1039,8 +1039,8 @@ $(function() {
 		}
 	});
 
-	// Add delete zone confirmation checkbox
-	$('form.zonedelete').each(function() {
+	// Add delete/restore zone confirmation checkbox
+	$('form.zonedelete, form.zonerestore').each(function() {
 		var form = $(this);
 		$('label', form).hide();
 		$('button.btn-danger', form).on('click', function(e) {

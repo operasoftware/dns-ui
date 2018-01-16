@@ -32,6 +32,10 @@ try {
 	$rrsets = $zone->list_resource_record_sets();
 } catch(ZoneNotFoundInPowerDNS $e) {
 	if($active_user->admin) {
+		if(isset($_POST['restore_zone'])) {
+			$zone->restore();
+			redirect();
+		}
 		$content = new PageSection('zonedeleted');
 		$content->set('zone', $zone);
 		$content->set('deletion', $deletion);
@@ -224,6 +228,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$alert = new UserAlert;
 		$alert->content = "Zone deleted.";
 		$active_user->add_alert($alert);
+		redirect();
+	} elseif(isset($_POST['remove_delete_record']) && $active_user->admin) {
+		$zone->remove_delete_record();
 		redirect();
 	} elseif(isset($_POST['add_access']) && $active_user->admin) {
 		try {

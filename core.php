@@ -38,6 +38,7 @@ require('routes.php');
 require('ldap.php');
 require('powerdns.php');
 require('email.php');
+require('bindzonefile.php');
 
 $ldap = new LDAP(
 	isset($config['ldap']['host']) ? $config['ldap']['host'] : $config['ldap']['hostname'],
