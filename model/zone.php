@@ -555,6 +555,8 @@ class Zone extends Record {
 	*/
 	public function restore() {
 		global $zone_dir;
+		$initial_limit = 10; // Max records to send in first request - workaround for https://github.com/PowerDNS/pdns/issues/6111
+		$batch_limit = 2500; // Max records to send in subsequent requests - avoid hitting limits in PowerDNS
 		$deletion = $this->get_delete_request();
 		$zonefile = new BindZonefile($deletion['zone_export']);
 		$rrsets = $zonefile->parse_into_rrsets($this, true);
@@ -590,9 +592,21 @@ class Zone extends Record {
 		$data->soa_edit_api = 'INCEPTION-INCREMENT';
 		$data->account = $this->account;
 		$data->dnssec = (bool)$this->dnssec;
+		$remaining_rrsets = array_slice($data->rrsets, $initial_limit);
+		$data->rrsets = array_slice($data->rrsets, 0, $initial_limit);
 		$response = $this->powerdns->post('zones', $data);
 		$this->pdns_id = $response->id;
 		$this->serial = $response->serial;
+		while(count($remaining_rrsets) > 0) {
+			$patch = new StdClass;
+			$patch->rrsets = $remaining_rrsets;
+			$remaining_rrsets = array_slice($patch->rrsets, $batch_limit);
+			$patch->rrsets = array_slice($patch->rrsets, 0, $batch_limit);
+			foreach($patch->rrsets as $ref => $value) {
+				$patch->rrsets[$ref]->changetype = 'REPLACE';
+			}
+			$response = $this->powerdns->patch('zones/'.urlencode($this->pdns_id), $patch);
+		}
 		$this->send_notify();
 		$zone_dir->git_tracked_export(array($this), 'Zone '.$this->name.' restored via DNS UI');
 		$stmt = $this->database->prepare('DELETE FROM zone_delete WHERE zone_id = ? AND confirm_date IS NOT NULL');
