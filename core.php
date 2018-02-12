@@ -143,6 +143,7 @@ function redirect($url = null, $type = '303 See other') {
 	if(is_null($url)) $url = $absolute_request_url;
 	header("HTTP/1.1 $type");
 	header("Location: $url");
+	print("\n");
 	exit;
 }
 
