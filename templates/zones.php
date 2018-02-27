@@ -203,13 +203,9 @@ foreach($zones as $zone) {
 			<div class="form-group">
 				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
 				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
 					<div class="checkbox">
-						<label><input type="checkbox" id="dnssec" name="dnssec" value="1"<?php if($zone->dnssec) out(' checked')?>> Enabled</label>
+						<label><input type="checkbox" id="dnssec" name="dnssec" value="1"> Enabled</label>
 					</div>
-					<?php } else { ?>
-					<p class="form-control-static"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></p>
-					<?php } ?>
 				</div>
 			</div>
 			<?php } ?>
