@@ -685,7 +685,7 @@ class Zone extends Record {
 	* @param array $revs_updated keep track of reverse zones that will be updated
 	*/
 	private function process_rrset_action($update, &$trash, &$revs_missing, &$revs_updated) {
-		global $active_user, $zone_dir;
+		global $active_user, $config, $zone_dir;
 		if(!is_object($update)) throw new BadData('Malformed update.');
 		if(!(isset($update->name) && isset($update->type))) throw new BadData('Malformed action.');
 		$change = new Change;
@@ -708,13 +708,22 @@ class Zone extends Record {
 			if(!isset($update->ttl)) throw new BadData('Malformed recordset.');
 			$rrset->ttl = DNSTime::expand($update->ttl);
 			$trash[$update->name.' '.$update->type] = false;
+			if(isset($config['dns']['autocreate_reverse_records'])) {
+				$autocreate_ptr = (bool)$config['dns']['autocreate_reverse_records']);
+			} else {
+				$autocreate_ptr = true; # enabled by default
+			}
 			foreach($update->records as $record) {
 				if(!(isset($record->content) && isset($record->enabled))) throw new BadData('Malformed record.');
 				$record->content = DNSContent::encode($record->content, $update->type, $this->name);
 				$rr = new ResourceRecord;
 				$rr->content = $record->content;
 				$rr->disabled = ($record->enabled === 'No' || $record->enabled === false);
-				$rr->{'set-ptr'} = $rr->disabled ? false : $zone_dir->check_reverse_record_zone($rrset->type, $rr->content, $revs_missing, $revs_updated);
+				if(!$autocreate_ptr || $rr->disabled) {
+					$rr->{'set-ptr'} = false;
+				} else {
+					$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rrset->type, $rr->content, $revs_missing, $revs_updated);
+				}
 				$rrset->add_resource_record($rr);
 			}
 			if(isset($update->comment)) {
