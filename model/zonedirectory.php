@@ -233,13 +233,24 @@ class ZoneDirectory extends DBDirectory {
 				$reverse_zone = $zone_dir->get_zone_by_name($reverse_zone_name);
 				// See if a record already exists for this IP
 				foreach($reverse_zone->list_resource_record_sets() as $rrset) {
-					if($rrset->type == 'PTR' && $rrset->name == $reverse_address) {
-						$alert = new UserAlert;
-						$alert->escaping = ESC_NONE;
-						$alert->content = 'Reverse record already exists for '.hesc($address).' in <a href="/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name)).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not modifying existing record.';
-						$alert->class = 'warning';
-						$active_user->add_alert($alert);
-						return false;
+					if($rrset->name == $reverse_address) {
+						if($rrset->type == 'PTR') {
+							$alert = new UserAlert;
+							$alert->escaping = ESC_NONE;
+							$alert->content = 'Reverse record already exists for '.hesc($address).' in <a href="/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name)).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not modifying existing PTR record.';
+							$alert->class = 'warning';
+							$active_user->add_alert($alert);
+							return false;
+						}
+						if($rrset->type == 'CNAME') {
+							$rr = reset($rrset->list_resource_records());
+							$alert = new UserAlert;
+							$alert->escaping = ESC_NONE;
+							$alert->content = 'Reverse record delegated to '.hesc($rr->content).' for '.hesc($address).' in <a href="/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name)).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not creating PTR record.';
+							$alert->class = 'warning';
+							$active_user->add_alert($alert);
+							return false;
+						}
 					}
 				}
 				// Add reverse zone to list of zones to send a notify for
