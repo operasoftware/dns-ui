@@ -709,7 +709,7 @@ class Zone extends Record {
 			$rrset->ttl = DNSTime::expand($update->ttl);
 			$trash[$update->name.' '.$update->type] = false;
 			if(isset($config['dns']['autocreate_reverse_records'])) {
-				$autocreate_ptr = (bool)$config['dns']['autocreate_reverse_records']);
+				$autocreate_ptr = (bool)$config['dns']['autocreate_reverse_records'];
 			} else {
 				$autocreate_ptr = true; # enabled by default
 			}
