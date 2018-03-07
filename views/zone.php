@@ -58,6 +58,7 @@ $access = $zone->list_access();
 $accounts = $zone_dir->list_accounts();
 $allusers = $user_dir->list_users();
 $replication_types = $replication_type_dir->list_replication_types();
+$force_change_review = isset($config['web']['force_change_review']) ? $config['web']['force_change_review'] : '0';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['update_rrs'])) {
@@ -69,7 +70,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		foreach($_POST['updates'] as $update) {
 			$json->actions[] = json_decode($update);
 		}
-		if($active_user->admin || $active_user->access_to($zone) == 'administrator') {
+		if(($active_user->admin || $active_user->access_to($zone) == 'administrator') && !$force_change_review) {
 			try {
 				$zone->process_bulk_json_rrset_update(json_encode($json));
 				redirect();
@@ -284,6 +285,7 @@ if(!isset($content)) {
 	$content->set('soa_templates', $template_dir->list_soa_templates());
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
 	$content->set('deletion', $deletion);
+	$content->set('force_change_review', $force_change_review);
 }
 
 $page = new PageSection('base');
