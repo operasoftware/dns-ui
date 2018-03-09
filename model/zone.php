@@ -589,6 +589,7 @@ class Zone extends Record {
 			}
 			$data->rrsets[] = $recordset;
 		}
+		$data->soa_edit = 'INCEPTION-INCREMENT';
 		$data->soa_edit_api = 'INCEPTION-INCREMENT';
 		$data->account = $this->account;
 		$data->dnssec = (bool)$this->dnssec;
