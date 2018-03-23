@@ -40,6 +40,10 @@ class Zone extends Record {
 	*/
 	private $nameservers = null;
 	/**
+	* Crypto keys for the zone as reported by PowerDNS
+	*/
+	private $cryptokeys = null;
+	/**
 	* List of changes to be applied to the zone when doing ->commit_changes()
 	*/
 	private $changes = array();
@@ -282,6 +286,19 @@ class Zone extends Record {
 			}
 		}
 		return $this->rrsets;
+	}
+
+	/**
+	* Get all cryptokey metadata this zone.
+	* Fetch and parse the data from the PowerDNS API if we do not yet have it.
+	* @return StdClass containing all cryptokey metadata
+	*/
+	public function &get_cryptokeys() {
+		if(is_null($this->cryptokeys)) {
+			$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id).'/cryptokeys');
+		}
+		$this->cryptokeys = $data;
+		return $this->cryptokeys;
 	}
 
 	/**

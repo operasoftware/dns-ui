@@ -21,6 +21,7 @@ $pending = $this->get('pending');
 $changesets = $this->get('changesets');
 $access = $this->get('access');
 $accounts = $this->get('accounts');
+$cryptokeys = $this->get('cryptokeys');
 $allusers = $this->get('allusers');
 $replication_types = $this->get('replication_types');
 $local_zone = $this->get('local_zone');
@@ -46,6 +47,9 @@ global $output_formatter;
 	<li role="presentation" class="active"><a href="#records" aria-controls="records" role="tab" data-toggle="tab">Resource records</a></li>
 	<li role="presentation"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">Pending updates<?php if(count($pending) > 0) {?> <span class="badge"><?php out(count($pending))?></span><?php } ?></a></li>
 	<li role="presentation"><a href="#soa" aria-controls="soa" role="tab" data-toggle="tab">Zone configuration</a></li>
+	<?php if($zone->dnssec) { ?>
+	<li role="presentation"><a href="#cryptokeys" aria-controls="cryptokeys" role="tab" data-toggle="tab">DNSSEC</a></li>
+	<?php } ?>
 	<li role="presentation"><a href="#import" aria-controls="import" role="tab" data-toggle="tab">Export / Import</a></li>
 	<?php if($active_user->admin) { ?>
 	<li role="presentation"><a href="#tools" aria-controls="tools" role="tab" data-toggle="tab">Tools<?php if(!is_null($deletion)) { ?> <span class="badge">!</span><?php } ?></a></li>
@@ -486,6 +490,40 @@ global $output_formatter;
 			<?php } ?>
 		</form>
 	</div>
+	<?php if($zone->dnssec) { ?>
+	<div role="tabpanel" class="tab-pane" id="cryptokeys">
+		<h2 class="sr-only">DNSSEC</h2>
+		<?php foreach($cryptokeys as $cryptokey) { ?>
+		<div class="panel <?php out($cryptokey->active ? 'panel-success' : 'panel-default') ?>">
+			<div class="panel-heading">
+				<h3 class="panel-title"><?php out($cryptokey->type.' #'.$cryptokey->id.': '.strtoupper($cryptokey->keytype))?></h3>
+			</div>
+			<div class="panel-body">
+				<dl>
+					<dt>Algorithm</dt>
+					<dd><?php out($cryptokey->algorithm)?></dd>
+					<dt>Bits</dt>
+					<dd><?php out($cryptokey->bits)?></dd>
+					<dt>Flags</dt>
+					<dd><?php out($cryptokey->flags)?></dd>
+					<dt>DNSKEY</dt>
+					<dd><code><?php out($zone->name.' DNSKEY '.$cryptokey->dnskey)?></code></dd>
+					<?php if(isset($cryptokey->ds)) { ?>
+					<dt>DS records</dt>
+					<dd>
+						<ul>
+							<?php foreach($cryptokey->ds as $ds) { ?>
+							<li><code><?php out($zone->name.' DS '.$ds) ?></code></li>
+							<?php } ?>
+						</ul>
+					</dd>
+					<?php } ?>
+				</dl>
+			</div>
+		</div>
+		<?php } ?>
+	</div>
+	<?php } ?>
 	<div role="tabpanel" class="tab-pane" id="import">
 		<h2 class="sr-only">Export / Import</h2>
 		<h3>Export zone</h3>

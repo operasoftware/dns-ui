@@ -55,6 +55,7 @@ try {
 $pending = $zone->list_pending_updates();
 $changesets = $zone->list_changesets();
 $access = $zone->list_access();
+$cryptokeys = $zone->get_cryptokeys();
 $accounts = $zone_dir->list_accounts();
 $allusers = $user_dir->list_users();
 $replication_types = $replication_type_dir->list_replication_types();
@@ -277,6 +278,7 @@ if(!isset($content)) {
 	$content->set('changesets', $changesets);
 	$content->set('access', $access);
 	$content->set('accounts', $accounts);
+	$content->set('cryptokeys', $cryptokeys);
 	$content->set('allusers', $allusers);
 	$content->set('replication_types', $replication_types);
 	$content->set('local_zone', $local_zone);
