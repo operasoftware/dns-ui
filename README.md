@@ -42,6 +42,8 @@ Requirements
 * PHP 5.6+
 * PHP intl (Internationalization Functions) extension
 * PHP JSON extension
+* PHP CURL extension
+* PHP Multibyte String extension
 * PHP LDAP extension
 * PHP PDO_PGSQL extension
 * PostgreSQL database
