@@ -1,0 +1,59 @@
+---
+- name: generate ldap password for admin
+  command: slappasswd -s {{ dnsui_admin_password }}
+  register: cn_admin_password
+
+- name: generate ldap password for user
+  command: slappasswd -s {{ dnsui_user_password }}
+  register: cn_user_password
+
+- name: create ldap ou's
+  ldap_entry:
+    dn: "{{ item }}"
+    objectClass: organizationalUnit
+    server_uri: ldap://localhost/
+    bind_dn: cn=admin,{{ ldap_domain_dc }}
+    bind_pw: "{{ ldap_admin_password }}"
+  loop:
+    - ou=users,{{ ldap_domain_dc }}
+    - ou=groups,{{ ldap_domain_dc }}
+
+- name: create ldap users
+  ldap_entry:
+    dn: "uid={{ item.user }},ou=users,{{ ldap_domain_dc }}"
+    objectClass:
+      - top
+      - account
+      - posixAccount
+      - shadowAccount
+    attributes:
+      cn: "{{ item.user }}"
+      userPassword: "{{ item.password }}"
+      uidNumber: 1000
+      gidNumber: 1000
+      homeDirectory: /tmp
+      loginShell: /usr/sbin/nologin
+      shadowLastChange: 0
+      shadowMin: 0
+      shadowMax: 99999
+      shadowWarning: 7
+    server_uri: ldap://localhost/
+    bind_dn: cn=admin,{{ ldap_domain_dc }}
+    bind_pw: "{{ ldap_admin_password }}"
+  loop:
+    - { user: "{{ dnsui_admin_username }}", password: "{{ cn_admin_password.stdout }}" } # password: admin
+    - { user: "{{ dnsui_user_username }}", password: "{{ cn_user_password.stdout }}" } # password: user
+
+- name: create ldap dnsui_admins posix group
+  ldap_entry:
+    dn: cn=dnsui_admins,ou=groups,{{ ldap_domain_dc }}
+    objectClass:
+      - posixGroup
+      - top
+    attributes:
+      description: dnsui_admins
+      gidNumber: 100
+      memberUid: "{{ dnsui_admin_username }}"
+    server_uri: ldap://localhost/
+    bind_dn: cn=admin,{{ ldap_domain_dc }}
+    bind_pw: "{{ ldap_admin_password }}"

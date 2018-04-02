@@ -1,0 +1,26 @@
+---
+- name: check existance of config file
+  stat:
+    path: /vagrant/vagrant/ansible/config.yml
+  register: override_config
+
+- name: load override variables
+  include_vars: /vagrant/vagrant/ansible/config.yml
+  when: override_config.stat.exists
+
+- name: generate ldap domain variable
+  set_fact:
+    ldap_domain_dc: "dc={{ ldap_domain | regex_replace('\\.', ',dc=') }}"
+
+- name: test if database vendor is supported
+  fail:
+    msg: "Database vendor '{{ database_vendor }}' is (currently) not supported"
+  when: "database_vendor not in supported_db_vendors"
+
+- set_fact:
+    ansible_database_package: python-psycopg2
+    database_package: postgresql
+    powerdns_database_package: pdns-backend-pgsql
+    powerdns_database_config: pdns.gpgsql.conf
+    php_database_package: php-pgsql
+  when: "database_vendor == 'postgresql'"

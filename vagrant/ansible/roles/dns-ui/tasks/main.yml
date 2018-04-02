@@ -1,0 +1,19 @@
+---
+- import_tasks: ping.yml
+  tags: ping
+- import_tasks: config.yml
+  tags: config
+- import_tasks: repo.yml
+  tags: repo
+- import_tasks: packages.yml
+  tags: packages
+- import_tasks: ldap.yml
+  tags: ldap
+- import_tasks: postgresql.yml
+  tags: postgresql
+- import_tasks: powerdns.yml
+  tags: powerdns
+- import_tasks: apache2.yml
+  tags: apache2
+- import_tasks: dns-ui.yml
+  tags: dns-ui
