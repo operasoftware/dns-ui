@@ -167,6 +167,8 @@ global $output_formatter;
 								<option value="CAA" data-content-pattern="[0-9]+\s+\S+\s+\S+">CAA</option>
 								<option value="CNAME" data-content-pattern="\S+">CNAME</option>
 								<option value="DNAME" data-content-pattern="\S+">DNAME</option>
+								<option value="DNSKEY" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+.+">DNSKEY</option>
+								<option value="DS" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+[a-zA-Z0-9]+">DS</option>
 								<option value="NAPTR" data-content-pattern="[0-9]+\s+[0-9]+\s+&quot;[A-Z0-9]+&quot;\s+&quot;[\w+]+&quot;\s+&quot;[^&quot;]*&quot;\s+\S+">NAPTR</option>
 								<?php if($active_user->admin) { ?>
 								<option value="NS" data-content-pattern="\S*">NS</option>
@@ -176,6 +178,7 @@ global $output_formatter;
 								<option value="PTR" data-content-pattern="\S+">PTR</option>
 								<option value="SRV" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+\S+">SRV</option>
 								<option value="SSHFP" data-content-pattern="[0-4]\s+[0-2]\s+[0-9a-f]+">SSHFP</option>
+								<option value="TLSA" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+[a-zA-Z0-9]+">TLSA</option>
 								<option value="TXT" data-content-pattern=".*">TXT</option>
 								<?php } ?>
 							</select>
