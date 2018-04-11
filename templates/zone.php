@@ -497,18 +497,17 @@ global $output_formatter;
 	<div role="tabpanel" class="tab-pane" id="cryptokeys">
 		<h2 class="sr-only">DNSSEC</h2>
 		<?php foreach($cryptokeys as $cryptokey) { ?>
+		<?php
+		list($dnskey_flags, $dnskey_protocol, $dnskey_algorithm) = preg_split('/\s+/', $cryptokey->dnskey);
+		?>
 		<div class="panel <?php out($cryptokey->active ? 'panel-success' : 'panel-default') ?>">
 			<div class="panel-heading">
 				<h3 class="panel-title"><?php out($cryptokey->type.' #'.$cryptokey->id.': '.strtoupper($cryptokey->keytype))?></h3>
 			</div>
 			<div class="panel-body">
 				<dl>
-					<dt>Algorithm</dt>
-					<dd><?php out($cryptokey->algorithm)?></dd>
-					<dt>Bits</dt>
-					<dd><?php out($cryptokey->bits)?></dd>
-					<dt>Flags</dt>
-					<dd><?php out($cryptokey->flags)?></dd>
+					<dt>Info</dt>
+					<dd><code>ID = <?php out($cryptokey->id)?> (<?php out(strtoupper($cryptokey->keytype))?>), flags = <?php out($cryptokey->flags)?>, algo = <?php out($dnskey_algorithm)?>, bits = <?php out($cryptokey->bits)?>  <?php out($cryptokey->active ? 'Active' : 'Inactive')?> ( <?php out($cryptokey->algorithm)?> )</code></dd>
 					<dt>DNSKEY</dt>
 					<dd><code><?php out($zone->name.' DNSKEY '.$cryptokey->dnskey)?></code></dd>
 					<?php if(isset($cryptokey->ds)) { ?>
