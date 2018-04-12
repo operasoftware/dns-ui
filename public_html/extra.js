@@ -1040,12 +1040,14 @@ $(function() {
 	});
 
 	// Add delete/restore zone confirmation checkbox
-	$('form.zonedelete, form.zonerestore').each(function() {
+	$('form.zonedelete, form.zonerestore, form.disablednssec').each(function() {
 		var form = $(this);
 		$('label', form).hide();
+		$('.alert', form).hide();
 		$('button.btn-danger', form).on('click', function(e) {
 			if($('input:checkbox:checked', form).length == 0) {
 				$('label', form).show('fast');
+				$('.alert', form).show('fast');
 				$('button span', form).hide('fast');
 				$(this).prop('disabled', true);
 				e.preventDefault();

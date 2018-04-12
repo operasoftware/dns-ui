@@ -177,7 +177,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	} elseif(isset($_POST['update_zone']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator')) {
 		$zone->kind = $_POST['kind'];
 		$zone->account = $_POST['classification'];
-		$zone->dnssec = isset($_POST['dnssec']) ? 1 : 0;
 		$zone->update();
 		$primary_ns = $_POST['primary_ns'];
 		$contact = $_POST['contact'];
@@ -208,6 +207,15 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$json->actions = array($update);
 			$zone->process_bulk_json_rrset_update(json_encode($json));
 		}
+		redirect();
+	} elseif(isset($_POST['enable_dnssec'])) {
+		$zone->dnssec = 1;
+		$zone->update();
+		redirect();
+	} elseif(isset($_POST['disable_dnssec'])) {
+		$zone->dnssec = 0;
+		$zone->update();
+		redirect();
 	} elseif(isset($_POST['request_delete_zone']) && $active_user->admin) {
 		$zone->add_delete_request();
 		$mail = new Email;

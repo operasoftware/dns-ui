@@ -47,8 +47,8 @@ global $output_formatter;
 	<li role="presentation" class="active"><a href="#records" aria-controls="records" role="tab" data-toggle="tab">Resource records</a></li>
 	<li role="presentation"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">Pending updates<?php if(count($pending) > 0) {?> <span class="badge"><?php out(count($pending))?></span><?php } ?></a></li>
 	<li role="presentation"><a href="#soa" aria-controls="soa" role="tab" data-toggle="tab">Zone configuration</a></li>
-	<?php if($zone->dnssec) { ?>
-	<li role="presentation"><a href="#cryptokeys" aria-controls="cryptokeys" role="tab" data-toggle="tab">DNSSEC</a></li>
+	<?php if($dnssec_enabled) { ?>
+	<li role="presentation"><a href="#dnssec" aria-controls="dnssec" role="tab" data-toggle="tab">DNSSEC</a></li>
 	<?php } ?>
 	<li role="presentation"><a href="#import" aria-controls="import" role="tab" data-toggle="tab">Export / Import</a></li>
 	<?php if($active_user->admin) { ?>
@@ -382,20 +382,6 @@ global $output_formatter;
 					<?php } ?>
 				</div>
 			</div>
-			<?php if($dnssec_enabled) { ?>
-			<div class="form-group">
-				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<div class="checkbox">
-						<label><input type="checkbox" id="dnssec" name="dnssec" value="1"<?php if($zone->dnssec) out(' checked')?>> Enabled</label>
-					</div>
-					<?php } else { ?>
-					<p class="form-control-static"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></p>
-					<?php } ?>
-				</div>
-			</div>
-			<?php } ?>
 			<h3>Start of authority (SOA)</h3>
 			<?php if($active_user->admin) { ?>
 			<div class="form-group">
@@ -493,9 +479,11 @@ global $output_formatter;
 			<?php } ?>
 		</form>
 	</div>
-	<?php if($zone->dnssec) { ?>
-	<div role="tabpanel" class="tab-pane" id="cryptokeys">
+	<?php if($dnssec_enabled) { ?>
+	<div role="tabpanel" class="tab-pane" id="dnssec">
 		<h2 class="sr-only">DNSSEC</h2>
+		<?php if($zone->dnssec) { ?>
+		<h3>Crypto keys</h3>
 		<?php foreach($cryptokeys as $cryptokey) { ?>
 		<?php
 		list($dnskey_flags, $dnskey_protocol, $dnskey_algorithm) = preg_split('/\s+/', $cryptokey->dnskey);
@@ -523,6 +511,26 @@ global $output_formatter;
 				</dl>
 			</div>
 		</div>
+		<?php } ?>
+		<h3>Disable DNSSEC</h3>
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="disablednssec">
+			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+			<p>
+				<p class="alert alert-danger">
+					<strong>Warning!</strong> Disabling DNSSEC for the zone will permanently delete the zone's DNSSEC private keys in PowerDNS.
+				</p>
+				<div class="checkbox"><label><input type="checkbox" name="disable_dnssec" value="1"> Confirm DNSSEC disable</label></div>
+				<button type="submit" class="btn btn-danger">Disable DNSSEC for <?php out(DNSZoneName::unqualify($zone->name))?><span>…</span></button>
+			</p>
+		</form>
+		<?php } else { ?>
+		<h3>Enable DNSSEC</h3>
+		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
+			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+			<p>
+				<button type="submit" name="enable_dnssec" value="1" class="btn btn-primary">Enable DNSSEC for <?php out(DNSZoneName::unqualify($zone->name))?></button>
+			</p>
+		</form>
 		<?php } ?>
 	</div>
 	<?php } ?>
