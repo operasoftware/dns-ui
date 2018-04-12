@@ -101,6 +101,42 @@ class User extends Record {
 	}
 
 	/**
+	* Retrieve this user's details from the configured data source.
+	* @throws UserDataSourceException if no user data source is configured
+	*/
+	public function get_details() {
+		global $config;
+		if(!empty($config['ldap']['enabled'])) {
+			$this->get_details_from_ldap();
+		} elseif(!empty($config['php_auth']['enabled'])) {
+			$this->get_details_from_php_auth();
+		} else {
+			throw new UserDataSourceException('User data source not configured.');
+		}
+	}
+
+	/**
+	* Retrieve this user's details from PHP_AUTH variables.
+	* @throws UserNotFoundException if the user details are not found in PHP_AUTH variables
+	*/
+	public function get_details_from_php_auth() {
+		global $config;
+		if($this->uid == $_SERVER['PHP_AUTH_USER'] and isset($_SERVER['PHP_AUTH_NAME']) and isset($_SERVER['PHP_AUTH_EMAIL']) and isset($_SERVER['PHP_AUTH_GROUPS'])) {
+			$this->auth_realm = 'PHP_AUTH';
+			$this->name = $_SERVER['PHP_AUTH_NAME'];
+			$this->email = $_SERVER['PHP_AUTH_EMAIL'];
+			$this->active = 1;
+			$this->admin = 0;
+			$groups = explode(' ', $_SERVER['PHP_AUTH_GROUPS']);
+			foreach($groups as $group) {
+				if($group == $config['php_auth']['admin_group']) $this->admin = 1;
+			}
+		} else {
+			throw new UserNotFoundException('User does not exist in PHP_AUTH variables.');
+		}
+	}
+
+	/**
 	* Retrieve this user's details from LDAP.
 	* @throws UserNotFoundException if the user is not found in LDAP
 	*/
@@ -138,7 +174,7 @@ class User extends Record {
 				if($ldapgroup['cn'] == $config['ldap']['admin_group_cn']) $this->admin = 1;
 			}
 		} else {
-			throw new UserNotFoundException('User does not exist.');
+			throw new UserNotFoundException('User does not exist in LDAP.');
 		}
 	}
 

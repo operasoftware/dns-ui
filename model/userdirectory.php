@@ -95,7 +95,7 @@ class UserDirectory extends DBDirectory {
 			$user = new User;
 			$user->uid = $uid;
 			$this->cache_uid[$uid] = $user;
-			$user->get_details_from_ldap();
+			$user->get_details();
 			$this->add_user($user);
 		}
 		return $user;
@@ -138,4 +138,5 @@ class UserDirectory extends DBDirectory {
 }
 
 class UserNotFoundException extends Exception {}
+class UserDataSourceException extends Exception {}
 class UserAlreadyExistsException extends Exception {}
