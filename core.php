@@ -342,6 +342,23 @@ class DNSContent {
 	}
 }
 
+class DNSKEY {
+	public static function get_tag($dnskey_flags, $dnskey_protocol, $dnskey_algorithm, $dnskey_keydata) {
+		// Reconstruct the DNSKEY RDATA wire format (https://tools.ietf.org/html/rfc4034#section-2.1)
+		// by merging the flags, protocol, algorithm, and the base64-decoded key data
+		$wire_format = pack("nCC", $dnskey_flags, $dnskey_protocol, $dnskey_algorithm).base64_decode($dnskey_keydata);
+		// Split data into (zero-indexed) array of bytes
+		$keyvalues = array_values(unpack("C*", $wire_format));
+		// Follow algorithm from RFC 4034 Appendix B (https://tools.ietf.org/html/rfc4034#appendix-B)
+		$ac = 0;
+		foreach($keyvalues as $i => $keyvalue) {
+			$ac += ($i & 1) ? $keyvalue : $keyvalue << 8;
+		}
+		$ac += ($ac >> 16) & 0xFFFF;
+		return $ac & 0xFFFF;
+	}
+}
+
 function ipv6_address_expand($address) {
 	if(strpos($address, '::') !== false) {
 		$address = str_replace('::', ':'.str_repeat('0:', 8 - substr_count($address, ':')), $address);

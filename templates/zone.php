@@ -486,7 +486,7 @@ global $output_formatter;
 		<h3>Crypto keys</h3>
 		<?php foreach($cryptokeys as $cryptokey) { ?>
 		<?php
-		list($dnskey_flags, $dnskey_protocol, $dnskey_algorithm) = preg_split('/\s+/', $cryptokey->dnskey);
+		list($dnskey_flags, $dnskey_protocol, $dnskey_algorithm, $dnskey_keydata) = preg_split('/\s+/', $cryptokey->dnskey);
 		?>
 		<div class="panel <?php out($cryptokey->active ? 'panel-success' : 'panel-default') ?>">
 			<div class="panel-heading">
@@ -495,7 +495,7 @@ global $output_formatter;
 			<div class="panel-body">
 				<dl>
 					<dt>Info</dt>
-					<dd><code>ID = <?php out($cryptokey->id)?> (<?php out(strtoupper($cryptokey->keytype))?>), flags = <?php out($cryptokey->flags)?>, algo = <?php out($dnskey_algorithm)?>, bits = <?php out($cryptokey->bits)?>  <?php out($cryptokey->active ? 'Active' : 'Inactive')?> ( <?php out($cryptokey->algorithm)?> )</code></dd>
+					<dd><code>ID = <?php out($cryptokey->id)?> (<?php out(strtoupper($cryptokey->keytype))?>), flags = <?php out($cryptokey->flags)?>, tag = <?php out(DNSKEY::get_tag($dnskey_flags, $dnskey_protocol, $dnskey_algorithm, $dnskey_keydata))?>, algo = <?php out($dnskey_algorithm)?>, bits = <?php out($cryptokey->bits)?>  <?php out($cryptokey->active ? 'Active' : 'Inactive')?> ( <?php out($cryptokey->algorithm)?> )</code></dd>
 					<dt>DNSKEY</dt>
 					<dd><code><?php out($zone->name.' DNSKEY '.$cryptokey->dnskey)?></code></dd>
 					<?php if(isset($cryptokey->ds)) { ?>
