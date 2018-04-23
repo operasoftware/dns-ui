@@ -512,6 +512,11 @@ global $output_formatter;
 			</div>
 		</div>
 		<?php } ?>
+		<?php } else { ?>
+		<p>DNSSEC is not currently enabled for this zone.</p>
+		<?php } ?>
+		<?php if($active_user->admin) { ?>
+		<?php if($zone->dnssec) { ?>
 		<h3>Disable DNSSEC</h3>
 		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="disablednssec">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
@@ -531,6 +536,7 @@ global $output_formatter;
 				<button type="submit" name="enable_dnssec" value="1" class="btn btn-primary">Enable DNSSEC for <?php out(DNSZoneName::unqualify($zone->name))?></button>
 			</p>
 		</form>
+		<?php } ?>
 		<?php } ?>
 	</div>
 	<?php } ?>

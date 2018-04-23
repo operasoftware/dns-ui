@@ -208,11 +208,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone->process_bulk_json_rrset_update(json_encode($json));
 		}
 		redirect();
-	} elseif(isset($_POST['enable_dnssec'])) {
+	} elseif(isset($_POST['enable_dnssec']) && $active_user->admin) {
 		$zone->dnssec = 1;
 		$zone->update();
 		redirect();
-	} elseif(isset($_POST['disable_dnssec'])) {
+	} elseif(isset($_POST['disable_dnssec']) && $active_user->admin) {
 		$zone->dnssec = 0;
 		$zone->update();
 		redirect();
