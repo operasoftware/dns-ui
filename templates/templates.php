@@ -29,8 +29,8 @@ $types = array('soa', 'ns');
 <?php } ?>
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="list">
-		<h2 class="sr-only">Forward zones</h2>
-		<form method="post" action="<?php out($this->get('relative_request_url'))?>">
+		<h2 class="sr-only">Template list</h2>
+		<form method="post" action="<?php outurl($this->get('relative_request_url'))?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<table class="table table-bordered">
 				<thead>
@@ -52,9 +52,9 @@ $types = array('soa', 'ns');
 						<?php if(is_null($type)) { ?>
 						<td><?php out(strtoupper($t))?></td>
 						<?php } ?>
-						<td><a href="/templates/<?php out($t)?>/<?php out($template->name, ESC_URL)?>"><?php out($template->name)?></a></td>
+						<td><a href="<?php outurl('/templates/'.urlencode($t).'/'.urlencode($template->name))?>"><?php out($template->name)?></a></td>
 						<td>
-							<a href="/templates/<?php out($t)?>/<?php out($template->name, ESC_URL)?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-cog"></span> Edit</a>
+							<a href="<?php outurl('/templates/'.urlencode($t).'/'.urlencode($template->name))?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-cog"></span> Edit</a>
 							<button type="submit" class="btn btn-xs btn-default" name="delete_<?php out($t)?>_template" value="<?php out($template->id)?>"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 							<?php if($template->default) { ?>
 							<button type="submit" class="btn btn-xs btn-success" disabled>Default</button>
@@ -74,7 +74,8 @@ $types = array('soa', 'ns');
 	</div>
 	<?php if(!is_null($type)) { ?>
 	<div role="tabpanel" class="tab-pane" id="create">
-		<form method="post" action="/templates/<?php out($type, ESC_URL)?>" class="form-horizontal">
+		<h2 class="sr-only">Create template</h2>
+		<form method="post" action="<?php outurl('/templates/'.urlencode($type))?>" class="form-horizontal">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="form-group">
 				<label for="name" class="col-sm-2 control-label">Template name</label>

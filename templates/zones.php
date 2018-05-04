@@ -65,7 +65,7 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['forward'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name, ESC_URL))?>"><?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?></a></td>
+					<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?></a></td>
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
@@ -100,7 +100,7 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['reverse4'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
+					<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
 					<td><?php out(ipv4_reverse_zone_to_range($zone->name))?></td>
 					<td><?php out(ipv4_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>
@@ -144,7 +144,7 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['reverse6'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
+					<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
 					<td><tt><?php out(ipv6_reverse_zone_to_range($zone->name))?></tt></td>
 					<td><?php out(ipv6_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>
@@ -169,7 +169,7 @@ foreach($zones as $zone) {
 	<?php if($active_user->admin) { ?>
 	<div role="tabpanel" class="tab-pane" id="create">
 		<h2 class="sr-only">Create zone</h2>
-		<form method="post" action="/zones" class="form-horizontal zoneadd">
+		<form method="post" action="<?php outurl('/zones')?>" class="form-horizontal zoneadd">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="form-group">
 				<label for="name" class="col-sm-2 control-label">Zone name</label>
@@ -217,7 +217,7 @@ foreach($zones as $zone) {
 						<?php foreach($soa_templates as $template) { ?>
 						<button type="button" class="btn btn-default soa-template" data-primary_ns="<?php out($template->primary_ns)?>" data-contact="<?php out($template->contact)?>" data-refresh="<?php out(DNSTime::abbreviate($template->refresh))?>" data-retry="<?php out(DNSTime::abbreviate($template->retry))?>" data-expire="<?php out(DNSTime::abbreviate($template->expire))?>" data-default_ttl="<?php out(DNSTime::abbreviate($template->default_ttl))?>" data-soa_ttl="<?php out(DNSTime::abbreviate($template->soa_ttl))?>" data-default="<?php out($template->default)?>"><?php out($template->name)?></button>
 						<?php } ?>
-						<a href="/templates/soa" class="btn btn-link">Edit templates</a>
+						<a href="<?php outurl('/templates/soa')?>" class="btn btn-link">Edit templates</a>
 					</div>
 				</div>
 				<div class="form-group">
@@ -271,7 +271,7 @@ foreach($zones as $zone) {
 						<?php foreach($ns_templates as $template) { ?>
 						<button type="button" class="btn btn-default ns-template" data-nameservers="<?php out($template->nameservers)?>" data-default="<?php out($template->default)?>"><?php out($template->name)?></button>
 						<?php } ?>
-						<a href="/templates/ns" class="btn btn-link">Edit templates</a>
+						<a href="<?php outurl('/templates/ns')?>" class="btn btn-link">Edit templates</a>
 					</div>
 				</div>
 				<div class="form-group">

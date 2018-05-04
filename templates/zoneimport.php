@@ -22,9 +22,9 @@ $limit = 2500;
 ?>
 <h1>Import preview for <?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?> zone update</h1>
 <?php if(count($modifications['add']) == 0 && count($modifications['update']) == 0 && count($modifications['delete']) == 0) { ?>
-<p>No changes have been made! <a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">Go back</a>.</p>
+<p>No changes have been made! <a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">Go back</a>.</p>
 <?php } else { ?>
-<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
+<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<?php if(count($modifications['add']) > 0) { ?>
 	<h2>New resource recordsets</h2>
@@ -156,7 +156,7 @@ $limit = 2500;
 	<div class="form-group"><label for="comment">Update comment</label><input type="text" id="comment" name="comment" class="form-control"></div>
 	<p>
 		<button type="submit" name="update_rrs" value="1" class="btn btn-primary">Confirm selected changes</button>
-		<a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="btn btn-default">Cancel import</a>
+		<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="btn btn-default">Cancel import</a>
 	</p>
 </form>
 <?php } ?>

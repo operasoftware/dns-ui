@@ -60,7 +60,7 @@ global $output_formatter;
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="records">
 		<h2 class="sr-only">Resource records</h2>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zoneedit" data-zone="<?php out(punycode_to_utf8($zone->name))?>" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zoneedit" data-zone="<?php out(punycode_to_utf8($zone->name))?>" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<nav></nav>
 			<table class="table table-bordered table-condensed table-hover stickyHeader rrsets">
@@ -199,7 +199,7 @@ global $output_formatter;
 			<nav></nav>
 			<input type="hidden" id="maxperpage" value="<?php out($maxperpage)?>">
 		</form>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div id="updates" class="hide">
 				<h3>Updates</h3>
@@ -243,7 +243,7 @@ global $output_formatter;
 			}
 		}
 		?>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="pending_update">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="pending_update">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -350,7 +350,7 @@ global $output_formatter;
 	</div>
 	<div role="tabpanel" class="tab-pane" id="soa">
 		<h2 class="sr-only">Zone configuration</h2>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="form-horizontal zoneeditsoa">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="form-horizontal zoneeditsoa">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<h3>Zone settings</h3>
 			<div class="form-group">
@@ -390,7 +390,7 @@ global $output_formatter;
 					<?php foreach($soa_templates as $template) { ?>
 					<button type="button" class="btn btn-default soa-template" data-primary_ns="<?php out($template->primary_ns)?>" data-contact="<?php out($template->contact)?>" data-refresh="<?php out(DNSTime::abbreviate($template->refresh))?>" data-retry="<?php out(DNSTime::abbreviate($template->retry))?>" data-expire="<?php out(DNSTime::abbreviate($template->expire))?>" data-default_ttl="<?php out(DNSTime::abbreviate($template->default_ttl))?>" data-soa_ttl="<?php out(DNSTime::abbreviate($template->soa_ttl))?>"><?php out($template->name)?></button>
 					<?php } ?>
-					<a href="/templates/soa" class="btn btn-link">Edit templates</a>
+					<a href="<?php outurl('/templates/soa')?>" class="btn btn-link">Edit templates</a>
 				</div>
 			</div>
 			<?php } ?>
@@ -518,7 +518,7 @@ global $output_formatter;
 		<?php if($active_user->admin) { ?>
 		<?php if($zone->dnssec) { ?>
 		<h3>Disable DNSSEC</h3>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="disablednssec">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="disablednssec">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<p>
 				<p class="alert alert-danger">
@@ -530,7 +530,7 @@ global $output_formatter;
 		</form>
 		<?php } else { ?>
 		<h3>Enable DNSSEC</h3>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<p>
 				<button type="submit" name="enable_dnssec" value="1" class="btn btn-primary">Enable DNSSEC for <?php out(DNSZoneName::unqualify($zone->name))?></button>
@@ -543,9 +543,9 @@ global $output_formatter;
 	<div role="tabpanel" class="tab-pane" id="import">
 		<h2 class="sr-only">Export / Import</h2>
 		<h3>Export zone</h3>
-		<a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/export" class="btn btn-primary">Export zone in bind9 format</a>
+		<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>/export" class="btn btn-primary">Export zone in bind9 format</a>
 		<h3>Import zone</h3>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/import" enctype="multipart/form-data">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)).'/import')?>" enctype="multipart/form-data">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="form-group">
 				<label>bind9 zone file</label>
@@ -573,7 +573,7 @@ global $output_formatter;
 		<h2 class="sr-only">Tools</h2>
 		<h3>Split zone</h3>
 		<p>This tool allows you to split records off into a separate new zone.</p>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/split" class="form-inline">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)).'/split')?>" class="form-inline">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<label for="zone_split_prefix" class="sr-only">Suffix</label>
 			<div class="input-group">
@@ -586,7 +586,7 @@ global $output_formatter;
 		<h3>Delete zone</h3>
 		<?php if(is_null($deletion)) { ?>
 		<p>Permanently delete a zone from the DNS server and archive it. Zone deletion requires confirmation from another user.</p>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zonedelete form-inline">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zonedelete form-inline">
 			<p>
 				<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 				<div class="checkbox"><label><input type="checkbox" name="request_delete_zone" value="1"> Confirm zone deletion request</label></div>
@@ -599,8 +599,8 @@ global $output_formatter;
 				<h4 class="panel-title">Deletion request pending</h4>
 			</div>
 			<div class="panel-body">
-				<p><a href="/users/<?php out($deletion['requester']->uid, ESC_URL)?>"><?php out($deletion['requester']->name)?></a> has requested that this zone be deleted from the DNS server. This request must be confirmed by another administrator.</p>
-				<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zonedelete form-inline">
+				<p><a href="<?php outurl('/users/'.urlencode($deletion['requester']->uid))?>"><?php out($deletion['requester']->name)?></a> has requested that this zone be deleted from the DNS server. This request must be confirmed by another administrator.</p>
+				<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zonedelete form-inline">
 					<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 					<button type="submit" class="btn btn-default" name="cancel_delete_zone" value="1">Abort request</button>
 					<?php if($deletion['requester']->id != $active_user->id) { ?>
@@ -612,10 +612,10 @@ global $output_formatter;
 		</div>
 		<?php } else { ?>
 		<div class="alert alert-warning">
-			<p>This zone was previously deleted on <?php out($deletion['confirm_date']->format('Y-m-d H:i:s'))?> by <a href="/users/<?php out($deletion['requester']->uid, ESC_URL)?>"><?php out($deletion['requester']->name)?></a> and <a href="/users/<?php out($deletion['confirmer']->uid, ESC_URL)?>"><?php out($deletion['confirmer']->name)?></a>.</p>
+			<p>This zone was previously deleted on <?php out($deletion['confirm_date']->format('Y-m-d H:i:s'))?> by <a href="<?php outurl('/users/'.urlencode($deletion['requester']->uid))?>"><?php out($deletion['requester']->name)?></a> and <a href="<?php outurl('/users/'.urlencode($deletion['confirmer']->uid))?>"><?php out($deletion['confirmer']->name)?></a>.</p>
 			<p>This is a snapshot of the zone's contents prior to its deletion.</p>
 			<pre class="source"><?php out($deletion['zone_export'])?></pre>
-			<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zonedelete form-inline">
+			<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zonedelete form-inline">
 				<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 				<button type="submit" class="btn btn-default" name="remove_delete_record" value="1">Remove snapshot</button>
 			</form>
@@ -649,8 +649,8 @@ global $output_formatter;
 				<tr data-zone="<?php out($zone->name)?>" data-changeset="<?php out($changeset->id)?>">
 					<td class="nowrap"><?php out($changeset->change_date->format('Y-m-d H:i:s'))?></td>
 					<td><?php out($output_formatter->changeset_comment_format($changeset->comment), ESC_NONE) ?></td>
-					<td class="nowrap"><?php if($changeset->requester) { ?><a href="/users/<?php out($changeset->requester->uid)?>"><?php out($changeset->requester->name)?><?php } ?></td>
-					<td class="nowrap"><a href="/users/<?php out($changeset->author->uid, ESC_URL)?>"><?php out($changeset->author->name)?></td>
+					<td class="nowrap"><?php if($changeset->requester) { ?><a href="<?php outurl('/users/'.urlencode($changeset->requester->uid))?>"><?php out($changeset->requester->name)?><?php } ?></td>
+					<td class="nowrap"><a href="<?php outurl('/users/'.urlencode($changeset->author->uid))?>"><?php out($changeset->author->name)?></td>
 					<td><?php out('-'.$changeset->deleted.'/+'.$changeset->added)?></td>
 					<td></td>
 				</tr>
@@ -663,7 +663,7 @@ global $output_formatter;
 		<?php if(count($access) == 0) { ?>
 		<p>No users have been assigned to this zone.</p>
 		<?php } else { ?>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<table class="table table-condensed table-bordered">
 				<thead>
@@ -690,7 +690,7 @@ global $output_formatter;
 		</form>
 		<?php } ?>
 		<?php if($active_user->admin) { ?>
-		<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="form-horizontal">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="form-horizontal">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="form-group">
 				<label for="uid" class="col-sm-2 control-label">Username</label>

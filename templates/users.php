@@ -38,7 +38,7 @@ $users = $this->get('users');
 			<tbody>
 				<?php foreach($users as $user) { ?>
 				<tr<?php if(!$user->active) out(' class="text-muted"', ESC_NONE) ?>>
-					<td><a href="/users/<?php out($user->uid, ESC_URL)?>" class="user<?php if(!$user->active) out(' text-muted') ?>"><?php out($user->uid)?></a></td>
+					<td><a href="<?php outurl('/users/'.urlencode($user->uid))?>" class="user<?php if(!$user->active) out(' text-muted') ?>"><?php out($user->uid)?></a></td>
 					<td><?php out($user->name)?></td>
 					<td><?php out($user->email)?></td>
 					<td><?php out(ucfirst($user->auth_realm))?></td>
@@ -52,7 +52,7 @@ $users = $this->get('users');
 	<div role="tabpanel" class="tab-pane" id="create">
 		<h2 class="sr-only">Create user</h2>
 		<p class="alert alert-info">You can create users in the local directory here. It is not possible to create users in your LDAP directory from the DNS UI.</p>
-		<form method="post" action="/users#create" class="form-horizontal">
+		<form method="post" action="<?php outurl('/users#create')?>" class="form-horizontal">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="form-group">
 				<label for="uid" class="col-sm-2 control-label">User ID</label>

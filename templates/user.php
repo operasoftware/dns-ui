@@ -22,7 +22,7 @@ global $output_formatter;
 <h1><span class="glyphicon glyphicon-user" title="User"></span> <?php out($user->name)?> <small>(<?php out($user->uid)?>)</small></h1>
 <h2>User details</h2>
 <?php if($active_user->admin && $user->auth_realm === 'local') { ?>
-<form method="post" action="/users/<?php out($user->uid, ESC_URL)?>" class="form-horizontal">
+<form method="post" action="<?php outurl('/users/'.urlencode($user->uid))?>" class="form-horizontal">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<div class="form-group">
 		<label for="uid" class="col-sm-2 control-label">User ID</label>
@@ -94,8 +94,8 @@ global $output_formatter;
 		<tr data-zone="<?php out($changeset->zone->name)?>" data-changeset="<?php out($changeset->id)?>">
 			<td class="nowrap"><?php out($changeset->change_date->format('Y-m-d H:i:s'))?></td>
 			<td><?php out($output_formatter->changeset_comment_format($changeset->comment), ESC_NONE) ?></td>
-			<td class="nowrap"><?php if($changeset->requester) { ?><a href="/users/<?php out($changeset->requester->uid)?>"><?php out($changeset->requester->name)?><?php } ?></td>
-			<td class="nowrap"><a href="/zones/<?php out(DNSZoneName::unqualify($changeset->zone->name), ESC_URL)?>"><?php out(punycode_to_utf8(DNSZoneName::unqualify($changeset->zone->name)))?></a></td>
+			<td class="nowrap"><?php if($changeset->requester) { ?><a href="<?php outurl('/users/'.urlencode($changeset->requester->uid))?>"><?php out($changeset->requester->name)?><?php } ?></td>
+			<td class="nowrap"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($changeset->zone->name)))?>"><?php out(punycode_to_utf8(DNSZoneName::unqualify($changeset->zone->name)))?></a></td>
 			<td><?php out('-'.$changeset->deleted.'/+'.$changeset->added)?></td>
 			<td></td>
 		</tr>

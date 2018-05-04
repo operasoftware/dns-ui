@@ -20,6 +20,6 @@ $newzonename = $this->get('newzonename');
 ?>
 <h2>Zone split of <?php out(punycode_to_utf8(DNSZoneName::unqualify($newzonename)))?> from <?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?></h2>
 <ul>
-	<li><a href="/zones/<?php out(urlencode(DNSZoneName::unqualify($zone->name)))?>">View <?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?> zone</a></li>
-	<li><a href="/zones/<?php out(urlencode(DNSZoneName::unqualify($newzonename)))?>">View <?php out(punycode_to_utf8(DNSZoneName::unqualify($newzonename)))?> zone</a></li>
+	<li><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">View <?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?> zone</a></li>
+	<li><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($newzonename)))?>">View <?php out(punycode_to_utf8(DNSZoneName::unqualify($newzonename)))?> zone</a></li>
 </ul>

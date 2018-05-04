@@ -237,7 +237,7 @@ class ZoneDirectory extends DBDirectory {
 						if($rrset->type == 'PTR') {
 							$alert = new UserAlert;
 							$alert->escaping = ESC_NONE;
-							$alert->content = 'Reverse record already exists for '.hesc($address).' in <a href="/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name)).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not modifying existing PTR record.';
+							$alert->content = 'Reverse record already exists for '.hesc($address).' in <a href="'.rrurl('/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name))).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not modifying existing PTR record.';
 							$alert->class = 'warning';
 							$active_user->add_alert($alert);
 							return false;
@@ -246,7 +246,7 @@ class ZoneDirectory extends DBDirectory {
 							$rr = reset($rrset->list_resource_records());
 							$alert = new UserAlert;
 							$alert->escaping = ESC_NONE;
-							$alert->content = 'Reverse record delegated to '.hesc($rr->content).' for '.hesc($address).' in <a href="/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name)).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not creating PTR record.';
+							$alert->content = 'Reverse record delegated to '.hesc($rr->content).' for '.hesc($address).' in <a href="'.rrurl('/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name))).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a>. Not creating PTR record.';
 							$alert->class = 'warning';
 							$active_user->add_alert($alert);
 							return false;

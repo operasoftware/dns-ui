@@ -50,6 +50,8 @@ if(!empty($config['ldap']['enabled'])) {
 }
 setup_database();
 
+$relative_frontend_base_url = (string)parse_url($config['web']['baseurl'], PHP_URL_PATH);
+
 // Convert all non-fatal errors into exceptions
 function exception_error_handler($errno, $errstr, $errfile, $errline) {
 	throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
@@ -86,8 +88,7 @@ function setup_database() {
  * @param string part of path
  * @return string joined path
  */
-function path_join() {
-	$args = func_get_args();
+function path_join(...$args) {
 	$parts = array();
 	foreach($args as $arg) {
 		$parts = array_merge($parts, explode("/", $arg));
@@ -102,6 +103,11 @@ define('ESC_URL', 2);
 define('ESC_URL_ALL', 3);
 define('ESC_NONE', 9);
 
+/**
+* Output the given string, HTML-escaped by default
+* @param string $string to output
+* @param integer $escaping method of escaping to use
+*/
 function out($string, $escaping = ESC_HTML) {
 	switch($escaping) {
 	case ESC_HTML:
@@ -119,6 +125,24 @@ function out($string, $escaping = ESC_HTML) {
 	default:
 		throw new InvalidArgumentException("Escaping format $escaping not known.");
 	}
+}
+
+/**
+* Generate a root-relative URL from the base URL and the given base-relative URL
+* @param string $url base-relative URL
+* @return string root-relative URL
+*/
+function rrurl($url) {
+	global $relative_frontend_base_url;
+	return $relative_frontend_base_url.$url;
+}
+
+/**
+* Output a root-relative URL from the base URL and the given base-relative URL
+* @param string $url relative URL
+*/
+function outurl($url) {
+	out(rrurl($url));
 }
 
 /**
@@ -141,8 +165,13 @@ function english_list($array) {
  * @param string $type HTTP response code/name to use
  */
 function redirect($url = null, $type = '303 See other') {
-	global $absolute_request_url;
-	if(is_null($url)) $url = $absolute_request_url;
+	global $absolute_request_url, $relative_frontend_base_url;
+	if(is_null($url)) {
+		// Redirect is to current URL
+		$url = $absolute_request_url;
+	} else {
+		$url = $relative_frontend_base_url.$url;
+	}
 	header("HTTP/1.1 $type");
 	header("Location: $url");
 	print("\n");

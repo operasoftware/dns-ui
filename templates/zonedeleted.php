@@ -23,14 +23,14 @@ $deletion = $this->get('deletion');
 <?php if(!is_null($deletion) && !is_null($deletion['confirm_date'])) { ?>
 <dl class="dl-horizontal">
 	<dt>Deletion requested by</dt>
-	<dd><a href="/users/<?php out($deletion['requester']->uid, ESC_URL)?>"><?php out($deletion['requester']->name)?></a> on <?php out($deletion['request_date']->format('Y-m-d H:i:s'))?></dd>
+	<dd><a href="<?php outurl('/users/'.urlencode($deletion['requester']->uid))?>"><?php out($deletion['requester']->name)?></a> on <?php out($deletion['request_date']->format('Y-m-d H:i:s'))?></dd>
 	<dt>Deletion confirmed by</dt>
-	<dd><a href="/users/<?php out($deletion['confirmer']->uid, ESC_URL)?>"><?php out($deletion['confirmer']->name)?></a> on <?php out($deletion['confirm_date']->format('Y-m-d H:i:s'))?></dd>
+	<dd><a href="<?php outurl('/users/'.urlencode($deletion['confirmer']->uid))?>"><?php out($deletion['confirmer']->name)?></a> on <?php out($deletion['confirm_date']->format('Y-m-d H:i:s'))?></dd>
 </dl>
 <h3>Zone archive</h3>
 <p>This is a snapshot of the zone's contents prior to its deletion.</p>
 <pre class="source"><?php out($deletion['zone_export'])?></pre>
-<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="zonerestore form-inline">
+<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zonerestore form-inline">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<div class="checkbox"><label><input type="checkbox" name="restore_zone" value="1"> Confirm zone restore</label></div>
 	<button type="submit" class="btn btn-danger">Restore zone from archive<span>…</span></button>

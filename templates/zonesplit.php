@@ -22,11 +22,11 @@ $split = $this->get('split');
 $cname_error = $this->get('cname_error');
 ?>
 <h2>Zone split of <?php out(punycode_to_utf8(DNSZoneName::unqualify($newzonename)))?> from <?php out(punycode_to_utf8(DNSZoneName::unqualify($zone->name)))?></h2>
-<form method="post" action="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>/split">
+<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>/split">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<?php if(count($split) == 0) { ?>
 	<p>No records match this pattern.</p>
-	<p><a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="btn btn-default">Go back</a></p>
+	<p><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="btn btn-default">Go back</a></p>
 	<?php } else { ?>
 	<table class="table table-bordered table-condensed table-hover stickyHeader">
 		<thead>
@@ -93,7 +93,7 @@ $cname_error = $this->get('cname_error');
 		<?php if(!$cname_error) { ?>
 		<button type="submit" name="confirm" value="1" class="btn btn-primary">Split records into new zone</button>
 		<?php } ?>
-		<a href="/zones/<?php out(DNSZoneName::unqualify($zone->name), ESC_URL)?>" class="btn btn-default">Cancel</a>
+		<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="btn btn-default">Cancel</a>
 	</div>
 	<?php } ?>
 </form>

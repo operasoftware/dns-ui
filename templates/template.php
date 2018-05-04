@@ -17,8 +17,8 @@
 $type = $this->get('type');
 $template = $this->get('template');
 ?>
-<h1><a href="/templates/<?php out($type, ESC_URL)?>"><?php out(strtoupper($type))?> templates</a>: <?php out($template->name)?></h1>
-<form method="post" action="/templates/<?php out($type, ESC_URL)?>/<?php out($template->name, ESC_URL)?>" class="form-horizontal">
+<h1><a href="<?php outurl('/templates/'.urlencode($type))?>"><?php out(strtoupper($type))?> templates</a>: <?php out($template->name)?></h1>
+<form method="post" action="<?php outurl('/templates/'.urlencode($type).'/'.urlencode($template->name))?>" class="form-horizontal">
 	<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 	<div class="form-group">
 		<label for="name" class="col-sm-2 control-label">Template name</label>

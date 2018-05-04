@@ -591,7 +591,7 @@ $(function() {
 				actions.push(JSON.parse(this.value));
 			})
 			$.ajax({
-				url: "/api/v2/zones/" + encodeURIComponent(form.data('zone')),
+				url: "../api/v2/zones/" + encodeURIComponent(form.data('zone')),
 				method: "PATCH",
 				data: JSON.stringify({actions: actions, comment: $('#comment').val()}),
 				contentType: "application/json",
@@ -945,7 +945,7 @@ $(function() {
 
 				tr.data('details_loaded', true);
 
-				$.getJSON('/api/v2/zones/' + encodeURIComponent(zone) + '/changes/' + encodeURIComponent(changeset), function(data) {
+				$.getJSON('../api/v2/zones/' + encodeURIComponent(zone) + '/changes/' + encodeURIComponent(changeset), function(data) {
 					var change;
 					for(i = 0; change = data.changes[i]; i++) {
 						var panelheader = $('<div>').addClass('panel-heading');
