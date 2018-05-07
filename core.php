@@ -187,7 +187,7 @@ function redirect($url = null, $type = '303 See other') {
  * @return array result of combining defaults and querystring data
  */
 function simplify_search($defaults, $values) {
-	global $absolute_request_url;
+	global $relative_request_url;
 	$simplify = false;
 	$simplified = array();
 	foreach($defaults as $key => $default) {
@@ -215,7 +215,7 @@ function simplify_search($defaults, $values) {
 		}
 	}
 	if($simplify) {
-		$url = preg_replace('/\?.*$/', '', $absolute_request_url);
+		$url = preg_replace('/\?.*$/', '', $relative_request_url);
 		if(count($simplified) > 0) $url .= '?'.implode('&', $simplified);
 		redirect($url);
 	} else {
