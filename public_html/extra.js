@@ -15,6 +15,7 @@
 ## limitations under the License.
 ##
 */
+'use strict';
 
 // Remember the last-selected tab in a tab group
 $(function() {
@@ -52,7 +53,7 @@ $(function() {
 	function get_tab_from_location() {
 		var url = document.location.toString();
 		if(url.match('#')) {
-			$('.nav-tabs a[href=#'+url.split('#')[1]+']').tab('show');
+			$('.nav-tabs a[href="#'+url.split('#')[1]+'"]').tab('show');
 		}
 	}
 });
@@ -884,7 +885,7 @@ $(function() {
 			if(!field[0].checkValidity()) return;
 			var prefix = field.val();
 			var parts = prefix.split(':');
-			for(i = 0; i < parts.length - 1; i++) {
+			for(var i = 0; i < parts.length - 1; i++) {
 				parts[i] = String('0000' + parts[i]).slice(-4);
 			}
 			$('#name').val(parts.join('').split('').reverse().join('.') + '.ip6.arpa');
@@ -947,7 +948,7 @@ $(function() {
 
 				$.getJSON('../api/v2/zones/' + encodeURIComponent(zone) + '/changes/' + encodeURIComponent(changeset), function(data) {
 					var change;
-					for(i = 0; change = data.changes[i]; i++) {
+					for(var i = 0, change; change = data.changes[i]; i++) {
 						var panelheader = $('<div>').addClass('panel-heading');
 						if(!change.before) {
 							var panelclass = 'success';
@@ -972,12 +973,12 @@ $(function() {
 						));
 						var tbody = $('<tbody>');
 						if(change.before) {
-							for(j = 0; rr = change.before.rrs[j]; j++) {
+							for(var j = 0, rr; rr = change.before.rrs[j]; j++) {
 								var tr = $('<tr>');
 								var rr_match = false;
 								var after_rr;
 								if(change.after) {
-									for(k = 0; after_rr = change.after.rrs[k]; k++) {
+									for(var k = 0, after_rr; after_rr = change.after.rrs[k]; k++) {
 										if(after_rr.content == rr.content) {
 											rr_match = true;
 											change.after.rrs.splice(k, 1); // Remove from array
@@ -1000,7 +1001,7 @@ $(function() {
 							}
 						}
 						if(change.after) {
-							for(j = 0; rr = change.after.rrs[j]; j++) {
+							for(var j = 0, rr; rr = change.after.rrs[j]; j++) {
 								var tr = $('<tr>');
 								tr.append($('<td>').addClass('content').append($('<ins>').append(rr.content)));
 								tr.append($('<td>').append($('<ins>').append(rr.enabled ? 'Yes' : 'No')));
