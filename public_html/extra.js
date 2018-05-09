@@ -582,6 +582,7 @@ $(function() {
 		}
 
 		function submit_zone_update(event) {
+			$('#zonesubmit').attr('disabled', true);
 			if($(event.target).val() == 'request') {
 				$(window).off('beforeunload');
 				return;
@@ -601,7 +602,8 @@ $(function() {
 				$(window).off('beforeunload');
 				window.location.href = window.location.pathname;
 			}).fail(function(response) {
-				data = JSON.parse(response.responseText);
+				$('#zonesubmit').attr('disabled', false);
+				var data = JSON.parse(response.responseText);
 				for(var i = 0, error; error = data.errors[i]; i++) {
 					$('#errors').append(
 						$('<div>').addClass('alert').addClass('alert-danger').append(
