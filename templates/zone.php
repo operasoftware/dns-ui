@@ -483,6 +483,15 @@ global $output_formatter;
 	<div role="tabpanel" class="tab-pane" id="dnssec">
 		<h2 class="sr-only">DNSSEC</h2>
 		<?php if($zone->dnssec) { ?>
+		<?php if(!$zone->api_rectify && $active_user->admin) { ?>
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">
+			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+			<div class="alert alert-warning">
+				<p><strong>Warning:</strong> API-rectify is not enabled for this zone. It is recommended to enable it so that manual DNSSEC rectification is not needed.</p>
+				<p><button type="submit" class="btn btn-success" name="enable_api_rectify" value="1">Enable API-rectify</button></p>
+			</div>
+		</form>
+		<?php } ?>
 		<h3>Crypto keys</h3>
 		<?php foreach($cryptokeys as $cryptokey) { ?>
 		<?php

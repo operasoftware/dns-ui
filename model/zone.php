@@ -44,6 +44,10 @@ class Zone extends Record {
 	*/
 	private $cryptokeys = null;
 	/**
+	* Flag for API-RECTIFY being enabled
+	*/
+	private $api_rectify = null;
+	/**
 	* List of changes to be applied to the zone when doing ->commit_changes()
 	*/
 	private $changes = array();
@@ -67,6 +71,9 @@ class Zone extends Record {
 		case 'nameservers':
 			if(is_null($this->nameservers)) $this->list_resource_record_sets();
 			return $this->nameservers;
+		case 'api_rectify':
+			if(is_null($this->api_rectify)) $this->list_resource_record_sets();
+			return $this->api_rectify;
 		default:
 			return parent::__get($field);
 		}
@@ -81,6 +88,9 @@ class Zone extends Record {
 		switch($field) {
 		case 'nameservers':
 			$this->nameservers = $value;
+			break;
+		case 'api_rectify':
+			$this->api_rectify = $value;
 			break;
 		default:
 			parent::__set($field, $value);
@@ -194,6 +204,7 @@ class Zone extends Record {
 		$update->account = $this->account;
 		if(isset($config['dns']['dnssec']) && $config['dns']['dnssec'] == 1) {
 			$update->dnssec = (bool)$this->dnssec;
+			$update->api_rectify = (bool)$this->api_rectify;
 		}
 		$response = $this->powerdns->put('zones/'.urlencode($this->pdns_id), $update);
 		parent::update();
@@ -283,6 +294,9 @@ class Zone extends Record {
 					unset($this->rrsets[$key]);
 					error_log("Stray comment for $key in zone {$this->name}");
 				}
+			}
+			if(isset($data->api_rectify)) {
+				$this->api_rectify = $data->api_rectify;
 			}
 		}
 		return $this->rrsets;

@@ -210,6 +210,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		redirect();
 	} elseif(isset($_POST['enable_dnssec']) && $active_user->admin) {
 		$zone->dnssec = 1;
+		$zone->api_rectify = 1;
+		$zone->update();
+		redirect();
+	} elseif(isset($_POST['enable_api_rectify']) && $active_user->admin) {
+		$zone->api_rectify = 1;
 		$zone->update();
 		redirect();
 	} elseif(isset($_POST['disable_dnssec']) && $active_user->admin) {
