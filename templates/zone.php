@@ -157,6 +157,7 @@ global $output_formatter;
 								-->
 								<?php if($reverse) { ?>
 								<option value="CNAME" data-content-pattern="\S+">CNAME</option>
+								<option value="DS" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+[a-zA-Z0-9]+">DS</option>
 								<?php if($active_user->admin) { ?>
 								<option value="NS" data-content-pattern="\S*">NS</option>
 								<?php } ?>
