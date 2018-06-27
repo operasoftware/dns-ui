@@ -1,0 +1,38 @@
+---
+- name: configure slapd package
+  debconf:
+    name: slapd
+    question: "{{ item.question }}"
+    vtype: "{{ item.vtype }}"
+    value: "{{ item.value }}"
+  loop:
+    - { question: 'slapd/password1', vtype: 'password', value: '{{ ldap_admin_password }}' }
+    - { question: 'slapd/password2', vtype: 'password', value: '{{ ldap_admin_password }}' }
+    - { question: 'slapd/backend', vtype: 'select', value: 'MDB' }
+    - { question: 'slapd/allow_ldap_v2', vtype: 'boolean', value: 'false' }
+    - { question: 'shared/organization', vtype: 'string', value: '{{ ldap_organisation }}' }
+    - { question: 'slapd/move_old_database', vtype: 'boolean', value: 'true' }
+    - { question: 'slapd/domain', vtype: 'string', value: '{{ ldap_domain }}' }
+
+- name: install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - python-ldap
+    - "{{ ansible_database_package }}"
+    - apache2
+    - libapache2-mod-php
+    - php-intl
+    - php-json
+    - php-ldap
+    - "{{ php_database_package }}"
+    - php-mbstring
+    - php-curl
+    - "{{ database_package }}"
+    - pdns-server
+    - pdns-tools
+    - "{{ powerdns_database_package }}"
+    - slapd
+    - ldap-utils

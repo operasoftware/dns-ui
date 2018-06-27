@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/xenial64"
+
+  # Expose TCP/80 and UDP/53 on localhost TCP/8080 and UDP/5353 respectively
+  # If the ports are in use, Vagrant will pick another and let the user know
+  config.vm.network "forwarded_port", protocol: "tcp", guest: 80, host: 8000,
+    host_ip: "127.0.0.1", auto_correct: true
+  config.vm.network "forwarded_port", protocol: "udp", guest: 53, host: 5300,
+    host_ip: "127.0.0.1", auto_correct: true
+
+  config.vm.synced_folder "..",  "/vagrant", id: "application"
+
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.compatibility_mode  = "2.0"
+    ansible.provisioning_path   = "/vagrant/vagrant/ansible"
+    ansible.playbook            = "dns-ui.yml"
+    ansible.verbose             = false
+    ansible.install             = true
+  end
+end

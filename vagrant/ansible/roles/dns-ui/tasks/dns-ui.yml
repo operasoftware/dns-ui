@@ -1,0 +1,32 @@
+---
+- name: create dns-ui config.ini
+  copy:
+    src: /vagrant/config/config-sample.ini
+    dest: /vagrant/config/config.ini
+    remote_src: yes
+    force: no
+  register: new_config
+
+- name: configure config.ini
+  ini_file:
+    path: /vagrant/config/config.ini
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+    backup: no
+  when: new_config.changed
+  loop:
+    - { section: "web", option: "baseurl", value: "http://localhost:8080" }
+    - { section: "database", option: "dsn", value: "\"pgsql:host=127.0.0.1;dbname={{ database_dnsui_schema }}\"" }
+    - { section: "database", option: "username", value: "{{ database_dnsui_username }}" }
+    - { section: "database", option: "password", value: "{{ database_dnsui_password }}" }
+    - { section: "ldap", option: "host", value: "ldap://localhost:389" }
+    - { section: "ldap", option: "starttls", value: "0" }
+    - { section: "ldap", option: "dn_user", value: "\"ou=users,{{ ldap_domain_dc }}\"" }
+    - { section: "ldap", option: "dn_group", value: "\"ou=groups,{{ ldap_domain_dc }}\"" }
+    - { section: "ldap", option: "bind_dn", value: "\"cn=admin,{{ ldap_domain_dc }}\"" }
+    - { section: "ldap", option: "bind_password", value: "{{ ldap_admin_password }}" }
+    - { section: "ldap", option: "admin_group_cn", value: "dnsui_admins" }
+    - { section: "ldap", option: "user_email", value: "cn" }
+    - { section: "powerdns", option: "api_url", value: "\"http://localhost:8081/api/v1/servers/localhost\"" }
+    - { section: "powerdns", option: "api_key", value: "{{ powerdns_api_key }}" }

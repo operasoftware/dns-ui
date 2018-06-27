@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+        DocumentRoot    /vagrant/public_html
+
+        CustomLog       /var/log/apache2/dns-ui-access.log combined
+        ErrorLog        /var/log/apache2/dns-ui-error.log
+
+        DirectoryIndex init.php
+        FallbackResource /init.php
+        AllowEncodedSlashes NoDecode
+
+        <Directory /vagrant/public_html>
+                AuthType Basic
+                AuthName "{{ dnsui_auth_name }}"
+                AuthBasicProvider ldap
+
+                AuthLDAPURL "ldap://localhost:389/ou=users,{{ ldap_domain_dc }}?uid?sub?(objectClass=*)"
+                Require valid-user
+        </Directory>
+</VirtualHost>

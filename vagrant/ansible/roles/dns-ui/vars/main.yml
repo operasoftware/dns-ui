@@ -1,0 +1,3 @@
+---
+supported_db_vendors:
+  - postgresql

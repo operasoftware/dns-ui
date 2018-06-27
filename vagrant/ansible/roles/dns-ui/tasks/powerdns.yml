@@ -1,0 +1,41 @@
+---
+- name: remove unused powerdns configuration
+  file:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/powerdns/bindbackend.conf
+    - /etc/powerdns/pdns.d/pdns.simplebind.conf
+  register: pdns_config_clean
+
+- name: create powerdns database configuration
+  template:
+    src: "{{ powerdns_database_config }}.j2"
+    dest: /etc/powerdns/pdns.d/{{ powerdns_database_config }}
+    owner: root
+    group: root
+    mode: 0644
+  register: pdns_db_config
+
+- name: configure powerdns
+  lineinfile:
+    path: /etc/powerdns/pdns.conf
+    regexp: "^{{ item.name }}="
+    line: "{{ item.name }}={{ item.value }}"
+  loop:
+    - { name: "default-soa-name", value: "{{ powerdns_default_soa_name }}" }
+    - { name: "default-soa-mail", value: "{{ powerdns_default_soa_mail }}" }
+    - { name: "{{ powerdns_default_ksk_algorithm_setting }}", value: "{{ powerdns_default_ksk_algorithm }}" }
+    - { name: "webserver", value: "yes" }
+    - { name: "webserver-address", value: "0.0.0.0" }
+    - { name: "webserver-allow-from", value: "127.0.0.1" }
+    - { name: "webserver-port", value: "8081" }
+    - { name: "api", value: "yes" }
+    - { name: "api-key", value: "{{ powerdns_api_key }}" }
+  register: pdns_config
+
+- name: restart powerdns
+  service:
+    name: pdns
+    state: restarted
+  when: pdns_config_clean.changed or pdns_db_config.changed or pdns_config.changed
