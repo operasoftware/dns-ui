@@ -1,0 +1,33 @@
+---
+- name: enable apache ldap module
+  apache2_module:
+    name: authnz_ldap
+    state: present
+  register: apache_module
+
+- name: disable default apache configuration
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+
+- name: create dns-ui apache configuration
+  template:
+    src: apache2.conf.j2
+    dest: /etc/apache2/sites-available/dns-ui.conf
+    owner: root
+    group: root
+    mode: 0644
+  register: apache_config_uploaded
+
+- name: enable dns-ui apache configuration
+  file:
+    src: /etc/apache2/sites-available/dns-ui.conf
+    dest: /etc/apache2/sites-enabled/dns-ui.conf
+    state: link
+  register: apache_config_linked
+
+- name: restart apache
+  service:
+    name: apache2
+    state: restarted
+  when: apache_module.changed or apache_config_uploaded.changed or apache_config_linked.changed

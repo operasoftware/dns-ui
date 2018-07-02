@@ -1,0 +1,49 @@
+---
+- name: create postgresql database '{{ database_dnsui_schema }}'
+  postgresql_db:
+    name: "{{ database_dnsui_schema }}"
+  become: true
+  become_user: postgres
+
+- name: create postgresql user '{{ database_dnsui_username }}'
+  postgresql_user:
+    db: "{{ database_dnsui_schema }}"
+    name: "{{ database_dnsui_username }}"
+    password: "{{ database_dnsui_password }}"
+  become: true
+  become_user: postgres
+
+- name: create postgresql database '{{ database_powerdns_schema }}'
+  postgresql_db:
+    name: "{{ database_powerdns_schema }}"
+  become: true
+  become_user: postgres
+
+- name: load schema for database '{{ database_powerdns_schema }}'
+  postgresql_db:
+    name: "{{ database_powerdns_schema }}"
+    state: restore
+    target: /usr/share/doc/pdns-backend-pgsql/schema.pgsql.sql
+  become: true
+  become_user: postgres
+
+- name: create postgresql user '{{ database_powerdns_username }}'
+  postgresql_user:
+    db: "{{ database_powerdns_schema }}"
+    name: "{{ database_powerdns_username }}"
+    password: "{{ database_powerdns_password }}"
+  become: true
+  become_user: postgres
+
+- name: grant all privileges for user '{{ database_powerdns_username }}'
+  postgresql_privs:
+    db: "{{ database_powerdns_schema }}"
+    privs: ALL
+    type: "{{ item }}"
+    objs: ALL_IN_SCHEMA
+    roles: "{{ database_powerdns_username }}"
+  become: true
+  become_user: postgres
+  loop:
+    - table
+    - sequence

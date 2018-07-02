@@ -1,0 +1,10 @@
+- name: add powerdns repository key
+  apt_key:
+    url: "{{ powerdns_repo_key }}"
+    state: present
+
+- name: add powerdns repository
+  apt_repository:
+    repo: "{{ powerdns_repo }}"
+    state: present
+    filename: powerdns

@@ -1,0 +1,23 @@
+---
+database_vendor: postgresql
+database_dnsui_schema: dns-ui
+database_dnsui_username: dns-ui
+database_dnsui_password: dns-ui
+database_powerdns_schema: powerdns
+database_powerdns_username: powerdns
+database_powerdns_password: powerdns
+powerdns_repo_key: https://repo.powerdns.com/FD380FBB-pub.asc
+powerdns_repo: deb [arch=amd64] http://repo.powerdns.com/ubuntu xenial-auth-41 main
+powerdns_default_soa_name: ns1.dns-ui.local
+powerdns_default_soa_mail: hostmaster.dns-ui.local
+powerdns_default_ksk_algorithm_setting: default-ksk-algorithm
+powerdns_default_ksk_algorithm: ecdsa256
+powerdns_api_key: pdns-api-key
+ldap_domain: dns-ui.local
+ldap_admin_password: dnsui
+ldap_organisation: DNS UI
+dnsui_auth_name: DNS UI
+dnsui_admin_username: admin
+dnsui_admin_password: admin
+dnsui_user_username: user
+dnsui_user_password: user
