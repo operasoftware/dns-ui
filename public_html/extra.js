@@ -582,7 +582,13 @@ $(function() {
 		}
 
 		function submit_zone_update(event) {
-			$('#zonesubmit').attr('disabled', true);
+			var submitButton = $('#zonesubmit');
+			if(submitButton.data('submitted') === true) {
+				event.preventDefault();
+			} else {
+				submitButton.data('submitted', true);
+				submitButton.addClass('disabled');
+			}
 			if($(event.target).val() == 'request') {
 				$(window).off('beforeunload');
 				return;
@@ -591,7 +597,7 @@ $(function() {
 			var actions = [];
 			$('input[name="updates[]"]', $(event.target).closest('form')).each(function() {
 				actions.push(JSON.parse(this.value));
-			})
+			});
 			$.ajax({
 				url: "../api/v2/zones/" + encodeURIComponent(form.data('zone')),
 				method: "PATCH",
@@ -602,7 +608,8 @@ $(function() {
 				$(window).off('beforeunload');
 				window.location.href = window.location.pathname;
 			}).fail(function(response) {
-				$('#zonesubmit').attr('disabled', false);
+				submitButton.data('submitted', false);
+				submitButton.removeClass('disabled');
 				var data = JSON.parse(response.responseText);
 				for(var i = 0, error; error = data.errors[i]; i++) {
 					$('#errors').append(
