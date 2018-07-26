@@ -608,7 +608,7 @@ $(function() {
 				$(window).off('beforeunload');
 				window.location.href = window.location.pathname;
 			}).fail(function(response) {
-        submitButton.data('submitted', false);
+				submitButton.data('submitted', false);
 				submitButton.removeClass('disabled');
 				var data = JSON.parse(response.responseText);
 				for(var i = 0, error; error = data.errors[i]; i++) {
