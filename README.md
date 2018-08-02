@@ -108,6 +108,12 @@ Usage
 Anyone in the LDAP group defined under `admin_group_cn` in `config/config.ini` will be able to add and modify all zones.
 They will also be able to grant access under "User access" for any zone to any number of users.
 
+API
+---
+
+By going to the URL `/api/v2` with your web browser you can see documentation of the rest API, including all of the
+available API methods. [See this on the demo server](https://dnsui.xiven.com/api/v2).
+
 Screenshots
 -----------
 
