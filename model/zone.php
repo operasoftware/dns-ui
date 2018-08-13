@@ -727,6 +727,13 @@ class Zone extends Record {
 			$update->oldtype = $update->type;
 		}
 		if(($update->type == 'SOA' || $update->type == 'NS') && !$active_user->admin) return;
+
+		if(isset($config['dns']['autocreate_reverse_records'])) {
+			$autocreate_ptr = (bool)$config['dns']['autocreate_reverse_records'];
+		} else {
+			$autocreate_ptr = true; # enabled by default
+		}
+
 		switch($update->action) {
 		case 'add':
 			if(!isset($update->records) || !is_array($update->records)) throw new BadData('Malformed action');
@@ -739,11 +746,6 @@ class Zone extends Record {
 			if(!isset($update->ttl)) throw new BadData('Malformed recordset.');
 			$rrset->ttl = DNSTime::expand($update->ttl);
 			$trash[$update->name.' '.$update->type] = false;
-			if(isset($config['dns']['autocreate_reverse_records'])) {
-				$autocreate_ptr = (bool)$config['dns']['autocreate_reverse_records'];
-			} else {
-				$autocreate_ptr = true; # enabled by default
-			}
 			foreach($update->records as $record) {
 				if(!(isset($record->content) && isset($record->enabled))) throw new BadData('Malformed record.');
 				$record->content = DNSContent::encode($record->content, $update->type, $this->name);
@@ -789,7 +791,11 @@ class Zone extends Record {
 				$rr = new ResourceRecord;
 				$rr->content = $record->content;
 				$rr->disabled = ($record->enabled === 'No' || $record->enabled === false);
-				$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rrset->type, $rr->content, $revs_missing, $revs_updated);
+				if(!$autocreate_ptr || $rr->disabled) {
+					$rr->{'set-ptr'} = false;
+				} else {
+					$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rrset->type, $rr->content, $revs_missing, $revs_updated);
+				}
 				$rrset->add_resource_record($rr);
 			}
 			if(isset($update->comment) && $update->comment != $rrset->merge_comment_text()) {
