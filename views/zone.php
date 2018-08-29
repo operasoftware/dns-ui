@@ -182,7 +182,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$contact = $_POST['contact'];
 		$refresh = DNSTime::expand($_POST['refresh']);
 		$retry = DNSTime::expand($_POST['retry']);
-		$expiry = DNSTime::expand($_POST['expiry']);
+		$expiry = DNSTime::expand($_POST['expire']);
 		$default_ttl = DNSTime::expand($_POST['default_ttl']);
 		$soa_ttl = DNSTime::expand($_POST['soa_ttl']);
 		if($zone->soa->primary_ns != $primary_ns

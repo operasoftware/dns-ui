@@ -443,10 +443,10 @@ global $output_formatter;
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="expiry" class="col-sm-2 control-label"><abbr title="Indicates when the zone data is no longer authoritative. Used by Slave (Secondary) servers only.">Expiry</abbr></label>
+				<label for="expire" class="col-sm-2 control-label"><abbr title="Indicates when the zone data is no longer authoritative. Used by Slave (Secondary) servers only.">Expire</abbr></label>
 				<div class="col-sm-10">
 					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="expiry" name="expiry" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->expiry))?>">
+					<input type="text" class="form-control" id="expire" name="expire" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->expiry))?>">
 					<?php } else { ?>
 					<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->expiry))?></p>
 					<?php } ?>
