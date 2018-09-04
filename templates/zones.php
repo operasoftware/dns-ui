@@ -37,9 +37,9 @@ foreach($zones as $zone) {
 ?>
 <h1>Zones</h1>
 <ul class="nav nav-tabs" role="tablist">
-	<li role="presentation" class="active"><a href="#forward" aria-controls="forward" role="tab" data-toggle="tab">Forward zones</a></li>
-	<li role="presentation"><a href="#reverse4" aria-controls="reverse4" role="tab" data-toggle="tab">Reverse zones IPv4</a></li>
-	<li role="presentation"><a href="#reverse6" aria-controls="reverse6" role="tab" data-toggle="tab">Reverse zones IPv6</a></li>
+	<li role="presentation" class="active"><a href="#forward" aria-controls="forward" role="tab" data-toggle="tab">Forward zones <span class="badge"><?= count($zone_types['forward']); ?></span></a></li>
+	<li role="presentation"><a href="#reverse4" aria-controls="reverse4" role="tab" data-toggle="tab">Reverse zones IPv4 <span class="badge"><?= count($zone_types['reverse4']); ?></span></a></li>
+	<li role="presentation"><a href="#reverse6" aria-controls="reverse6" role="tab" data-toggle="tab">Reverse zones IPv6 <span class="badge"><?= count($zone_types['reverse6']); ?></span></a></li>
 	<?php if($active_user->admin) { ?>
 	<li role="presentation"><a href="#create" aria-controls="create" role="tab" data-toggle="tab">Create zone</a></li>
 	<?php } ?>
