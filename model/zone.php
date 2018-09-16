@@ -309,7 +309,11 @@ class Zone extends Record {
 	*/
 	public function &get_cryptokeys() {
 		if(is_null($this->cryptokeys)) {
-			$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id).'/cryptokeys');
+			try {
+				$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id).'/cryptokeys');
+			} catch(Pest_InvalidRecord $e) {
+				$data = array();
+			}
 		}
 		$this->cryptokeys = $data;
 		return $this->cryptokeys;
