@@ -37,6 +37,7 @@ class Router {
 
 	public function handle_request($request_path) {
 		$request_path = preg_replace('|\?.*$|', '', $request_path);
+		$request_path = preg_replace('|//+|', '/', $request_path);
 		foreach($this->routes as $path => $route) {
 			if(preg_match('|^'.$path.'$|', $request_path, $matches)) {
 				$this->view = $route->view;
