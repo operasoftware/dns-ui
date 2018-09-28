@@ -1,5 +1,5 @@
 ---
-- name: check existance of config file
+- name: check existence of config file
   stat:
     path: /vagrant/vagrant/ansible/config.yml
   register: override_config
