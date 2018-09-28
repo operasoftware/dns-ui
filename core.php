@@ -181,7 +181,7 @@ function redirect($url = null, $type = '303 See other') {
 /**
  * Given a set of defaults and an array of querystring data, convert to a simpler
  * easy-to-read form and redirect if any conversion was done.  Also return array
- * combining defaults with any querysting parameters that do not match defaults.
+ * combining defaults with any querystring parameters that do not match defaults.
  * @param array $defaults associative array of default values
  * @param array $values associative array of querystring data
  * @return array result of combining defaults and querystring data
