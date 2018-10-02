@@ -38,7 +38,7 @@ header("Content-Security-Policy: default-src 'self'");
 				<span class="icon-bar"></span>
 			</button>
 			<?php if(!empty($web_config['logo'])) { ?>
-			<a class="navbar-brand" href="/">
+			<a class="navbar-brand" href="<?php out($web_config['baseurl'])?>">
 				<img src="<?php out($web_config['logo'])?>">
 				DNS management
 			</a>
