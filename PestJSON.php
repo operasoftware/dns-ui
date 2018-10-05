@@ -3,7 +3,7 @@
  * Pest is a REST client for PHP.
  *
  * PestJSON adds JSON-specific functionality to Pest, automatically converting
- * JSON data resturned from REST services into PHP arrays and vice versa.
+ * JSON data returned from REST services into PHP arrays and vice versa.
  *
  * In other words, while Pest's get/post/put/delete calls return raw strings,
  * PestJSON return (associative) arrays.
