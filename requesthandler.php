@@ -30,7 +30,7 @@ if(isset($_SERVER['PHP_AUTH_USER'])) {
 $base_path = dirname(__FILE__);
 $request_url = preg_replace('|(.)/$|', '$1', $_SERVER['REQUEST_URI']);
 $relative_request_url = preg_replace('/^'.preg_quote($relative_frontend_base_url, '/').'/', '', $request_url) ?: '/';
-$absolute_request_url = 'http'.(empty($_SERVER['HTTPS']) ? '' : 's').'://'.$_SERVER['HTTP_HOST'].$request_url;
+$absolute_request_url = $frontend_root_url.$request_url;
 
 if(empty($config['web']['enabled'])) {
 	require('views/error503.php');

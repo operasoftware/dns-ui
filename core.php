@@ -51,6 +51,7 @@ if(!empty($config['ldap']['enabled'])) {
 setup_database();
 
 $relative_frontend_base_url = (string)parse_url($config['web']['baseurl'], PHP_URL_PATH);
+$frontend_root_url = preg_replace('/'.preg_quote($relative_frontend_base_url, '/').'$/', '', $config['web']['baseurl']);
 
 // Convert all non-fatal errors into exceptions
 function exception_error_handler($errno, $errstr, $errfile, $errline) {
