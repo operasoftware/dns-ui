@@ -206,6 +206,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$update->records = array($record);
 			$json = new StdClass;
 			$json->actions = array($update);
+			$json->comment = $_POST['soa_change_comment'];
 			$zone->process_bulk_json_rrset_update(json_encode($json));
 		}
 		redirect();

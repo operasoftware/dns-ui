@@ -473,7 +473,14 @@ global $output_formatter;
 					<?php } ?>
 				</div>
 			</div>
+			<hr>
 			<?php if($active_user->admin) { ?>
+			<div class="form-group">
+				<label for="soa_change_comment" class="col-sm-2 control-label">Change comment</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="soa_change_comment" name="soa_change_comment" value=""<?php if($force_change_comment) out(' required');?>>
+				</div>
+			</div>
 			<div class="form-group">
 				<div class="col-sm-offset-2 col-sm-10">
 					<button type="submit" name="update_zone" value="1" class="btn btn-primary">Save changes</button>
