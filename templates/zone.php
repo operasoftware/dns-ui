@@ -31,6 +31,7 @@ $soa_templates = $this->get('soa_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
 $deletion = $this->get('deletion');
 $force_change_review = $this->get('force_change_review');
+$force_change_comment = $this->get('force_change_comment');
 $maxperpage = 1000;
 $reverse = false;
 global $output_formatter;
@@ -210,7 +211,7 @@ global $output_formatter;
 				<ul id="collisions_list">
 				</ul>
 				<input type="hidden" name="serial" value="<?php out($zone->soa->serial)?>">
-				<div class="form-group"><label for="comment">Update comment</label><input type="text" id="comment" name="comment" class="form-control"></div>
+				<div class="form-group"><label for="comment">Update comment</label><input type="text" id="comment" name="comment" class="form-control"<?php if($force_change_comment) out(' required');?>></div>
 				<div id="errors"></div>
 				<?php if(($active_user->admin || $active_user->access_to($zone) == 'administrator') && !$force_change_review) { ?>
 				<p><button type="submit" id="zonesubmit" name="update_rrs" value="save" class="btn btn-primary">Save changes</button></p>

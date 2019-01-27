@@ -583,6 +583,8 @@ $(function() {
 
 		function submit_zone_update(event) {
 			var submitButton = $('#zonesubmit');
+			var form = submitButton[0].form;
+			if(!form.checkValidity()) return;
 			if(submitButton.data('submitted') === true) {
 				event.preventDefault();
 			} else {

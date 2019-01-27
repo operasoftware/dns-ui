@@ -665,6 +665,7 @@ class Zone extends Record {
 		$update = json_decode($update);
 		if(is_null($update)) throw new InvalidJSON(json_last_error_msg());
 		if(!isset($update->actions) && !is_array($update->actions)) throw new BadData('No actions provided.');
+		if(isset($config['web']['force_change_comment']) && intval($config['web']['force_change_comment']) == 1 && empty($update->comment)) throw new BadData('A change comment must be provided.');
 		foreach($update->actions as $action) {
 			try {
 				$changes[] = $this->process_rrset_action($action, $trash, $revs_missing, $revs_updated);

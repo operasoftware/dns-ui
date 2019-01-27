@@ -59,7 +59,8 @@ $cryptokeys = $zone->get_cryptokeys();
 $accounts = $zone_dir->list_accounts();
 $allusers = $user_dir->list_users();
 $replication_types = $replication_type_dir->list_replication_types();
-$force_change_review = isset($config['web']['force_change_review']) ? $config['web']['force_change_review'] : '0';
+$force_change_review = isset($config['web']['force_change_review']) ? intval($config['web']['force_change_review']) : 0;
+$force_change_comment = isset($config['web']['force_change_comment']) ? intval($config['web']['force_change_comment']) : 0;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['update_rrs'])) {
@@ -301,6 +302,7 @@ if(!isset($content)) {
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
 	$content->set('deletion', $deletion);
 	$content->set('force_change_review', $force_change_review);
+	$content->set('force_change_comment', $force_change_comment);
 }
 
 $page = new PageSection('base');
