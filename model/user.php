@@ -197,11 +197,12 @@ class User extends Record {
 
 	/**
 	* List all zones that this user is an administrator of
+	* @param array $include list of extra data to include in response
 	* @return array of Zone objects
 	*/
-	public function list_admined_zones() {
+	public function list_admined_zones($include = array()) {
 		global $zone_dir;
-		$zones = $zone_dir->list_zones();
+		$zones = $zone_dir->list_zones($include);
 		$admined_zones = array();
 		foreach($zones as $zone) {
 			if($this->access_to($zone)) $admined_zones[$zone->pdns_id] = $zone;
@@ -211,14 +212,15 @@ class User extends Record {
 
 	/**
 	* List all zones that this user has access to in some way
+	* @param array $include list of extra data to include in response
 	* @return array of Zone objects
 	*/
-	public function list_accessible_zones() {
+	public function list_accessible_zones($include = array()) {
 		global $zone_dir;
 		if($this->admin) {
-			$zones = $zone_dir->list_zones();
+			$zones = $zone_dir->list_zones($include);
 		} else {
-			$zones = $this->list_admined_zones();
+			$zones = $this->list_admined_zones($include);
 		}
 		return $zones;
 	}

@@ -15,7 +15,7 @@
 ## limitations under the License.
 ##
 
-$zones = $active_user->list_accessible_zones();
+$zones = $active_user->list_accessible_zones(array('pending_updates'));
 usort($zones, function($a, $b) {
 	$aname = implode(',', array_reverse(explode('.', $a->name)));
 	$bname = implode(',', array_reverse(explode('.', $b->name)));

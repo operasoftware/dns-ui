@@ -113,12 +113,28 @@ class ZoneDirectory extends DBDirectory {
 
 	/**
 	* List all zones in PowerDNS and update list in database to match.
+	* @param array $include list of extra data to include in response
 	* @return array of Zone objects indexed by pdns_id
 	*/
-	public function list_zones() {
+	public function list_zones($include = array()) {
 		$this->database->query('BEGIN WORK');
 		$this->database->query('LOCK TABLE zone');
-		$stmt = $this->database->prepare('SELECT * FROM zone ORDER BY name');
+		$fields = array('zone.*');
+		$joins = array();
+		foreach($include as $field) {
+			switch($field) {
+			case 'pending_updates':
+				$fields[] = 'COUNT(pending_update.id) as pending_updates';
+				$joins[] = 'LEFT JOIN pending_update ON pending_update.zone_id = zone.id';
+				break;
+			}
+		}
+		$stmt = $this->database->prepare('
+			SELECT '.implode(', ', $fields).'
+			FROM zone '.implode(" ", $joins).'
+			GROUP BY zone.id
+			ORDER BY zone.name
+		');
 		$stmt->execute();
 		$zones_by_pdns_id = array();
 		$current_zones = array();

@@ -65,7 +65,10 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['forward'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify(punycode_to_utf8($zone->name)))?></a></td>
+					<td class="name">
+						<?php if($zone->pending_updates > 0) { ?><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>#pending"><span class="badge"><?php out(number_format($zone->pending_updates))?></span></a><?php } ?>
+						<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a>
+					</td>
 					<td><?php out($zone->serial)?></td>
 					<td><?php out($zone->kind)?></td>
 					<td><?php out($zone->account)?></td>
@@ -100,7 +103,10 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['reverse4'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
+					<td class="name">
+						<?php if($zone->pending_updates > 0) { ?><span class="badge"><?php out(number_format($zone->pending_updates))?></span><?php } ?>
+						<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a>
+					</td>
 					<td><?php out(ipv4_reverse_zone_to_range($zone->name))?></td>
 					<td><?php out(ipv4_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>
@@ -144,7 +150,10 @@ foreach($zones as $zone) {
 			<tbody>
 				<?php foreach($zone_types['reverse6'] as $zone) { ?>
 				<tr>
-					<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a></td>
+					<td class="name">
+						<?php if($zone->pending_updates > 0) { ?><span class="badge"><?php out(number_format($zone->pending_updates))?></span><?php } ?>
+						<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a>
+					</td>
 					<td><tt><?php out(ipv6_reverse_zone_to_range($zone->name))?></tt></td>
 					<td><?php out(ipv6_reverse_zone_to_subnet($zone->name))?></td>
 					<td><?php out($zone->serial)?></td>
