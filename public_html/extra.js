@@ -1114,14 +1114,14 @@ $(function() {
 			var filters = [];
 			$('thead th input', table).each(function() {
 				if(this.value != '') {
-					filters[$(this).parent().prop('cellIndex')] = this.value;
+					filters[$(this).parent().prop('cellIndex')] = this.value.toLowerCase();
 				}
 			});
 			$('tbody tr', table).each(function() {
 				var filtered = false;
 				$('td', this).each(function() {
 					var cellIndex = $(this).prop('cellIndex');
-					if(filters[cellIndex] && $(this).text().indexOf(filters[cellIndex]) == -1) {
+					if(filters[cellIndex] && $(this).text().toLowerCase().indexOf(filters[cellIndex]) == -1) {
 						filtered = true;
 					}
 				});
