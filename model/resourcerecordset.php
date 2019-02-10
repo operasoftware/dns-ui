@@ -113,6 +113,17 @@ class ResourceRecordSet {
 	}
 
 	/**
+	* Return a single string containing all contents of records in the RRset
+	*/
+	public function merge_content_text() {
+		$array = array();
+		foreach($this->list_resource_records() as $record) {
+			$array[] = $record->content;
+		}
+		return english_list($array);
+	}
+
+	/**
 	* Empty the list of Comment objects associated in this recordset.
 	*/
 	public function clear_comments() {

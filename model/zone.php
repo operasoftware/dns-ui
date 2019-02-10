@@ -760,7 +760,7 @@ class Zone extends Record {
 				if(!$autocreate_ptr || $rr->disabled) {
 					$rr->{'set-ptr'} = false;
 				} else {
-					$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rrset->type, $rr->content, $revs_missing, $revs_updated);
+					$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rrset->name, $rrset->type, $rr->content, $revs_missing, $revs_updated);
 				}
 				$rrset->add_resource_record($rr);
 			}
@@ -799,7 +799,7 @@ class Zone extends Record {
 				if(!$autocreate_ptr || $rr->disabled) {
 					$rr->{'set-ptr'} = false;
 				} else {
-					$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rrset->type, $rr->content, $revs_missing, $revs_updated);
+					$rr->{'set-ptr'} = $zone_dir->check_reverse_record_zone($rrset->name, $rrset->type, $rr->content, $revs_missing, $revs_updated);
 				}
 				$rrset->add_resource_record($rr);
 			}
@@ -844,10 +844,10 @@ class Zone extends Record {
 				$mail->subject = $revs_missing_count.' new DNS resource record'.($revs_missing_count == 1 ? '' : 's').' in '.DNSZoneName::unqualify(punycode_to_utf8($this->name)).' '.($revs_missing_count == 1 ? 'needs a reverse zone' : 'need reverse zones');
 				$mail->body = "The following records were added or updated in the ".DNSZoneName::unqualify(punycode_to_utf8($this->name))." zone:\n\n";
 				foreach($revs_missing['A'] as $rev_missing) {
-					$mail->body .= "    A: {$rev_missing}\n";
+					$mail->body .= "    A: {$rev_missing['address']} ({$rev_missing['name']})\n";
 				}
 				foreach($revs_missing['AAAA'] as $rev_missing) {
-					$mail->body .= " AAAA: {$rev_missing}\n";
+					$mail->body .= " AAAA: {$rev_missing['address']} ({$rev_missing['name']})\n";
 				}
 				$mail->body .= "\nBut no appropriate reverse zone could be found.\n";
 				if(count($revs_missing['A']) > 0) {
