@@ -41,11 +41,15 @@ require('email.php');
 require('bindzonefile.php');
 
 if(!empty($config['ldap']['enabled'])) {
+	$ldap_options = array();
+	$ldap_options[LDAP_OPT_PROTOCOL_VERSION] = 3;
+	$ldap_options[LDAP_OPT_REFERRALS] = !empty($config['ldap']['follow_referrals']);
 	$ldap = new LDAP(
 		isset($config['ldap']['host']) ? $config['ldap']['host'] : $config['ldap']['hostname'],
 		isset($config['ldap']['starttls']) ? $config['ldap']['starttls'] : 1,
 		$config['ldap']['bind_dn'],
-		$config['ldap']['bind_password']
+		$config['ldap']['bind_password'],
+		$ldap_options;
 	);
 }
 setup_database();
