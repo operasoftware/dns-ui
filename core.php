@@ -49,7 +49,7 @@ if(!empty($config['ldap']['enabled'])) {
 		isset($config['ldap']['starttls']) ? $config['ldap']['starttls'] : 1,
 		$config['ldap']['bind_dn'],
 		$config['ldap']['bind_password'],
-		$ldap_options;
+		$ldap_options
 	);
 }
 setup_database();
