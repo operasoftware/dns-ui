@@ -393,6 +393,19 @@ class DNSKEY {
 	}
 }
 
+class DS {
+	public static function get_digest_type($ds) {
+		$digest_types = array(
+			1 => 'SHA-1',
+			2 => 'SHA-256',
+			3 => 'GOST R 34.11-94',
+			4 => 'SHA-384'
+		);
+		list($key_tag, $algorithm, $digest_type, $digest) = explode(' ', $ds);
+		return $digest_types[$digest_type];
+	}
+}
+
 function ipv6_address_expand($address) {
 	if(strpos($address, '::') !== false) {
 		$address = str_replace('::', ':'.str_repeat('0:', 8 - substr_count($address, ':')), $address);

@@ -516,13 +516,13 @@ global $output_formatter;
 					<dt>Info</dt>
 					<dd><code>ID = <?php out($cryptokey->id)?> (<?php out(strtoupper($cryptokey->keytype))?>), flags = <?php out($cryptokey->flags)?>, tag = <?php out(DNSKEY::get_tag($dnskey_flags, $dnskey_protocol, $dnskey_algorithm, $dnskey_keydata))?>, algo = <?php out($dnskey_algorithm)?>, bits = <?php out($cryptokey->bits)?>  <?php out($cryptokey->active ? 'Active' : 'Inactive')?> ( <?php out($cryptokey->algorithm)?> )</code></dd>
 					<dt>DNSKEY</dt>
-					<dd><code><?php out($zone->name.' DNSKEY '.$cryptokey->dnskey)?></code></dd>
+					<dd><code><?php out($zone->name.' IN DNSKEY '.$cryptokey->dnskey.' ; ( '.$cryptokey->algorithm.' )')?></code></dd>
 					<?php if(isset($cryptokey->ds)) { ?>
 					<dt>DS records</dt>
 					<dd>
 						<ul>
 							<?php foreach($cryptokey->ds as $ds) { ?>
-							<li><code><?php out($zone->name.' DS '.$ds) ?></code></li>
+							<li><code><?php out($zone->name.' IN DS '.$ds.' ; ( '.DS::get_digest_type($ds).' )') ?></code></li>
 							<?php } ?>
 						</ul>
 					</dd>
