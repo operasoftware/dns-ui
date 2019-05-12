@@ -395,6 +395,7 @@ class DNSKEY {
 
 class DS {
 	public static function get_digest_type($ds) {
+		// List sourced from https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml
 		$digest_types = array(
 			1 => 'SHA-1',
 			2 => 'SHA-256',
