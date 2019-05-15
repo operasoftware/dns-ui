@@ -43,7 +43,7 @@ class BindZonefile {
 		$line_number = 0;
 		$new_rrsets = array();
 		$new_rrset_comments = array();
-		$recordtypes = 'A|AAAA|CAA|CNAME|LOC|MX|NAPTR|NS|PTR|SOA|SRV|SSHFP|TXT';
+		$recordtypes = 'A|AAAA|ALIAS|CAA|CNAME|LOC|MX|NAPTR|NS|PTR|SOA|SRV|SSHFP|TXT';
 		$mainregexp = '/^
 					   (;)?                                    # Starting semicolon, indicating commented-out (disabled) record
 					   (?:\s+|(\S+)\s+)                        # Record name, or whitespace to use same name as previous line
