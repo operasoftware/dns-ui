@@ -141,6 +141,11 @@ table.rrsets tr.rrset-delete td {
 table.rrsets tr.filtered {
 	display: none;
 }
+#reverse4 > table.zonelist td.name,
+#reverse6 > table.zonelist td.name,
+table.rrsets td.name {
+	font-family: monospace;
+}
 table.changepreview {
 	table-layout: fixed;
 }
