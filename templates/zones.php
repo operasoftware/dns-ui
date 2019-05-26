@@ -170,7 +170,7 @@ foreach($zones as $zone) {
 		<?php if($active_user->admin) { ?>
 		<div class="form-inline reverse_zone_prefill">
 			<label for="ipv6_zone_prefix">IPv6 prefix</label>
-			<input type="text" id="ipv6_zone_prefix" class="form-control" pattern="([0-9a-fA-F]{1,4})(:[0-9a-fA-F]{1,4}){0,6}\:?" required>
+			<input type="text" id="ipv6_zone_prefix" class="form-control" pattern="([0-9a-fA-F]{1,4})(:[0-9a-fA-F]{1,4}){0,6}:?" required>
 			<button type="button" id="ipv6_zone_create" class="btn btn-primary">Create zone from prefix</button>
 		</div>
 		<?php } ?>
