@@ -457,20 +457,21 @@ function ipv6_reverse_zone_to_range($zonename) {
 }
 
 function ipv6_reverse_zone_to_subnet($zonename) {
-	// eg. 2.2.8.b.d.0.1.0.0.2.ip6.arpa.
-	$result = substr($zonename, 0, -10);      // Chop off .ip6.arpa.        = 2.2.8.b.d.0.1.0.0.2
+	// eg. 0.0.0.2.2.8.b.d.0.1.0.0.2.ip6.arpa.
+	$result = substr($zonename, 0, -10);      // Chop off .ip6.arpa.        = 0.0.0.2.2.8.b.d.0.1.0.0.2
 	if(!preg_match('/^[0-9a-f\.]*$/i', $result)) return "";
-	$result = explode('.', $result);          // Split by . separators      = 2, 2, 8, b, d, 0, 1, 0, 0, 2
-	$result = array_reverse($result);         // Reverse chunks             = 2, 0, 0, 1, 0, d, b, 8, 2, 2
-	$result = implode('', $result);           // Combine into single string = 20010db822
+	$result = explode('.', $result);          // Split by . separators      = 0, 0, 0, 2, 2, 8, b, d, 0, 1, 0, 0, 2
+	$result = array_reverse($result);         // Reverse chunks             = 2, 0, 0, 1, 0, d, b, 8, 2, 2, 0, 0, 0
+	$result = implode('', $result);           // Combine into single string = 20010db822000
 	$prefix_len = strlen($result) * 4;
 	$result = str_pad($result, ceil(strlen($result) / 4) * 4, '0', STR_PAD_RIGHT);
-	                                          // Pad up to multiple of 4    = 20010db82200
-	$sections = str_split($result, 4);        // Split into lengths of 4    = 2001, 0db8, 2200
+	                                          // Pad up to multiple of 4    = 20010db822000000
+	$sections = str_split($result, 4);        // Split into lengths of 4    = 2001, 0db8, 2200, 0000
 	array_walk($sections, function(&$a, $b) { $a = ltrim($a, '0');});
-	                                          // Remove leading zeroes      = 2001, db8, 2200
-	$result = implode(':', $sections);        // Combine with :             = 2001:db8:2200
-	$result .= '::/'.$prefix_len;             // Append prefix length       = 2001:db8:2200::/40
+	                                          // Remove leading zeroes      = 2001, db8, 2200, ''
+	$result = implode(':', $sections);        // Combine with :             = 2001:db8:2200:
+	$result = preg_replace('/:+$/', '', $result); // Chop off trailing :    = 2001:db8:2200
+	$result .= '::/'.$prefix_len;             // Append prefix length       = 2001:db8:2200::/52
 	return $result;
 }
 
