@@ -21,7 +21,14 @@ ob_start();
 set_exception_handler('exception_handler');
 
 if(isset($_SERVER['PHP_AUTH_USER'])) {
-	$active_user = $user_dir->get_user_by_uid($_SERVER['PHP_AUTH_USER']);
+
+	if (!empty($config['php_auth']['lowercase_user_auth'])) {
+		$php_auth_user = mb_strtolower($_SERVER['PHP_AUTH_USER']);
+	} else {
+		$php_auth_user = $_SERVER['PHP_AUTH_USER'];
+	}
+
+	$active_user = $user_dir->get_user_by_uid($php_auth_user);
 } else {
 	throw new Exception("Not logged in.");
 }

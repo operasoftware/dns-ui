@@ -121,7 +121,14 @@ class User extends Record {
 	*/
 	public function get_details_from_php_auth() {
 		global $config;
-		if($this->uid == $_SERVER['PHP_AUTH_USER'] and isset($_SERVER['PHP_AUTH_NAME']) and isset($_SERVER['PHP_AUTH_EMAIL']) and isset($_SERVER['PHP_AUTH_GROUPS'])) {
+
+		if (!empty($config['php_auth']['lowercase_user_auth'])) {
+			$php_auth_user = mb_strtolower($_SERVER['PHP_AUTH_USER']);
+		} else {
+			$php_auth_user = $_SERVER['PHP_AUTH_USER'];
+		}
+
+		if($this->uid == $php_auth_user and isset($_SERVER['PHP_AUTH_NAME']) and isset($_SERVER['PHP_AUTH_EMAIL']) and isset($_SERVER['PHP_AUTH_GROUPS'])) {
 			$this->auth_realm = 'PHP_AUTH';
 			$this->name = $_SERVER['PHP_AUTH_NAME'];
 			$this->email = $_SERVER['PHP_AUTH_EMAIL'];
