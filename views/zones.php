@@ -73,6 +73,7 @@ if(!isset($content)) {
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
 	$content->set('account_whitelist', $account_whitelist);
 	$content->set('force_account_whitelist', $force_account_whitelist);
+	$content->set('dnssec_readonly', isset($config['dns']['dnssec_readonly']) ? $config['dns']['dnssec_readonly'] : '0');
 }
 
 $page = new PageSection('base');

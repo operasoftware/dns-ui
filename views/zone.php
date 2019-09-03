@@ -303,6 +303,7 @@ if(!isset($content)) {
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);
 	$content->set('soa_templates', $template_dir->list_soa_templates());
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
+	$content->set('dnssec_readonly', isset($config['dns']['dnssec_readonly']) ? $config['dns']['dnssec_readonly'] : '0');
 	$content->set('deletion', $deletion);
 	$content->set('force_change_review', $force_change_review);
 	$content->set('force_change_comment', $force_change_comment);

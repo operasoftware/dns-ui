@@ -29,6 +29,7 @@ $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
 $soa_templates = $this->get('soa_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
+$dnssec_readonly = $this->get('dnssec_readonly');
 $deletion = $this->get('deletion');
 $force_change_review = $this->get('force_change_review');
 $force_change_comment = $this->get('force_change_comment');
@@ -50,7 +51,7 @@ global $output_formatter;
 	<li role="presentation" class="active"><a href="#records" aria-controls="records" role="tab" data-toggle="tab">Resource records</a></li>
 	<li role="presentation"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">Pending updates<?php if(count($pending) > 0) {?> <span class="badge"><?php out(count($pending))?></span><?php } ?></a></li>
 	<li role="presentation"><a href="#soa" aria-controls="soa" role="tab" data-toggle="tab">Zone configuration</a></li>
-	<?php if($dnssec_enabled) { ?>
+	<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 	<li role="presentation"><a href="#dnssec" aria-controls="dnssec" role="tab" data-toggle="tab">DNSSEC</a></li>
 	<?php } ?>
 	<li role="presentation"><a href="#import" aria-controls="import" role="tab" data-toggle="tab">Export / Import</a></li>
@@ -502,7 +503,7 @@ global $output_formatter;
 			<?php } ?>
 		</form>
 	</div>
-	<?php if($dnssec_enabled) { ?>
+	<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 	<div role="tabpanel" class="tab-pane" id="dnssec">
 		<h2 class="sr-only">DNSSEC</h2>
 		<?php if($zone->dnssec) { ?>
@@ -547,6 +548,7 @@ global $output_formatter;
 		<?php } else { ?>
 		<p>DNSSEC is not currently enabled for this zone.</p>
 		<?php } ?>
+		<?php if($dnssec_enabled) { ?>
 		<?php if($active_user->admin) { ?>
 		<?php if($zone->dnssec) { ?>
 		<h3>Disable DNSSEC</h3>
@@ -568,6 +570,7 @@ global $output_formatter;
 				<button type="submit" name="enable_dnssec" value="1" class="btn btn-primary">Enable DNSSEC for <?php out(DNSZoneName::unqualify($zone->name))?></button>
 			</p>
 		</form>
+		<?php } ?>
 		<?php } ?>
 		<?php } ?>
 	</div>

@@ -22,6 +22,7 @@ $ns_templates = $this->get('ns_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
 $account_whitelist = $this->get('account_whitelist');
 $force_account_whitelist = $this->get('force_account_whitelist');
+$dnssec_readonly = $this->get('dnssec_readonly');
 $zone_types = array('forward' => array(), 'reverse4' => array(), 'reverse6' => array());
 $accounts = array();
 foreach($zones as $zone) {
@@ -59,7 +60,7 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
-					<?php if($dnssec_enabled) { ?>
+					<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 					<th>DNSSEC</th>
 					<?php } ?>
 				</tr>
@@ -74,7 +75,7 @@ foreach($zones as $zone) {
 					<td class="serial"><?php out($zone->serial)?></td>
 					<td class="kind"><?php out($zone->kind)?></td>
 					<td class="account"><?php out($zone->account)?></td>
-					<?php if($dnssec_enabled) { ?>
+					<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 					<td class="dnssec<?php if($zone->dnssec) out(' success') ?>"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 					<?php } ?>
 				</tr>
@@ -97,7 +98,7 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
-					<?php if($dnssec_enabled) { ?>
+					<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 					<th>DNSSEC</th>
 					<?php } ?>
 				</tr>
@@ -114,7 +115,7 @@ foreach($zones as $zone) {
 					<td class="serial"><?php out($zone->serial)?></td>
 					<td class="kind"><?php out($zone->kind)?></td>
 					<td class="account"><?php out($zone->account)?></td>
-					<?php if($dnssec_enabled) { ?>
+					<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 					<td class="dnssec<?php if($zone->dnssec) out(' success') ?>"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 					<?php } ?>
 				</tr>
@@ -144,7 +145,7 @@ foreach($zones as $zone) {
 					<th>Serial</th>
 					<th>Replication type</th>
 					<th>Classification</th>
-					<?php if($dnssec_enabled) { ?>
+					<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 					<th>DNSSEC</th>
 					<?php } ?>
 				</tr>
@@ -161,7 +162,7 @@ foreach($zones as $zone) {
 					<td class="serial"><?php out($zone->serial)?></td>
 					<td class="kind"><?php out($zone->kind)?></td>
 					<td class="account"><?php out($zone->account)?></td>
-					<?php if($dnssec_enabled) { ?>
+					<?php if($dnssec_enabled || $dnssec_readonly) { ?>
 					<td class="dnssec<?php if($zone->dnssec) out(' success') ?>"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 					<?php } ?>
 				</tr>
