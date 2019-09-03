@@ -24,6 +24,9 @@ header("Content-Security-Policy: default-src 'self'");
 <link rel="stylesheet" href="<?php outurl('/bootstrap/css/bootstrap.min.css')?>">
 <link rel="stylesheet" href="<?php outurl('/bootstrap/css/bootstrap-theme.min.css')?>">
 <link rel="stylesheet" href="<?php outurl('/style.css?'.filemtime('public_html/style.css'))?>">
+<?php if(is_file("public_html/site.css")) { ?>
+<link rel="stylesheet" href="<?php outurl('/site.css?'.filemtime('public_html/site.css'))?>">
+<?php } ?>
 <link rel="icon" href="<?php outurl('/book_next.png')?>">
 <title><?php out($this->get('title'))?></title>
 <?php out($this->get('head'), ESC_NONE) ?>
