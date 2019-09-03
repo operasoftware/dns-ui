@@ -40,7 +40,11 @@ header("Content-Security-Policy: default-src 'self'");
 			<?php if(!empty($web_config['logo'])) { ?>
 			<a class="navbar-brand" href="<?php outurl('/')?>">
 				<img src="<?php out($web_config['logo'])?>">
+				<?php if(!empty($web_config['header'])) { ?>
+				<?php out($web_config['header'], ESC_NONE)?>
+				<?php } else { ?>
 				DNS management
+				<?php } ?>
 			</a>
 			<?php } ?>
 		</div>
