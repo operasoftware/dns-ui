@@ -53,6 +53,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$newzone = new Zone;
 			$newzone->name = $newzonename;
 			$newzone->account = $zone->account;
+			$newzone->dnssec = $zone->dnssec;
 			$newzone->kind = 'Master';
 			$newzone->nameservers = $zone->nameservers;
 			foreach($split as $rrset) {
