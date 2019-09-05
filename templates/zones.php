@@ -20,6 +20,8 @@ $replication_types = $this->get('replication_types');
 $soa_templates = $this->get('soa_templates');
 $ns_templates = $this->get('ns_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
+$account_whitelist = $this->get('account_whitelist');
+$force_account_whitelist = $this->get('force_account_whitelist');
 $zone_types = array('forward' => array(), 'reverse4' => array(), 'reverse6' => array());
 $accounts = array();
 foreach($zones as $zone) {
@@ -200,12 +202,20 @@ foreach($zones as $zone) {
 			<div class="form-group">
 				<label for="classification" class="col-sm-2 control-label">Classification</label>
 				<div class="col-sm-10">
+					<?php if($force_account_whitelist) { ?>
+					<select class="form-control" id="classification" name="classification" required>
+						<?php foreach($account_whitelist as $account) { ?>
+						<option value="<?php out($account)?>"><?php out($account)?></option>
+						<?php } ?>
+					</select>
+					<?php } else { ?>
 					<input type="text" class="form-control" id="classification" name="classification" required list="account_list" maxlength="40">
 					<datalist id="account_list">
 						<?php foreach($accounts as $account) { ?>
 						<option value="<?php out($account)?>"><?php out($account)?></option>
 						<?php } ?>
 					</datalist>
+					<?php } ?>
 				</div>
 			</div>
 			<?php if($dnssec_enabled) { ?>

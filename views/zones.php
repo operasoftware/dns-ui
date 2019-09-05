@@ -25,6 +25,8 @@ usort($zones, function($a, $b) {
 $replication_types = $replication_type_dir->list_replication_types();
 $soa_templates = $template_dir->list_soa_templates();
 $ns_templates = $template_dir->list_ns_templates();
+$account_whitelist = !empty($config['dns']['classification_whitelist']) ? explode(',', $config['dns']['classification_whitelist']) : [];
+$force_account_whitelist = !empty($config['dns']['classification_whitelist']) ? 1 : 0;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['add_zone']) && $active_user->admin) {
@@ -69,6 +71,8 @@ if(!isset($content)) {
 	$content->set('soa_templates', $soa_templates);
 	$content->set('ns_templates', $ns_templates);
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
+	$content->set('account_whitelist', $account_whitelist);
+	$content->set('force_account_whitelist', $force_account_whitelist);
 }
 
 $page = new PageSection('base');

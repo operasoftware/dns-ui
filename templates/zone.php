@@ -32,6 +32,8 @@ $dnssec_enabled = $this->get('dnssec_enabled');
 $deletion = $this->get('deletion');
 $force_change_review = $this->get('force_change_review');
 $force_change_comment = $this->get('force_change_comment');
+$account_whitelist = $this->get('account_whitelist');
+$force_account_whitelist = $this->get('force_account_whitelist');
 $maxperpage = 1000;
 $reverse = false;
 global $output_formatter;
@@ -374,12 +376,23 @@ global $output_formatter;
 				<label for="classification" class="col-sm-2 control-label">Classification</label>
 				<div class="col-sm-10">
 					<?php if($active_user->admin) { ?>
+					<?php if($force_account_whitelist) { ?>
+					<select class="form-control" id="classification" name="classification">
+						<?php foreach($account_whitelist as $account) { ?>
+						<option value="<?php out($account)?>"<?php if($account == $zone->account) out(' selected', ESC_NONE)?>><?php out($account)?></option>
+						<?php } ?>
+						<?php if(!in_array($zone->account, $account_whitelist)) { ?>
+						<option value="<?php out($zone->account)?>" selected><?php out($zone->account)?></option>
+						<?php } ?>
+					</select>
+					<?php } else { ?>
 					<input type="text" class="form-control" id="classification" name="classification" list="account_list" required maxlength="40" value="<?php out($zone->account)?>">
 					<datalist id="account_list">
 						<?php foreach($accounts as $account) { ?>
 						<option value="<?php out($account)?>"><?php out($account)?></option>
 						<?php } ?>
 					</datalist>
+					<?PHP } ?>
 					<?php } else { ?>
 					<p class="form-control-static"><?php out($zone->account)?></p>
 					<?php } ?>
