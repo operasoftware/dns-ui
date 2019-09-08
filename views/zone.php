@@ -61,6 +61,8 @@ $allusers = $user_dir->list_users();
 $replication_types = $replication_type_dir->list_replication_types();
 $force_change_review = isset($config['web']['force_change_review']) ? intval($config['web']['force_change_review']) : 0;
 $force_change_comment = isset($config['web']['force_change_comment']) ? intval($config['web']['force_change_comment']) : 0;
+$account_whitelist = !empty($config['dns']['classification_whitelist']) ? explode(',', $config['dns']['classification_whitelist']) : [];
+$force_account_whitelist = !empty($config['dns']['classification_whitelist']) ? 1 : 0;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['update_rrs'])) {
@@ -304,6 +306,8 @@ if(!isset($content)) {
 	$content->set('deletion', $deletion);
 	$content->set('force_change_review', $force_change_review);
 	$content->set('force_change_comment', $force_change_comment);
+	$content->set('account_whitelist', $account_whitelist);
+	$content->set('force_account_whitelist', $force_account_whitelist);
 }
 
 $page = new PageSection('base');
