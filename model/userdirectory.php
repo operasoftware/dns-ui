@@ -82,10 +82,18 @@ class UserDirectory extends DBDirectory {
 	* @throws UserNotFoundException if no user with that uid exists
 	*/
 	public function get_user_by_uid($uid) {
+		global $config;
+		if(isset($config['authentication']['user_case_sensitive']) && $config['authentication']['user_case_sensitive'] == 0) {
+			$uid = mb_strtolower($uid);
+			$sql_statement = 'SELECT * FROM "user" WHERE lower(uid) = ?';
+		} else {
+			$sql_statement = 'SELECT * FROM "user" WHERE uid = ?';
+		}
+
 		if(isset($this->cache_uid[$uid])) {
 			return $this->cache_uid[$uid];
 		}
-		$stmt = $this->database->prepare('SELECT * FROM "user" WHERE uid = ?');
+		$stmt = $this->database->prepare($sql_statement);
 		$stmt->bindParam(1, $uid, PDO::PARAM_STR);
 		$stmt->execute();
 		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
