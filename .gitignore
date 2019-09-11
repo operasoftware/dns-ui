@@ -1,4 +1,5 @@
 config/config.ini
+public_html/site.css
 extensions/*.php
 vagrant/*.retry
 vagrant/*.log

@@ -66,16 +66,16 @@ foreach($zones as $zone) {
 			</thead>
 			<tbody>
 				<?php foreach($zone_types['forward'] as $zone) { ?>
-				<tr>
+				<tr data-name="<?php out(DNSZoneName::unqualify($zone->name))?>" data-serial="<?php out($zone->serial)?>" data-kind="<?php out($zone->kind)?>" data-account="<?php out($zone->account)?>" data-dnssec="<?php out($zone->dnssec)?>">
 					<td class="name">
 						<?php if($zone->pending_updates > 0) { ?><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>#pending"><span class="badge"><?php out(number_format($zone->pending_updates))?></span></a><?php } ?>
 						<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a>
 					</td>
-					<td><?php out($zone->serial)?></td>
-					<td><?php out($zone->kind)?></td>
-					<td><?php out($zone->account)?></td>
+					<td class="serial"><?php out($zone->serial)?></td>
+					<td class="kind"><?php out($zone->kind)?></td>
+					<td class="account"><?php out($zone->account)?></td>
 					<?php if($dnssec_enabled) { ?>
-					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
+					<td class="dnssec<?php if($zone->dnssec) out(' success') ?>"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 					<?php } ?>
 				</tr>
 				<?php } ?>
@@ -104,18 +104,18 @@ foreach($zones as $zone) {
 			</thead>
 			<tbody>
 				<?php foreach($zone_types['reverse4'] as $zone) { ?>
-				<tr>
+				<tr data-name="<?php out(DNSZoneName::unqualify($zone->name))?>" data-ipv4-reverse-range="<?php out(ipv4_reverse_zone_to_range($zone->name))?>" data-ipv4-reverse-subnet="<?php out(ipv4_reverse_zone_to_subnet($zone->name))?>" data-serial="<?php out($zone->serial)?>" data-kind="<?php out($zone->kind)?>" data-account="<?php out($zone->account)?>" data-dnssec="<?php out($zone->dnssec)?>">
 					<td class="name">
 						<?php if($zone->pending_updates > 0) { ?><span class="badge"><?php out(number_format($zone->pending_updates))?></span><?php } ?>
 						<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a>
 					</td>
-					<td><?php out(ipv4_reverse_zone_to_range($zone->name))?></td>
-					<td><?php out(ipv4_reverse_zone_to_subnet($zone->name))?></td>
-					<td><?php out($zone->serial)?></td>
-					<td><?php out($zone->kind)?></td>
-					<td><?php out($zone->account)?></td>
+					<td class="ipv4-reverse-range"><?php out(ipv4_reverse_zone_to_range($zone->name))?></td>
+					<td class="ipv4-reverse-subnet"><?php out(ipv4_reverse_zone_to_subnet($zone->name))?></td>
+					<td class="serial"><?php out($zone->serial)?></td>
+					<td class="kind"><?php out($zone->kind)?></td>
+					<td class="account"><?php out($zone->account)?></td>
 					<?php if($dnssec_enabled) { ?>
-					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
+					<td class="dnssec<?php if($zone->dnssec) out(' success') ?>"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 					<?php } ?>
 				</tr>
 				<?php } ?>
@@ -151,18 +151,18 @@ foreach($zones as $zone) {
 			</thead>
 			<tbody>
 				<?php foreach($zone_types['reverse6'] as $zone) { ?>
-				<tr>
+				<tr data-name="<?php out(DNSZoneName::unqualify($zone->name))?>" data-ipv6-reverse-range="<?php out(ipv6_reverse_zone_to_range($zone->name))?>" data-ipv6-reverse-subnet="<?php out(ipv6_reverse_zone_to_subnet($zone->name))?>" data-serial="<?php out($zone->serial)?>" data-kind="<?php out($zone->kind)?>" data-account="<?php out($zone->account)?>" data-dnssec="<?php out($zone->dnssec)?>">
 					<td class="name">
 						<?php if($zone->pending_updates > 0) { ?><span class="badge"><?php out(number_format($zone->pending_updates))?></span><?php } ?>
 						<a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>"><?php out(DNSZoneName::unqualify($zone->name))?></a>
 					</td>
-					<td><tt><?php out(ipv6_reverse_zone_to_range($zone->name))?></tt></td>
-					<td><?php out(ipv6_reverse_zone_to_subnet($zone->name))?></td>
-					<td><?php out($zone->serial)?></td>
-					<td><?php out($zone->kind)?></td>
-					<td><?php out($zone->account)?></td>
+					<td class="ipv6-reverse-range"><tt><?php out(ipv6_reverse_zone_to_range($zone->name))?></tt></td>
+					<td class="ipv6-reverse-subnet"><?php out(ipv6_reverse_zone_to_subnet($zone->name))?></td>
+					<td class="serial"><?php out($zone->serial)?></td>
+					<td class="kind"><?php out($zone->kind)?></td>
+					<td class="account"><?php out($zone->account)?></td>
 					<?php if($dnssec_enabled) { ?>
-					<td<?php if($zone->dnssec) out(' class="success"', ESC_NONE) ?>><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
+					<td class="dnssec<?php if($zone->dnssec) out(' success') ?>"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
 					<?php } ?>
 				</tr>
 				<?php } ?>
