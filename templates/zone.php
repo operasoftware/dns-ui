@@ -29,6 +29,7 @@ $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
 $soa_templates = $this->get('soa_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
+$dnssec_edit = $this->get('dnssec_edit');
 $deletion = $this->get('deletion');
 $force_change_review = $this->get('force_change_review');
 $force_change_comment = $this->get('force_change_comment');
@@ -506,7 +507,7 @@ global $output_formatter;
 	<div role="tabpanel" class="tab-pane" id="dnssec">
 		<h2 class="sr-only">DNSSEC</h2>
 		<?php if($zone->dnssec) { ?>
-		<?php if(!$zone->api_rectify && $active_user->admin) { ?>
+		<?php if(!$zone->api_rectify && $active_user->admin && $dnssec_edit) { ?>
 		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<div class="alert alert-warning">
@@ -547,7 +548,7 @@ global $output_formatter;
 		<?php } else { ?>
 		<p>DNSSEC is not currently enabled for this zone.</p>
 		<?php } ?>
-		<?php if($active_user->admin) { ?>
+		<?php if($active_user->admin && $dnssec_edit) { ?>
 		<?php if($zone->dnssec) { ?>
 		<h3>Disable DNSSEC</h3>
 		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="disablednssec">

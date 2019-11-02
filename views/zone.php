@@ -63,6 +63,8 @@ $force_change_review = isset($config['web']['force_change_review']) ? intval($co
 $force_change_comment = isset($config['web']['force_change_comment']) ? intval($config['web']['force_change_comment']) : 0;
 $account_whitelist = !empty($config['dns']['classification_whitelist']) ? explode(',', $config['dns']['classification_whitelist']) : [];
 $force_account_whitelist = !empty($config['dns']['classification_whitelist']) ? 1 : 0;
+$dnssec_enabled = isset($config['dns']['dnssec']) ? intval($config['dns']['dnssec']) : 0;
+$dnssec_edit = isset($config['dns']['dnssec_edit']) ? intval($config['dns']['dnssec_edit']) : 1;
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['update_rrs'])) {
@@ -212,16 +214,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone->process_bulk_json_rrset_update(json_encode($json));
 		}
 		redirect();
-	} elseif(isset($_POST['enable_dnssec']) && $active_user->admin) {
+	} elseif(isset($_POST['enable_dnssec']) && $active_user->admin && $dnssec_enabled && $dnssec_edit) {
 		$zone->dnssec = 1;
 		$zone->api_rectify = 1;
 		$zone->update();
 		redirect();
-	} elseif(isset($_POST['enable_api_rectify']) && $active_user->admin) {
+	} elseif(isset($_POST['enable_api_rectify']) && $active_user->admin && $dnssec_enabled && $dnssec_edit) {
 		$zone->api_rectify = 1;
 		$zone->update();
 		redirect();
-	} elseif(isset($_POST['disable_dnssec']) && $active_user->admin) {
+	} elseif(isset($_POST['disable_dnssec']) && $active_user->admin && $dnssec_enabled && $dnssec_edit) {
 		$zone->dnssec = 0;
 		$zone->update();
 		redirect();
@@ -302,7 +304,8 @@ if(!isset($content)) {
 	$content->set('local_ipv4_ranges', $config['dns']['local_ipv4_ranges']);
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);
 	$content->set('soa_templates', $template_dir->list_soa_templates());
-	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
+	$content->set('dnssec_enabled', $dnssec_enabled);
+	$content->set('dnssec_edit', $dnssec_edit);
 	$content->set('deletion', $deletion);
 	$content->set('force_change_review', $force_change_review);
 	$content->set('force_change_comment', $force_change_comment);
