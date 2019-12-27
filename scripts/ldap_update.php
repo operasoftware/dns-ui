@@ -17,6 +17,7 @@
 ##
 
 chdir(__DIR__);
+define('BASE_PATH', dirname(__DIR__));
 require('../core.php');
 
 $users = $user_dir->list_users();

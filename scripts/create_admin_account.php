@@ -17,6 +17,7 @@
 ##
 
 chdir(__DIR__);
+define('BASE_PATH', dirname(__DIR__));
 require('../core.php');
 
 echo "This script creates a new admin account in DNS UI.\n";

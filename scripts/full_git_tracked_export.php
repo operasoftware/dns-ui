@@ -17,6 +17,7 @@
 ##
 
 chdir(__DIR__);
+define('BASE_PATH', dirname(__DIR__));
 require('../core.php');
 
 // Use 'import' user as the active user (create if it does not yet exist)
