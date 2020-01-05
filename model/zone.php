@@ -589,7 +589,7 @@ class Zone extends Record {
 	* Restore a deleted zone.
 	*/
 	public function restore() {
-		global $zone_dir;
+		global $zone_dir, $config;
 		$initial_limit = 10; // Max records to send in first request - workaround for https://github.com/PowerDNS/pdns/issues/6111
 		$batch_limit = 2500; // Max records to send in subsequent requests - avoid hitting limits in PowerDNS
 		$deletion = $this->get_delete_request();
@@ -624,7 +624,7 @@ class Zone extends Record {
 			}
 			$data->rrsets[] = $recordset;
 		}
-		$data->soa_edit_api = 'INCEPTION-INCREMENT';
+		$data->soa_edit_api = isset($config['pdns']['soa_edit_api']) ? $config['pdns']['soa_edit_api'] : 'INCEPTION-INCREMENT';
 		$data->account = $this->account;
 		$data->dnssec = (bool)$this->dnssec;
 		$remaining_rrsets = array_slice($data->rrsets, $initial_limit);

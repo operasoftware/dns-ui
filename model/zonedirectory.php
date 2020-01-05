@@ -70,6 +70,7 @@ class ZoneDirectory extends DBDirectory {
 	* @param Zone $zone to be created
 	*/
 	public function create_zone($zone) {
+		global $config;
 		$data = new StdClass;
 		$data->name = $zone->name;
 		$data->kind = $zone->kind;
@@ -99,7 +100,7 @@ class ZoneDirectory extends DBDirectory {
 			}
 			$data->rrsets[] = $recordset;
 		}
-		$data->soa_edit_api = 'INCEPTION-INCREMENT';
+		$data->soa_edit_api = isset($config['pdns']['soa_edit_api']) ? $config['pdns']['soa_edit_api'] : 'INCEPTION-INCREMENT';
 		$data->account = $zone->account;
 		$data->dnssec = (bool)$zone->dnssec;
 		$response = $this->powerdns->post('zones', $data);
