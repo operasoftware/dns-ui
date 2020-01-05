@@ -17,7 +17,8 @@
 
 global $config, $ldap, $database, $powerdns, $user_dir, $zone_dir, $template_dir, $replication_type_dir;
 
-chdir(dirname(__FILE__));
+$base_path = dirname(__FILE__);
+chdir($base_path);
 mb_internal_encoding('UTF-8');
 setlocale(LC_CTYPE, "en_US.UTF-8");
 date_default_timezone_set('UTC');
