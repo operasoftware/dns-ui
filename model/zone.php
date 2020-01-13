@@ -624,7 +624,7 @@ class Zone extends Record {
 			}
 			$data->rrsets[] = $recordset;
 		}
-		$data->soa_edit_api = isset($config['pdns']['soa_edit_api']) ? $config['pdns']['soa_edit_api'] : 'INCEPTION-INCREMENT';
+		$data->soa_edit_api = isset($config['powerdns']['soa_edit_api']) ? $config['powerdns']['soa_edit_api'] : 'INCEPTION-INCREMENT';
 		$data->account = $this->account;
 		$data->dnssec = (bool)$this->dnssec;
 		$remaining_rrsets = array_slice($data->rrsets, $initial_limit);

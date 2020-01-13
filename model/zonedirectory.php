@@ -100,7 +100,7 @@ class ZoneDirectory extends DBDirectory {
 			}
 			$data->rrsets[] = $recordset;
 		}
-		$data->soa_edit_api = isset($config['pdns']['soa_edit_api']) ? $config['pdns']['soa_edit_api'] : 'INCEPTION-INCREMENT';
+		$data->soa_edit_api = isset($config['powerdns']['soa_edit_api']) ? $config['powerdns']['soa_edit_api'] : 'INCEPTION-INCREMENT';
 		$data->account = $zone->account;
 		$data->dnssec = (bool)$zone->dnssec;
 		$response = $this->powerdns->post('zones', $data);
