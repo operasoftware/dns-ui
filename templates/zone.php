@@ -64,7 +64,7 @@ global $output_formatter;
 <div class="tab-content">
 	<div role="tabpanel" class="tab-pane active" id="records">
 		<h2 class="sr-only">Resource records</h2>
-		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zoneedit" data-zone="<?php out(punycode_to_utf8($zone->name))?>" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
+		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zoneedit" data-zone="<?php out($zone->name)?>" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
 			<nav></nav>
 			<table class="table table-bordered table-condensed table-hover stickyHeader rrsets">
