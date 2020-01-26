@@ -17,8 +17,8 @@
 
 $zones = $active_user->list_accessible_zones(array('pending_updates'));
 usort($zones, function($a, $b) {
-	$aname = implode(',', array_reverse(explode('.', $a->name)));
-	$bname = implode(',', array_reverse(explode('.', $b->name)));
+	$aname = implode(',', array_reverse(explode('.', punycode_to_utf8($a->name))));
+	$bname = implode(',', array_reverse(explode('.', punycode_to_utf8($b->name))));
 	return strnatcasecmp($aname, $bname);
 });
 
