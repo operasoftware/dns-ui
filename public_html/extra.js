@@ -905,7 +905,7 @@ $(function() {
 	});
 
 	$('#changelog-expand-all').on('click', function() {
-		$('table.changelog tbody tr').each(function() {
+		$('table.changelog tbody tr[data-changeset]').each(function() {
 			show_changes($(this), true);
 		});
 		$(this).hide();
@@ -913,7 +913,7 @@ $(function() {
 	});
 
 	$('#changelog-collapse-all').on('click', function() {
-		$('table.changelog tbody tr').each(function() {
+		$('table.changelog tbody tr[data-changeset]').each(function() {
 			show_changes($(this), false);
 		});
 		$(this).hide();
