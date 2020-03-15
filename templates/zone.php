@@ -663,6 +663,8 @@ global $output_formatter;
 	<?php } ?>
 	<div role="tabpanel" class="tab-pane" id="changelog">
 		<h2 class="sr-only">Changelog</h2>
+		<button class="btn btn-default" id="changelog-expand-all">expand all</button>
+		<button class="btn btn-default" id="changelog-collapse-all">collapse all</button>
 		<?php if(count($changesets) == 0) { ?>
 		<p>No changes have been made to this zone.</p>
 		<?php } ?>

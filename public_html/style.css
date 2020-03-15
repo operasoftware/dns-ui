@@ -172,6 +172,13 @@ table.changelog table td.content {
 	word-break: break-all;
 }
 
+#changelog-expand-all, #changelog-collapse-all {
+	float: right;
+}
+#changelog-collapse-all {
+	display: none;
+}
+
 input[type=text]:focus:invalid, input[type=email]:focus:invalid, select:focus:invalid, textarea:focus:invalid {
 	box-shadow: 0 0 5px #d45252;
 	border-color: #b03535;
