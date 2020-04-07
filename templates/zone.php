@@ -172,6 +172,8 @@ global $output_formatter;
 								<option value="ALIAS" data-content-pattern="\S+">ALIAS</option>
 								<option value="CAA" data-content-pattern="[0-9]+\s+\S+\s+\S+">CAA</option>
 								<option value="CNAME" data-content-pattern="\S+">CNAME</option>
+								<!-- DHCID regex contributed under CC BY-SA 4.0 by njzk2 (https://stackoverflow.com/users/671543/njzk2) on Stack Overflow: https://stackoverflow.com/a/5885097 -->
+								<option value="DHCID" data-content-pattern="^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$">DHCID</option>
 								<option value="DNAME" data-content-pattern="\S+">DNAME</option>
 								<option value="DNSKEY" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+.+">DNSKEY</option>
 								<option value="DS" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+[a-zA-Z0-9]+">DS</option>
