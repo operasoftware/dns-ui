@@ -896,7 +896,7 @@ $(function() {
 			if(!field[0].checkValidity()) return;
 			var prefix = field.val();
 			var parts = prefix.split(':');
-			for(var i = 0; i < parts.length - 1; i++) {
+			for(var i = 0; i < parts.length; i++) {
 				parts[i] = String('0000' + parts[i]).slice(-4);
 			}
 			$('#name').val(parts.join('').split('').reverse().join('.') + '.ip6.arpa');
