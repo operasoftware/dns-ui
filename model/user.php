@@ -154,6 +154,12 @@ class User extends Record {
 		$ldapusers = $this->ldap->search($config['ldap']['dn_user'], LDAP::escape($config['ldap']['user_id']).'='.LDAP::escape($this->uid), array_keys(array_flip($attributes)));
 		if($ldapuser = reset($ldapusers)) {
 			$this->auth_realm = 'LDAP';
+
+			foreach (array('user_id', 'user_name', 'user_email') as $key) {
+				if (!isset($ldapuser[strtolower($config['ldap'][$key])])) {
+					throw new UserNotFoundException(sprintf('User misses %s attribute in LDAP directory.', $config['ldap'][$key]));
+				}
+			}
 			$this->uid = $ldapuser[strtolower($config['ldap']['user_id'])];
 			$this->name = $ldapuser[strtolower($config['ldap']['user_name'])];
 			$this->email = $ldapuser[strtolower($config['ldap']['user_email'])];
