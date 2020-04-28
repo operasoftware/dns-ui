@@ -20,7 +20,13 @@ $content = new PageSection('login');
 $page = new PageSection('base');
 $page->set('title', 'Login');
 $page->set('content', $content);
-$page->set('alerts', array());
+
+$alerts = array();
+## Argh - what an ugly interface...
+if (isset($login_alerts)) {
+	$alerts = $login_alerts;
+}
+$page->set('alerts', $alerts);
 
 echo $page->generate();
 
