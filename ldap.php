@@ -46,9 +46,14 @@ class LDAP {
 		}
 	}
 
-	public function auth($uid, $pass, $user_id_attr, $basedn) {
+	public function auth($uid, $pass, $user_id_attr, $basedn, $extrafilter) {
 		if(is_null($this->conn)) $this->connect();
+
 		$filter = sprintf("(%s=%s)", LDAP::escape($user_id_attr), LDAP::escape($uid));
+		if ( isset($extrafilter) ) {
+			$filter = sprintf("(&%s%s)", $extrafilter, $filter);
+		}
+
 		$r = @ldap_search($this->conn, $basedn, $filter);
 
 		if(! $r) {
