@@ -53,7 +53,12 @@ function auth_by_ldap($user, $pass) {
 		throw new Exception('Misconfiguration detected - check the error log');
 	}
 
-	return $ldap->auth($user, $pass, $config['ldap']['user_id'], $config['ldap']['dn_user']);
+	return $ldap->auth($user, $pass, 
+			   $config['ldap']['user_id'], $config['ldap']['dn_user'],
+			   isset($config['ldap']['extra_user_filter']) 
+				? $config['ldap']['extra_user_filter']
+				: null
+			   );
 }
 
 if ($config['authentication']['form_based'] !== false) {
@@ -76,10 +81,15 @@ if ($config['authentication']['form_based'] !== false) {
 						// if we can't this will throw an exception...
 						$active_user = $user_dir->get_user_by_uid($_POST['username']);
 
-						$_SESSION['loggedin'] = true;
-						$_SESSION['user'] = $_POST['username'];
-						require('views/home.php');
-						die;
+						if(!$active_user->active) {
+							// user is no longer active. Behave as if login failed
+							error_log("Login attempt by inactive user '" . $_POST['username'] . "'");
+						} else {
+							$_SESSION['loggedin'] = true;
+							$_SESSION['user'] = $_POST['username'];
+							require('views/home.php');
+							die;
+						}
 					} else {
 						error_log("Failed login attempt for user '" . $_POST['username'] . "'"); 
 					}
