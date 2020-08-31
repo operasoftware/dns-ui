@@ -27,13 +27,25 @@ class PageSection {
 		$this->template = $template;
 		$this->data = new StdClass;
 		$this->data->menu_items = array();
-		$this->data->menu_items['Zones'] = '/zones';
-		if(is_object($active_user) && $active_user->admin) {
-			$this->data->menu_items['Templates'] = array();
-			$this->data->menu_items['Templates']['SOA templates'] = '/templates/soa';
-			$this->data->menu_items['Templates']['Nameserver templates'] = '/templates/ns';
-			$this->data->menu_items['Users'] = '/users';
-			$this->data->menu_items['Settings'] = '/settings';
+
+		$add_menu_items = true;
+		if ($config['authentication']['form_based']) {
+			/* Do NOT add any menu items if we have not been authenticated */
+			$add_menu_items = is_form_authenticated();
+		}
+
+		if ($add_menu_items) {
+			$this->data->menu_items['Zones'] = '/zones';
+			if(is_object($active_user) && $active_user->admin) {
+				$this->data->menu_items['Templates'] = array();
+				$this->data->menu_items['Templates']['SOA templates'] = '/templates/soa';
+				$this->data->menu_items['Templates']['Nameserver templates'] = '/templates/ns';
+				$this->data->menu_items['Users'] = '/users';
+				$this->data->menu_items['Settings'] = '/settings';
+			}
+			if ($config['authentication']['form_based']) {
+				$this->data->menu_items['Log out'] = '/logout';
+			}
 		}
 		$this->data->relative_request_url = $relative_request_url;
 		$this->data->active_user = $active_user;

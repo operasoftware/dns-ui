@@ -96,7 +96,11 @@ Installation
 
         [Full nginx server example](https://github.com/operasoftware/dns-ui/wiki/Example-configuration:-nginx)
 
-5.  Set up an authentication module for your virtual host (eg. authnz_ldap for Apache).
+5.  Set up authentication 
+
+    * Either using the old-style way using an authentication module for your virtual host (eg. authnz_ldap for Apache).
+
+    * Or using HTML form-based authentication using LDAP by setting form_based = "ldap" in config.ini and enabling and configuring LDAP there as well.
 
 6.  Copy the file `config/config-sample.ini` to `config/config.ini` and edit the settings as required.
 
