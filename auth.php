@@ -125,4 +125,3 @@ if ($config['authentication']['form_based'] !== false) {
 		$active_user = $user_dir->get_user_by_uid($_SESSION['user']);
 	}
 }
-
