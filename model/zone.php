@@ -222,8 +222,10 @@ class Zone extends Record {
 			$this->nameservers = array();
 			try {
 				$data = $this->powerdns->get('zones/'.urlencode($this->pdns_id));
-			} catch(Pest_InvalidRecord $e) {
+			} catch(Pest_InvalidRecord $e) { // before PowerDNS 4.2
 				throw new ZoneNotFoundInPowerDNS;
+			} catch(Pest_NotFound $e) { // 404 since PowerDNS 4.2
+			    throw new ZoneNotFoundInPowerDNS;;
 			}
 			$possible_bad_data = array();
 			usort($data->rrsets,
