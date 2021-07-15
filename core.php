@@ -361,7 +361,7 @@ class DNSContent {
 		case 'TXT':
 			$content = self::decode($content, $type, $zonename);
 			$split = array();
-			while($content !== false) {
+			while(mb_strlen($content) != 0) {
 				// Using mb_strcut to ensure that multi-byte characters are not cut in half
 				// (mb_substr would give 255 chars instead of 255 bytes)
 				$split[] = mb_strcut($content, 0, 255);
