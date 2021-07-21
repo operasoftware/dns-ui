@@ -470,7 +470,7 @@ global $output_formatter;
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="default_ttl" class="col-sm-2 control-label"><abbr title="The time a NAME ERROR = NXDOMAIN result may be cached by any resolver.">Minimum TTL</abbr></label>
+				<label for="default_ttl" class="col-sm-2 control-label"><abbr title="The time a valueless answer to a question may be cached by any resolver unless the SOA TTL is lower.">Minimum TTL</abbr></label>
 				<div class="col-sm-10">
 					<?php if($active_user->admin) { ?>
 					<input type="text" class="form-control" id="default_ttl" name="default_ttl" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->default_ttl))?>">
