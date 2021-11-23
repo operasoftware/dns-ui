@@ -522,6 +522,14 @@ function log_exception($e) {
 	return $error_number;
 }
 
+function parse_postgres_date($date_str) {
+	// If the date's microsecond part is exactly zero, it is omitted by
+	// postgres from its string representation and '.u' must be removed
+	// from the format, or parsing will fail.
+	$date_format = strpos($date_str, '.') !== false ? 'Y-m-d H:i:s.u' : 'Y-m-d H:i:s';
+	return DateTime::createFromFormat($date_format, $date_str);
+}
+
 class AccessDenied extends RuntimeException {}
 class BadData extends RuntimeException {}
 class InvalidJSON extends RuntimeException {}

@@ -250,7 +250,7 @@ class User extends Record {
 			unset($row['serial']);
 			unset($row['account']);
 			unset($row['active']);
-			$row['change_date'] = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['change_date']);
+			$row['change_date'] = parse_postgres_date($row['change_date']);
 			$changesets[] = new ChangeSet($row['id'], $row);
 		}
 		return $changesets;

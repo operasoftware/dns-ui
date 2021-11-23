@@ -351,7 +351,7 @@ class Zone extends Record {
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$row['author'] = $user_dir->get_user_by_id($row['author_id']);
 			$row['requester'] = (is_null($row['requester_id']) ? null : $user_dir->get_user_by_id($row['requester_id']));
-			$row['change_date'] = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['change_date']);
+			$row['change_date'] = parse_postgres_date($row['change_date']);
 			$changesets[] = new ChangeSet($row['id'], $row);
 		}
 		return $changesets;
@@ -370,7 +370,7 @@ class Zone extends Record {
 		$stmt->execute();
 		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$row['author'] = $user_dir->get_user_by_id($row['author_id']);
-			$row['change_date'] = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['change_date']);
+			$row['change_date'] = parse_postgres_date($row['change_date']);
 			return new ChangeSet($row['id'], $row);
 		}
 		throw new ChangeSetNotFound;
@@ -484,7 +484,7 @@ class Zone extends Record {
 		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$update = new PendingUpdate($row['id'], $row);
 			$update->author = new User($row['author_id']);
-			$update->request_date = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['request_date']);
+			$update->request_date = parse_postgres_date($row['request_date']);
 			$update->raw_data = stream_get_contents($row['raw_data']);
 			return $update;
 		}
@@ -503,7 +503,7 @@ class Zone extends Record {
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$update = new PendingUpdate($row['id'], $row);
 			$update->author = new User($row['author_id']);
-			$update->request_date = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['request_date']);
+			$update->request_date = parse_postgres_date($row['request_date']);
 			$update->raw_data = stream_get_contents($row['raw_data']);
 			$updates[] = $update;
 		}
@@ -535,10 +535,10 @@ class Zone extends Record {
 		$stmt->execute();
 		if($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$row['requester'] = new User($row['requester_id']);
-			$row['request_date'] = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['request_date']);
+			$row['request_date'] = parse_postgres_date($row['request_date']);
 			if(!is_null($row['confirmer_id'])) {
 				$row['confirmer'] = new User($row['confirmer_id']);
-				$row['confirm_date'] = DateTime::createFromFormat('Y-m-d H:i:s.u', $row['confirm_date']);
+				$row['confirm_date'] = parse_postgres_date($row['confirm_date']);
 			}
 			return $row;
 		}
