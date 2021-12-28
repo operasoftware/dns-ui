@@ -20,6 +20,7 @@ $replication_types = $this->get('replication_types');
 $soa_templates = $this->get('soa_templates');
 $ns_templates = $this->get('ns_templates');
 $dnssec_enabled = $this->get('dnssec_enabled');
+$dnssec_edit = $this->get('dnssec_edit');
 $account_whitelist = $this->get('account_whitelist');
 $force_account_whitelist = $this->get('force_account_whitelist');
 $zone_types = array('forward' => array(), 'reverse4' => array(), 'reverse6' => array());
@@ -218,7 +219,7 @@ foreach($zones as $zone) {
 					<?php } ?>
 				</div>
 			</div>
-			<?php if($dnssec_enabled) { ?>
+			<?php if($dnssec_enabled && $dnssec_edit) { ?>
 			<div class="form-group">
 				<label for="dnssec" class="col-sm-2 control-label">DNSSEC</label>
 				<div class="col-sm-10">

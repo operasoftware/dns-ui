@@ -71,6 +71,7 @@ if(!isset($content)) {
 	$content->set('soa_templates', $soa_templates);
 	$content->set('ns_templates', $ns_templates);
 	$content->set('dnssec_enabled', isset($config['dns']['dnssec']) ? $config['dns']['dnssec'] : '0');
+	$content->set('dnssec_edit', isset($config['dns']['dnssec_edit']) ? $config['dns']['dnssec_edit'] : '0');
 	$content->set('account_whitelist', $account_whitelist);
 	$content->set('force_account_whitelist', $force_account_whitelist);
 }
