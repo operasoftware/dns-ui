@@ -172,6 +172,10 @@ table.changelog table td.content {
 	word-break: break-all;
 }
 
+#changelog-search {
+	display: inline;
+}
+
 #changelog-expand-all, #changelog-collapse-all {
 	float: right;
 }

@@ -53,7 +53,41 @@ try {
 	}
 }
 $pending = $zone->list_pending_updates();
-$changesets = $zone->list_changesets();
+
+$changeset_filters = array();
+if (isset($_GET['changeset_comment']) and !empty($_GET['changeset_comment'])) {
+	$changeset_filters['comment'] = $_GET['changeset_comment'];
+}
+if (isset($_GET['changeset_start']) and !empty($_GET['changeset_start'])) {
+	$start_date = DateTime::createFromFormat("!Y-m-d", $_GET['changeset_start']);
+	if ($start_date) {
+		$changeset_filters['start_date'] = $start_date;
+	} else {
+		// warn the user that their date is invalid
+		$alert = new UserAlert;
+		$alert->content = 'Invalid date supplied; ignoring.';
+		$alert->class = 'warning';
+		$active_user->add_alert($alert);
+	}
+}
+if (isset($_GET['changeset_end']) and !empty($_GET['changeset_end'])) {
+	$end_date = DateTime::createFromFormat("!Y-m-d", $_GET['changeset_end']);
+	if ($end_date) {
+		$changeset_filters['end_date'] = $end_date;
+	} else {
+		// warn the user that their date is invalid
+		$alert = new UserAlert;
+		$alert->content = 'Invalid date supplied; ignoring.';
+		$alert->class = 'warning';
+		$active_user->add_alert($alert);
+	}
+}
+$changeset_filters['page'] = 1;
+if (isset($_GET['page']) and !empty($_GET['page'])) {
+	$changeset_filters['page'] = $changeset_filters['page'] = max(1, intval($_GET['page']));
+}
+list($changeset_pagecount, $changesets) = $zone->list_changesets($changeset_filters);
+
 $access = $zone->list_access();
 $cryptokeys = $zone->get_cryptokeys();
 $accounts = $zone_dir->list_accounts();
@@ -295,6 +329,8 @@ if(!isset($content)) {
 	$content->set('rrsets', $rrsets);
 	$content->set('pending', $pending);
 	$content->set('changesets', $changesets);
+	$content->set('changeset_filters', $changeset_filters);
+	$content->set('changeset_pagecount', $changeset_pagecount);
 	$content->set('access', $access);
 	$content->set('accounts', $accounts);
 	$content->set('cryptokeys', $cryptokeys);

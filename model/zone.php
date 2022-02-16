@@ -340,21 +340,69 @@ class Zone extends Record {
 
 	/**
 	* List all ChangeSet objects associated with this zone.
+	* @param $filters array with optional keys 'comment', 'start_date' and 'end_date' to filter results
 	* @return array of ChangeSet objects
 	*/
-	public function list_changesets() {
+	public function list_changesets($filters=[]) {
 		global $user_dir;
-		$stmt = $this->database->prepare('SELECT * FROM "changeset" WHERE zone_id = ? ORDER BY id DESC');
+
+		$items_per_page = 200;  # arbitrary
+		$comment = null;
+		$start_date = null;
+		$end_date = null;
+		$limit = null;
+		$offset = null;
+		if (isset($filters['comment'])) {
+			$comment = "%" . $filters['comment'] . "%";
+		}
+		if (isset($filters['start_date'])) {
+			$start_date = $filters['start_date']->format('Y-m-d 00:00:00');
+		}
+		if (isset($filters['end_date'])) {
+			$end_date = $filters['end_date']->format('Y-m-d 23:59:59');
+		}
+		if (isset($filters['page'])) {
+			$limit = $items_per_page;
+			$offset = $items_per_page * ($filters['page'] - 1);
+		} # otherwise, keep limit and offset NULL to disable pagination
+
+		$stmt = $this->database->prepare('
+			SELECT *, count(*) OVER () AS row_count
+			FROM "changeset"
+			WHERE
+				zone_id = ? AND
+				(? OR comment ILIKE ?) AND
+				(? OR change_date >= ?) AND  -- start_date
+				(? OR change_date < ?)       -- end_date
+			ORDER BY id DESC
+			LIMIT ?
+			OFFSET ?');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
+
+		$stmt->bindValue(2, is_null($comment), PDO::PARAM_BOOL);
+		$stmt->bindParam(3, $comment, PDO::PARAM_STR);
+
+		$stmt->bindValue(4, is_null($start_date), PDO::PARAM_BOOL);
+		$stmt->bindParam(5, $start_date, PDO::PARAM_STR);
+
+		$stmt->bindValue(6, is_null($end_date), PDO::PARAM_BOOL);
+		$stmt->bindParam(7, $end_date, PDO::PARAM_STR);
+
+		$stmt->bindParam(8, $limit, PDO::PARAM_INT);
+		$stmt->bindParam(9, $offset, PDO::PARAM_INT);
+
 		$stmt->execute();
 		$changesets = array();
+		$row_count = 0;
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$row['author'] = $user_dir->get_user_by_id($row['author_id']);
 			$row['requester'] = (is_null($row['requester_id']) ? null : $user_dir->get_user_by_id($row['requester_id']));
 			$row['change_date'] = parse_postgres_date($row['change_date']);
 			$changesets[] = new ChangeSet($row['id'], $row);
+			$row_count = $row['row_count'];
 		}
-		return $changesets;
+		$page_count = ceil($row_count / $items_per_page);
+		return array($page_count, $changesets);
 	}
 
 	/**

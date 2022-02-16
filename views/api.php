@@ -156,7 +156,7 @@ class API {
 		global $zone_dir, $active_user;
 		$zone = $zone_dir->get_zone_by_name($zone_name);
 		if(!$active_user->admin && !$active_user->access_to($zone)) throw new AccessDenied;
-		$changesets = $zone->list_changesets();
+		list($changeset_pagecount, $changesets) = $zone->list_changesets();
 		$list = array();
 		foreach($changesets as $changeset) {
 			$item = new StdClass;
