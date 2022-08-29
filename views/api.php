@@ -191,8 +191,14 @@ class API {
 		foreach($changeset->list_changes() as $change) {
 			$c_data = new StdClass;
 			$states = array();
-			$states['before'] = unserialize($change->before);
-			$states['after'] = unserialize($change->after);
+			$check_before = $change->before;
+			$check_after = $change->after;
+			if(isset($check_before)) {
+				$states['before'] = unserialize($change->before);
+			}
+			if(isset($check_after)) {
+				$states['after'] = unserialize($change->after);
+			}
 			foreach($states as $state => $rrset) {
 				if($rrset) {
 					$c_data->{$state} = new StdClass;
