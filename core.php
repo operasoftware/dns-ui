@@ -157,7 +157,7 @@ function outurl($url) {
  * @return string HTML-escaped string
  */
 function hesc($string) {
-	return htmlspecialchars($string);
+	return htmlspecialchars($string ?? '');
 }
 
 function english_list($array) {
