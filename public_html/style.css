@@ -224,6 +224,10 @@ div.stickyHeader th {
 	background-color: white;
 }
 
+input.authbox {
+	width: auto;
+}
+
 /**
  * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
  * (http://qbnz.com/highlighter/ and http://geshi.org/)

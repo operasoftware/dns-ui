@@ -46,6 +46,48 @@ class LDAP {
 		}
 	}
 
+	public function auth($uid, $pass, $user_id_attr, $basedn, $extrafilter) {
+		if(is_null($this->conn)) $this->connect();
+
+		$filter = sprintf("(%s=%s)", LDAP::escape($user_id_attr), LDAP::escape($uid));
+		if ( isset($extrafilter) ) {
+			$filter = sprintf("(&%s%s)", $extrafilter, $filter);
+		}
+
+		$r = @ldap_search($this->conn, $basedn, $filter);
+
+		if(! $r) {
+			return false;
+		}
+
+		// Fetch entries
+		$result = @ldap_get_entries($this->conn, $r);
+
+		if ($result['count'] != 1) {
+			return false;
+		}
+
+		$authdn = $result[0]['dn'];
+		
+		$authconn = ldap_connect($this->host);
+		if($authconn === false) throw new LDAPConnectionFailureException('Invalid LDAP connection settings');
+		if($this->starttls) {
+			if(!ldap_start_tls($authconn)) throw new LDAPConnectionFailureException('Could not initiate TLS connection to LDAP server');
+		}
+		foreach($this->options as $option => $value) {
+			ldap_set_option($authconn, $option, $value);
+		}
+
+		try {
+			$bound = @ldap_bind($authconn, $authdn, $pass);
+			return $bound;
+		} catch (Exception $e) {
+			return false;
+		} finally {
+			@ldap_unbind($authconn);
+		}
+	}
+
 	public function search($basedn, $filter, $fields = array(), $sort = array()) {
 		if(is_null($this->conn)) $this->connect();
 		if(empty($fields)) $r = @ldap_search($this->conn, $basedn, $filter);

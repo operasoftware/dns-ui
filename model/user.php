@@ -151,9 +151,21 @@ class User extends Record {
 		if(isset($config['ldap']['user_active'])) {
 			$attributes[] = $config['ldap']['user_active'];
 		}
-		$ldapusers = $this->ldap->search($config['ldap']['dn_user'], LDAP::escape($config['ldap']['user_id']).'='.LDAP::escape($this->uid), array_keys(array_flip($attributes)));
+
+		$filter = sprintf("(%s=%s)", LDAP::escape($config['ldap']['user_id']), LDAP::escape($this->uid));
+		if ( isset($config['ldap']['extra_user_filter']) ) {
+			$filter = sprintf("(&%s%s)", $config['ldap']['extra_user_filter'], $filter);
+		}
+
+		$ldapusers = $this->ldap->search($config['ldap']['dn_user'], $filter, array_keys(array_flip($attributes)));
 		if($ldapuser = reset($ldapusers)) {
 			$this->auth_realm = 'LDAP';
+
+			foreach (array('user_id', 'user_name', 'user_email') as $key) {
+				if (!isset($ldapuser[strtolower($config['ldap'][$key])])) {
+					throw new UserNotFoundException(sprintf('User misses %s attribute in LDAP directory.', $config['ldap'][$key]));
+				}
+			}
 			$this->uid = $ldapuser[strtolower($config['ldap']['user_id'])];
 			$this->name = $ldapuser[strtolower($config['ldap']['user_name'])];
 			$this->email = $ldapuser[strtolower($config['ldap']['user_email'])];
