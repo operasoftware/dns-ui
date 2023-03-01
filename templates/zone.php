@@ -190,6 +190,7 @@ global $output_formatter;
 								<option value="SSHFP" data-content-pattern="[0-4]\s+[0-2]\s+[0-9a-f]+">SSHFP</option>
 								<option value="TLSA" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+[a-zA-Z0-9]+">TLSA</option>
 								<option value="TXT" data-content-pattern=".*">TXT</option>
+								<option value="LUA" data-content-pattern=".*">LUA</option>
 								<?php } ?>
 							</select>
 						</td>
