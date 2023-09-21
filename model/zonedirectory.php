@@ -18,6 +18,7 @@
 /**
 * Class for reading/writing to the list of Zone objects in the database.
 */
+#[AllowDynamicProperties]
 class ZoneDirectory extends DBDirectory {
 	/**
 	* PowerDNS communication object
