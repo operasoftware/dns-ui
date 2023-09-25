@@ -157,6 +157,7 @@ function outurl($url) {
  * @return string HTML-escaped string
  */
 function hesc($string) {
+    if (is_null($string)) return NULL;
 	return htmlspecialchars($string ?? '');
 }
 
