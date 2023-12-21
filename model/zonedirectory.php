@@ -32,7 +32,6 @@ class ZoneDirectory extends DBDirectory {
 		parent::__construct();
 		global $powerdns;
 		$this->powerdns = $powerdns;
-		$this->cache_uid = array();
 	}
 
 	/**
