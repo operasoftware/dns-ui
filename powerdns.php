@@ -32,7 +32,7 @@ class PowerDNS extends PestJSON {
 
     public function head($url, $headers = array()) {
     	$headers['X-API-Key'] = $this->api_key;
-        return parent::head($url, headers);
+        return parent::head($url, $headers);
     }
 
     public function post($url, $data, $headers = array()) {
