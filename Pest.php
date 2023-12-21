@@ -173,7 +173,7 @@ class Pest
 
         $curl = curl_init($url);
         if ($curl === false) {
-            throw new Pest_Curl_Init($this->processError(curl_error($curl), 'curl'), curl_errno($curl));
+            throw new Pest_Curl_Init('Curl init failed');
         }
 
         foreach ($opts as $opt => $val)
