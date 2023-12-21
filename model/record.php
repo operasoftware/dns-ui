@@ -83,7 +83,7 @@ abstract class Record {
 			$stmt->execute();
 
 			if($stmt->rowCount() != 1) {
-				throw new Exception("Unexpected number of rows returned ({$result->num_rows}), expected exactly 1. Table:{$this->table}, ID field: {$this->idfield}, ID: {$this->id}");
+				throw new Exception("Unexpected number of rows returned ({$stmt->num_rows}), expected exactly 1. Table:{$this->table}, ID field: {$this->idfield}, ID: {$this->id}");
 			}
 			$data = $stmt->fetch(PDO::FETCH_ASSOC);
 			// Populate data array for fields we do not already have a value for
