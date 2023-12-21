@@ -88,7 +88,7 @@ header("Content-Security-Policy: default-src 'self'");
 		<?php } ?>
 	</div>
 </div>
-<script src="<?php outurl('/jquery/jquery-1.11.3.min.js')?>"></script>
+<script src="<?php outurl('/jquery/jquery-3.7.1.min.js')?>"></script>
 <script src="<?php outurl('/bootstrap/js/bootstrap.min.js')?>"></script>
 <script src="<?php outurl('/ipaddr/ipaddr.min.js')?>"></script>
 <script src="<?php outurl('/extra.js?'.filemtime('public_html/extra.js'))?>"></script>
