@@ -162,7 +162,7 @@ class Pest
      *
      * @param array $opts
      * @param string $url
-     * @return resource
+     * @return CURLHandle
      * @throws Pest_Curl_Init
      */
     protected function prepRequest($opts, $url)
@@ -242,7 +242,7 @@ class Pest
 
     /**
      * Do CURL request
-     * @param resource $curl
+     * @param CURLHandle $curl
      * @return mixed
      * @throws Pest_Curl_Exec
      * @throws Pest_Curl_Meta
