@@ -69,6 +69,8 @@ class BindZonefile {
 			$line_number++;
 			$line = rtrim($line);
 			if($continuation) {
+				assert(isset($comment));
+				assert(isset($content_parsed));
 				try {
 					list($content_parsed, $more_comment, $continuation) = $this->parse_content(trim($line), $type, $content_parsed);
 					$comment .= " $more_comment";
@@ -223,6 +225,7 @@ class BindZonefile {
 			if($in_comment) {
 				$comment .= $char;
 			} elseif($in_string) {
+				assert(isset($string));
 				if($escape) {
 					$string .= $char;
 					$escape = false;
