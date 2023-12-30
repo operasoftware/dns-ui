@@ -41,7 +41,7 @@ $users = $this->get('users');
 					<td><a href="<?php outurl('/users/'.urlencode($user->uid))?>" class="user<?php if(!$user->active) out(' text-muted') ?>"><?php out($user->uid)?></a></td>
 					<td><?php out($user->name)?></td>
 					<td><?php out($user->email)?></td>
-					<td><?php out(ucfirst($user->auth_realm))?></td>
+					<td><?php out(ucfirst($user->auth_realm ?? ''))?></td>
 					<td><?php out($user->active ? '✓' : '')?></td>
 					<td><?php out($user->admin ? '✓' : '')?></td>
 				</tr>
