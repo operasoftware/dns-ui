@@ -956,7 +956,9 @@ $(function() {
 		var changeset = tr.data('changeset');
 
 		var hash = '#changelog#' + changeset;
-		if(history) {
+		if(display !== undefined) {
+			// don't do anything for #changelog-expand-all / #changelog-collapse-all
+		} else if(history) {
 			history.replaceState(null, null, hash);
 		} else {
 			window.location.hash = hash;
