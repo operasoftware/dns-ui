@@ -82,6 +82,9 @@ foreach($zones as $zone) {
 				<?php } ?>
 			</tbody>
 		</table>
+		<div>
+			(Zones are sorted by reversed Internet domain name to group labels according to the DNS hierarchy.)
+		</div>
 		<?php } ?>
 	</div>
 	<div role="tabpanel" class="tab-pane" id="reverse4">
@@ -122,6 +125,9 @@ foreach($zones as $zone) {
 				<?php } ?>
 			</tbody>
 		</table>
+		<div>
+			(Zones are sorted by reversed Internet domain name to group labels according to the DNS hierarchy.)
+		</div>
 		<?php } ?>
 		<?php if($active_user->admin) { ?>
 		<div class="form-inline reverse_zone_prefill">
@@ -169,6 +175,9 @@ foreach($zones as $zone) {
 				<?php } ?>
 			</tbody>
 		</table>
+		<div>
+			(Zones are sorted by reversed Internet domain name to group labels according to the DNS hierarchy.)
+		</div>
 		<?php } ?>
 		<?php if($active_user->admin) { ?>
 		<div class="form-inline reverse_zone_prefill">
