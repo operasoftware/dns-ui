@@ -102,6 +102,10 @@ Installation
 
 7.  Set `scripts/ldap_update.php` to run on a regular cron job.
 
+### Ansible playbook
+
+For installation on debian based systems you can use: [ansible-role-opera-dns-ui](https://github.com/Rosa-Luxemburgstiftung-Berlin/ansible-role-opera-dns-ui)
+
 Usage
 -----
 
