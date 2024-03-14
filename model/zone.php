@@ -718,7 +718,11 @@ class Zone extends Record {
 		if(isset($config['web']['force_change_comment']) && intval($config['web']['force_change_comment']) == 1 && empty($update->comment)) throw new BadData('A change comment must be provided.');
 		foreach($update->actions as $action) {
 			try {
-				$changes[] = $this->process_rrset_action($action, $trash, $revs_missing, $revs_updated);
+				if(isset($config['web']['force_tag_comment']) && intval($config['web']['force_tag_comment']) == 1) {
+					$changes[] = $this->process_rrset_action($action, $trash, $revs_missing, $revs_updated, $update->comment);
+				} else {
+					$changes[] = $this->process_rrset_action($action, $trash, $revs_missing, $revs_updated);
+				}
 			} catch(RuntimeException $e) {
 				$errors[] = $e->getMessage();
 			}
@@ -770,7 +774,7 @@ class Zone extends Record {
 	* @param array $revs_missing keep track of reverse zones that are missing
 	* @param array $revs_updated keep track of reverse zones that will be updated
 	*/
-	private function process_rrset_action($update, &$trash, &$revs_missing, &$revs_updated) {
+	private function process_rrset_action($update, &$trash, &$revs_missing, &$revs_updated, $change_comment=NULL) {
 		global $active_user, $config, $zone_dir;
 		if(!is_object($update)) throw new BadData('Malformed update.');
 		if(!(isset($update->name) && isset($update->type))) throw new BadData('Malformed action.');
@@ -816,7 +820,12 @@ class Zone extends Record {
 			}
 			if(isset($update->comment)) {
 				$comment = new Comment;
-				$comment->content = $update->comment;
+				if(isset($change_comment)) {
+					$tag_comment = get_tag_comment($active_user->uid);
+					$comment->content = $tag_comment.$change_comment;
+				} else {
+					$comment->content = $update->comment;
+				}
 				$comment->account = $active_user->uid;
 				$rrset->add_comment($comment);
 			}
@@ -853,10 +862,15 @@ class Zone extends Record {
 				}
 				$rrset->add_resource_record($rr);
 			}
-			if(isset($update->comment) && $update->comment != $rrset->merge_comment_text()) {
+			if( (isset($update->comment) && $update->comment != $rrset->merge_comment_text()) || isset($change_comment) ) {
 				$rrset->clear_comments();
 				$comment = new Comment;
-				$comment->content = $update->comment;
+				if(isset($change_comment)) {
+					$tag_comment = get_tag_comment($active_user->uid);
+					$comment->content = $tag_comment.$change_comment;
+				} else {
+					$comment->content = $update->comment;
+				}
 				$comment->account = $active_user->uid;
 				$rrset->add_comment($comment);
 			}
