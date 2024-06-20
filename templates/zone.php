@@ -331,7 +331,7 @@ global $output_formatter;
 									}
 								}
 								?>
-								<?php foreach($action->records as $record) { ?>
+								<?php foreach($action->records ?? [] as $record) { ?>
 								<?php if(isset($record->delete)) { ?>
 								<tr>
 									<td><del><?php out($record->content)?></del></td>
@@ -346,7 +346,7 @@ global $output_formatter;
 								<?php } ?>
 							</tbody>
 						</table>
-						<p>RRSet comment: <?php show_diff($current_comment, $action->comment)?></p>
+						<p>RRSet comment: <?php show_diff($current_comment, $action->comment ?? null )?></p>
 						<?php
 					}
 					?>
