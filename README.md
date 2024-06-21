@@ -39,7 +39,7 @@ Requirements
 ------------
 
 * Apache 2.2.18+ / nginx
-* PHP 5.6+
+* PHP 7.0+
 * PHP intl (Internationalization Functions) extension
 * PHP JSON extension
 * PHP CURL extension
