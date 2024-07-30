@@ -179,6 +179,7 @@ global $output_formatter;
 								<option value="DNAME" data-content-pattern="\S+">DNAME</option>
 								<option value="DNSKEY" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+.+">DNSKEY</option>
 								<option value="DS" data-content-pattern="[0-9]+\s+[0-9]+\s+[0-9]+\s+[a-zA-Z0-9]+">DS</option>
+                                                                <option value="HTTPS" data-content-pattern=".*">HTTPS</option>
 								<option value="NAPTR" data-content-pattern="[0-9]+\s+[0-9]+\s+&quot;[a-zA-Z0-9]+&quot;\s*&quot;[^&quot;]*&quot;\s+&quot;[^&quot;]*&quot;\s+\S+">NAPTR</option>
 								<?php if($active_user->admin) { ?>
 								<option value="NS" data-content-pattern="\S*">NS</option>
