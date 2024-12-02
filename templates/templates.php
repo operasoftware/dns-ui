@@ -55,11 +55,13 @@ $types = array('soa', 'ns');
 						<td><a href="<?php outurl('/templates/'.urlencode($t).'/'.urlencode($template->name))?>"><?php out($template->name)?></a></td>
 						<td>
 							<a href="<?php outurl('/templates/'.urlencode($t).'/'.urlencode($template->name))?>" class="btn btn-xs btn-default"><span class="glyphicon glyphicon-cog"></span> Edit</a>
+							<?php if($template->name != 'Producer') { ?>
 							<button type="submit" class="btn btn-xs btn-default" name="delete_<?php out($t)?>_template" value="<?php out($template->id)?>"><span class="glyphicon glyphicon-trash"></span> Delete</button>
 							<?php if($template->default) { ?>
 							<button type="submit" class="btn btn-xs btn-success" disabled>Default</button>
 							<?php } else { ?>
 							<button type="submit" class="btn btn-xs btn-default" name="set_default_<?php out($t)?>_template" value="<?php out($template->id)?>">Set as default</button>
+							<?php } ?>
 							<?php } ?>
 						</td>
 					</tr>

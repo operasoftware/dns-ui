@@ -39,29 +39,20 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone = new Zone;
 			$zone->name = $zonename;
 			$zone->account = trim($_POST['classification']);
+			$zone->dnssec = isset($_POST['dnssec']) ? 1 : 0;
+			$zone->catalog = isset($_POST['catalog']) ? $_POST['catalog'] : null;
 			$zone->kind = $_POST['kind'];
-			$soa = new ResourceRecord;
-			if ($zone->kind == 'Producer') {
-				$zone->dnssec = 0;
-				$zone->catalog = '';
-				$zone->nameservers = ['invalid.'];
-				$soa->content = $config['catalog']['soa'];
-				$soa_ttl = $config['catalog']['soa_ttl'];
-			} else {
-				$zone->dnssec = isset($_POST['dnssec']) ? 1 : 0;
-				$zone->catalog = $_POST['catalog'];
-				$zone->nameservers = array();
-				foreach(preg_split('/[,\s]+/', $_POST['nameservers']) as $nameserver) {
-					$zone->nameservers[] = $nameserver;
-				}
-				$soa->content = "$_POST[primary_ns] $_POST[contact] ".date('Ymd00')." ".DNSTime::expand($_POST['refresh'])." ".DNSTime::expand($_POST['retry'])." ".DNSTime::expand($_POST['expire'])." ".DNSTime::expand($_POST['default_ttl']);
-				$soa_ttl = DNSTime::expand($_POST['soa_ttl']);
+			$zone->nameservers = array();
+			foreach(preg_split('/[,\s]+/', $_POST['nameservers']) as $nameserver) {
+				$zone->nameservers[] = $nameserver;
 			}
+			$soa = new ResourceRecord;
+			$soa->content = "$_POST[primary_ns] $_POST[contact] ".date('Ymd00')." ".DNSTime::expand($_POST['refresh'])." ".DNSTime::expand($_POST['retry'])." ".DNSTime::expand($_POST['expire'])." ".DNSTime::expand($_POST['default_ttl']);
 			$soa->disabled = false;
 			$soaset = new ResourceRecordSet;
 			$soaset->name = $zonename;
 			$soaset->type = 'SOA';
-			$soaset->ttl = $soa_ttl;
+			$soaset->ttl = DNSTime::expand($_POST['soa_ttl']);
 			$soaset->add_resource_record($soa);
 			$zone->add_resource_record_set($soaset);
 			try {

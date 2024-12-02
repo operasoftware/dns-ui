@@ -880,6 +880,37 @@ $(function() {
 			$(this).removeClass('btn-default').addClass('btn-success');
 		});
 
+		// Handle Producer zones settings restictions
+		$('button.soa-template:contains(Producer), ' +
+		  'button.ns-template:contains(Producer)', form).each(function() {
+			$(this).prop('disabled', true)
+		});
+		$('select#kind', form).on('change', function() {
+			var zone_kind = this.value
+			if (zone_kind == 'Producer') {
+				$('button.soa-template, button.ns-template', form).each(function() { $(this).prop('disabled', true) });
+				$('button.soa-template:contains(Producer), ' +
+				  'button.ns-template:contains(Producer)', form).each(function() {
+					$(this).prop('disabled', false).click();
+				});
+				$('#catalog').val('');
+				$('#dnssec').prop('checked', false);
+
+			} else {
+				$('button.soa-template, button.ns-template', form).each(function() { $(this).prop('disabled', false) });
+				$('button.soa-template:contains(Producer), ' +
+				  'button.ns-template:contains(Producer)', form).each(function() {
+					$.each(this.dataset, function(index, value) { $('#' + index).val('') });
+					$(this).removeClass('btn-success').addClass('btn-default').prop('disabled', true);
+				});
+				$('button.soa-template[data-default="1"], ' +
+				  'button.ns-template[data-default="1"]', form).each(function() {
+					$(this).click();
+				});
+			}
+			$('#catalog, #dnssec').each(function() { $(this).prop('disabled', (zone_kind === 'Producer')) });
+		});
+
 		$('input#ipv4_zone_prefix').on('keyup', function(event) { if(event.which == 13) prefill_reverse_ipv4_zone($(this)) });
 		$('button#ipv4_zone_create').on('click', function() { prefill_reverse_ipv4_zone($('input#ipv4_zone_prefix')) });
 		$('input#ipv6_zone_prefix').on('keyup', function(event) { if(event.which == 13) prefill_reverse_ipv6_zone($(this)) });
@@ -904,17 +935,6 @@ $(function() {
 		}
 	});
 	
-	// Disable superfluous fields for Producer (catalog) zones
-	$('form.zoneadd, form.zoneeditsoa').each(function() {
-		var form = $(this);
-		$('select#kind', form).on('change', function() {
-			var hide_fields = (this.value == 'Producer')
-			$('div#catalog-form-group, div#dnssec-form-group, fieldset#soa-fieldset, fieldset#nameservers-fieldset', form).each(function() {
-				$(this).prop('hidden', hide_fields);
-			});
-		});
-	});
-
 	$('#changelog-expand-all').on('click', function() {
 		$('table.changelog tbody tr[data-changeset]').each(function() {
 			show_changes($(this), true);
