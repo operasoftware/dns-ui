@@ -867,10 +867,45 @@ $(function() {
 		});
 	});
 
+
 	// Add template button functionality on zone add and zone soa edit form
+	// and handle constraints for 'Producer' zones
 	$('form.zoneadd, form.zoneeditsoa').each(function() {
+
+		function set_zone_settings_constraints(form) {
+			var zone_kind = $('select#kind', form).val()
+			if (zone_kind == 'Producer') {
+				$('button.soa-template, button.ns-template', form).each(function() {
+					$(this).prop('disabled', true)
+				});
+				$('button.soa-template:contains(Producer), ' +
+					'button.ns-template:contains(Producer)', form).each(function() {
+					$(this).prop('disabled', false).click();
+				});
+				$('#catalog', form).val('');
+				$('#dnssec', form).prop('checked', false);
+			} else {
+				$('button.soa-template, button.ns-template', form).each(function() {
+					$(this).prop('disabled', false)
+				});
+				$('button.soa-template:contains(Producer), ' +
+					'button.ns-template:contains(Producer)', form).each(function() {
+					$.each(this.dataset, function(index, value) { $('#' + index).val('') });
+					$(this).removeClass('btn-success').addClass('btn-default').prop('disabled', true);
+				});
+				$('button.soa-template[data-default="1"], ' +
+					'button.ns-template[data-default="1"]', form).each(function() {
+					$(this).click();
+				});
+			}
+			$('#catalog, #dnssec', form).each(function() {
+				$(this).prop('disabled', (zone_kind === 'Producer'))
+			});
+		}
+
 		var form = $(this);
-		$('button.soa-template[data-default="1"], button.ns-template[data-default="1"]', form).each(function() {
+		$('button.soa-template[data-default="1"], ' +
+			'button.ns-template[data-default="1"]', form).each(function() {
 			$.each(this.dataset, function(index, value) { $('#' + index).val(value) });
 			$(this).removeClass('btn-default').addClass('btn-success');
 		});
@@ -880,36 +915,8 @@ $(function() {
 			$(this).removeClass('btn-default').addClass('btn-success');
 		});
 
-		// Handle Producer zones settings restictions
-		$('button.soa-template:contains(Producer), ' +
-		  'button.ns-template:contains(Producer)', form).each(function() {
-			$(this).prop('disabled', true)
-		});
-		$('select#kind', form).on('change', function() {
-			var zone_kind = this.value
-			if (zone_kind == 'Producer') {
-				$('button.soa-template, button.ns-template', form).each(function() { $(this).prop('disabled', true) });
-				$('button.soa-template:contains(Producer), ' +
-				  'button.ns-template:contains(Producer)', form).each(function() {
-					$(this).prop('disabled', false).click();
-				});
-				$('#catalog').val('');
-				$('#dnssec').prop('checked', false);
-
-			} else {
-				$('button.soa-template, button.ns-template', form).each(function() { $(this).prop('disabled', false) });
-				$('button.soa-template:contains(Producer), ' +
-				  'button.ns-template:contains(Producer)', form).each(function() {
-					$.each(this.dataset, function(index, value) { $('#' + index).val('') });
-					$(this).removeClass('btn-success').addClass('btn-default').prop('disabled', true);
-				});
-				$('button.soa-template[data-default="1"], ' +
-				  'button.ns-template[data-default="1"]', form).each(function() {
-					$(this).click();
-				});
-			}
-			$('#catalog, #dnssec').each(function() { $(this).prop('disabled', (zone_kind === 'Producer')) });
-		});
+		set_zone_settings_constraints(form);
+		$('select#kind', form).on('change', function() { set_zone_settings_constraints(form); });
 
 		$('input#ipv4_zone_prefix').on('keyup', function(event) { if(event.which == 13) prefill_reverse_ipv4_zone($(this)) });
 		$('button#ipv4_zone_create').on('click', function() { prefill_reverse_ipv4_zone($('input#ipv4_zone_prefix')) });
