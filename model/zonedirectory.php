@@ -114,6 +114,16 @@ class ZoneDirectory extends DBDirectory {
 	}
 
 	/**
+	* Zone name comparison function, that will group zones by TLD, then SLD, etc.
+	* To be used as callback function with e.g. the "uasort" function
+	*/
+	private function compare_zones_by_name($a, $b) {
+		$aname = implode(',', array_reverse(explode('.', punycode_to_utf8($a->name))));
+		$bname = implode(',', array_reverse(explode('.', punycode_to_utf8($b->name))));
+		return strnatcasecmp($aname, $bname);
+	}
+
+	/**
 	* List all zones in PowerDNS and update list in database to match.
 	* @param array $include list of extra data to include in response
 	* @return array of Zone objects indexed by pdns_id
@@ -191,6 +201,7 @@ class ZoneDirectory extends DBDirectory {
 			}
 		}
 		$this->database->query('COMMIT WORK');
+		uasort($zones_by_pdns_id, array($this, 'compare_zones_by_name'));
 		return $zones_by_pdns_id;
 	}
 
@@ -207,6 +218,7 @@ class ZoneDirectory extends DBDirectory {
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$zones_by_pdns_id[$row['pdns_id']] = new Zone($row['id'], $row);
 		}
+		uasort($zones_by_pdns_id, array($this, 'compare_zones_by_name'));
 		return $zones_by_pdns_id;
 	}
 
@@ -223,6 +235,7 @@ class ZoneDirectory extends DBDirectory {
 		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$zones_by_pdns_id[$row['pdns_id']] = new Zone($row['id'], $row);
 		}
+		uasort($zones_by_pdns_id, array($this, 'compare_zones_by_name'));
 		return $zones_by_pdns_id;
 	}
 

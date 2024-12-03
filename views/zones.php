@@ -16,11 +16,6 @@
 ##
 
 $zones = $active_user->list_accessible_zones(array('pending_updates'));
-usort($zones, function($a, $b) {
-	$aname = implode(',', array_reverse(explode('.', punycode_to_utf8($a->name))));
-	$bname = implode(',', array_reverse(explode('.', punycode_to_utf8($b->name))));
-	return strnatcasecmp($aname, $bname);
-});
 
 $replication_types = $replication_type_dir->list_replication_types();
 $catalog_zones = $zone_dir->list_zones_by_kind('Producer');
