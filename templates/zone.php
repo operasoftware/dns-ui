@@ -27,6 +27,7 @@ $cryptokeys = $this->get('cryptokeys');
 $allusers = $this->get('allusers');
 $replication_types = $this->get('replication_types');
 $catalog_zones = $this->get('catalog_zones');
+$member_zones = $this->get('member_zones');
 $local_zone = $this->get('local_zone');
 $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
@@ -51,7 +52,11 @@ global $output_formatter;
 	<?php } ?>
 </h1>
 <ul class="nav nav-tabs" role="tablist">
+	<?php if($zone->kind === 'Producer') { ?>
+	<li role="presentation" class="active"><a href="#members" aria-controls="members" role="tab" data-toggle="tab">Member zones</a></li>
+	<?php } else { ?>
 	<li role="presentation" class="active"><a href="#records" aria-controls="records" role="tab" data-toggle="tab">Resource records</a></li>
+	<?php } ?>
 	<li role="presentation"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">Pending updates<?php if(count($pending) > 0) {?> <span class="badge"><?php out(count($pending))?></span><?php } ?></a></li>
 	<li role="presentation"><a href="#soa" aria-controls="soa" role="tab" data-toggle="tab">Zone configuration</a></li>
 	<?php if($dnssec_enabled) { ?>
@@ -65,7 +70,28 @@ global $output_formatter;
 	<li role="presentation"><a href="#access" aria-controls="access" role="tab" data-toggle="tab">User access</a></li>
 </ul>
 <div class="tab-content">
-	<div role="tabpanel" class="tab-pane active" id="records">
+	<div role="tabpanel" class="tab-pane<?php if($zone->kind === 'Producer') out(' active', ESC_NONE) ?>" id="members">
+		<h2 class="sr-only">Member zones</h2>
+			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+			<table class="table table-bordered table-condensed table-hover zonelist">
+				<thead>
+					<tr>
+						<th>Member zone</th>
+						<th class="no-filter-button">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach($member_zones as $member) { ?>
+					<tr data-name="<?php out(DNSZoneName::unqualify($member->name))?>">
+						<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($member->name)))?>"><?php out(DNSZoneName::unqualify($member->name))?></a></td>
+						<td>
+						</td>
+					</tr>
+					<?php } ?>
+				</tbody>
+			</table>
+	</div>
+	<div role="tabpanel" class="tab-pane<?php if($zone->kind != 'Producer') out(' active', ESC_NONE) ?>" id="records">
 		<h2 class="sr-only">Resource records</h2>
 		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zoneedit" data-zone="<?php out($zone->name)?>" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
@@ -380,7 +406,7 @@ global $output_formatter;
 						<?php } ?>
 					</div>
 				</div>
-				<div class="form-group" id="catalog-form-group" name="catalog-form-group"<?php if($zone->kind == "Producer") out(' hidden', ESC_NONE)?>>
+				<div class="form-group" id="catalog-form-group" name="catalog-form-group">
 					<label for="catalog" class="col-sm-2 control-label">Catalog zone</label>
 					<div class="col-sm-10">
 						<?php if($active_user->admin) { ?>
@@ -424,7 +450,7 @@ global $output_formatter;
 					</div>
 				</div>
 			</fieldset>
-			<fieldset id="soa-fieldset" name="soa-fieldset"<?php if($zone->kind == "Producer") out(' hidden', ESC_NONE)?>>
+			<fieldset id="soa-fieldset" name="soa-fieldset">
 				<legend>Start of authority (SOA)</legend>
 				<?php if($active_user->admin) { ?>
 				<div class="form-group">

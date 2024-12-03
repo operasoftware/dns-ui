@@ -391,6 +391,7 @@ if(!isset($content)) {
 	$content->set('allusers', $allusers);
 	$content->set('replication_types', $replication_types);
 	$content->set('catalog_zones', $catalog_zones);
+	$content->set('member_zones', $member_zones);
 	$content->set('local_zone', $local_zone);
 	$content->set('local_ipv4_ranges', $config['dns']['local_ipv4_ranges']);
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);
