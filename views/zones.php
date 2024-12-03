@@ -40,7 +40,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone->name = $zonename;
 			$zone->account = trim($_POST['classification']);
 			$zone->dnssec = isset($_POST['dnssec']) ? 1 : 0;
-			$zone->catalog = isset($_POST['catalog']) ? $_POST['catalog'] : null;
+			$zone->catalog = empty($_POST['catalog']) ? null : $_POST['catalog'];
 			$zone->kind = $_POST['kind'];
 			$zone->nameservers = array();
 			foreach(preg_split('/[,\s]+/', $_POST['nameservers']) as $nameserver) {
