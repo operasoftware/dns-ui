@@ -60,6 +60,7 @@ foreach($zones as $zone) {
 					<th>Zone name</th>
 					<th>Serial</th>
 					<th>Replication type</th>
+					<th>Catalog zone</th>
 					<th>Classification</th>
 					<?php if($dnssec_enabled) { ?>
 					<th>DNSSEC</th>
@@ -75,6 +76,7 @@ foreach($zones as $zone) {
 					</td>
 					<td class="serial"><?php out($zone->serial)?></td>
 					<td class="kind"><?php out($zone->kind)?></td>
+					<td class="catalog"><?php out($zone->catalog)?></td>
 					<td class="account"><?php out($zone->account)?></td>
 					<?php if($dnssec_enabled) { ?>
 					<td class="dnssec<?php if($zone->dnssec) out(' success') ?>"><?php out($zone->dnssec ? 'Enabled' : 'Disabled')?></td>
