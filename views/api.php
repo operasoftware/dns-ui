@@ -142,7 +142,7 @@ class API {
 	public function update_zone_rrsets($zone_name) {
 		global $zone_dir, $active_user;
 		$zone = $zone_dir->get_zone_by_name($zone_name);
-		if(!$active_user->admin && !$active_user->access_to($zone)) throw new AccessDenied;
+		if(!$active_user->admin && $active_user->access_to($zone) != 'administrator') throw new AccessDenied;
 		$json = file_get_contents('php://input');
 		$zone->process_bulk_json_rrset_update($json);
 		$this->output(null);
