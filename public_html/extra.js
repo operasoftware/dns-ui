@@ -890,7 +890,7 @@ $(function() {
 			var prefix = field.val().replace(/\.$/, '');
 			var parts = prefix.split('.').reverse();
 			$('#name').val(parts.join('.') + '.in-addr.arpa');
-			$('a[href=#create]').tab('show');
+			$('a[href="#create"]').tab('show');
 		}
 		function prefill_reverse_ipv6_zone(field) {
 			if(!field[0].checkValidity()) return;
@@ -900,7 +900,7 @@ $(function() {
 				parts[i] = String('0000' + parts[i]).slice(-4);
 			}
 			$('#name').val(parts.join('').split('').reverse().join('.') + '.ip6.arpa');
-			$('a[href=#create]').tab('show');
+			$('a[href="#create"]').tab('show');
 		}
 	});
 
