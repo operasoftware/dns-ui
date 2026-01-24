@@ -201,6 +201,7 @@ class Zone extends Record {
 		global $config;
 		$update = new StdClass;
 		$update->kind = $this->kind;
+		$update->catalog = $this->catalog;
 		$update->account = $this->account;
 		if(isset($config['dns']['dnssec']) && $config['dns']['dnssec'] == 1) {
 			$update->dnssec = (bool)$this->dnssec;
@@ -648,6 +649,7 @@ class Zone extends Record {
 		$data = new StdClass;
 		$data->name = $this->name;
 		$data->kind = $this->kind;
+		$data->catalog = $this->catalog;
 		$data->nameservers = array();
 		$data->rrsets = array();
 		foreach($rrsets as $rrset) {

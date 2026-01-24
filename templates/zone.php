@@ -26,6 +26,8 @@ $accounts = $this->get('accounts');
 $cryptokeys = $this->get('cryptokeys');
 $allusers = $this->get('allusers');
 $replication_types = $this->get('replication_types');
+$catalog_zones = $this->get('catalog_zones');
+$member_zones = $this->get('member_zones');
 $local_zone = $this->get('local_zone');
 $local_ipv4_ranges = $this->get('local_ipv4_ranges');
 $local_ipv6_ranges = $this->get('local_ipv6_ranges');
@@ -50,7 +52,11 @@ global $output_formatter;
 	<?php } ?>
 </h1>
 <ul class="nav nav-tabs" role="tablist">
+	<?php if($zone->kind === 'Producer') { ?>
+	<li role="presentation" class="active"><a href="#members" aria-controls="members" role="tab" data-toggle="tab">Member zones</a></li>
+	<?php } else { ?>
 	<li role="presentation" class="active"><a href="#records" aria-controls="records" role="tab" data-toggle="tab">Resource records</a></li>
+	<?php } ?>
 	<li role="presentation"><a href="#pending" aria-controls="pending" role="tab" data-toggle="tab">Pending updates<?php if(count($pending) > 0) {?> <span class="badge"><?php out(count($pending))?></span><?php } ?></a></li>
 	<li role="presentation"><a href="#soa" aria-controls="soa" role="tab" data-toggle="tab">Zone configuration</a></li>
 	<?php if($dnssec_enabled) { ?>
@@ -64,7 +70,28 @@ global $output_formatter;
 	<li role="presentation"><a href="#access" aria-controls="access" role="tab" data-toggle="tab">User access</a></li>
 </ul>
 <div class="tab-content">
-	<div role="tabpanel" class="tab-pane active" id="records">
+	<div role="tabpanel" class="tab-pane<?php if($zone->kind === 'Producer') out(' active', ESC_NONE) ?>" id="members">
+		<h2 class="sr-only">Member zones</h2>
+			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
+			<table class="table table-bordered table-condensed table-hover zonelist">
+				<thead>
+					<tr>
+						<th>Member zone</th>
+						<th class="no-filter-button">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach($member_zones as $member) { ?>
+					<tr data-name="<?php out(DNSZoneName::unqualify($member->name))?>">
+						<td class="name"><a href="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($member->name)))?>"><?php out(DNSZoneName::unqualify($member->name))?></a></td>
+						<td>
+						</td>
+					</tr>
+					<?php } ?>
+				</tbody>
+			</table>
+	</div>
+	<div role="tabpanel" class="tab-pane<?php if($zone->kind != 'Producer') out(' active', ESC_NONE) ?>" id="records">
 		<h2 class="sr-only">Resource records</h2>
 		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="zoneedit" data-zone="<?php out($zone->name)?>" data-local-zone="<?php out($local_zone ? 1 : 0)?>" data-local-ipv4-ranges="<?php out($local_ipv4_ranges)?>" data-local-ipv6-ranges="<?php out($local_ipv6_ranges)?>">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
@@ -363,149 +390,172 @@ global $output_formatter;
 		<h2 class="sr-only">Zone configuration</h2>
 		<form method="post" action="<?php outurl('/zones/'.urlencode(DNSZoneName::unqualify($zone->name)))?>" class="form-horizontal zoneeditsoa">
 			<?php out($this->get('active_user')->get_csrf_field(), ESC_NONE) ?>
-			<h3>Zone settings</h3>
-			<div class="form-group">
-				<label for="kind" class="col-sm-2 control-label">Replication type</label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<select id="kind" name="kind" class="form-control" required>
-						<?php foreach($replication_types as $type) { ?>
-						<option value="<?php out($type->name)?>"<?php if($zone->kind == $type->name) out(' selected')?>><?php out($type->name)?></option>
+			<fieldset id="settings-fieldset" name="settings-fieldset">
+				<legend>Zone settings</legend>
+				<div class="form-group">
+					<label for="kind" class="col-sm-2 control-label">Replication type</label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<select id="kind" name="kind" class="form-control" required>
+							<?php foreach($replication_types as $type) { ?>
+							<option value="<?php out($type->name)?>"<?php if($zone->kind == $type->name) out(' selected')?>><?php out($type->name)?></option>
+							<?php } ?>
+						</select>
+						<?php } else { ?>
+						<p class="form-control-static"><?php out($zone->kind)?></p>
 						<?php } ?>
-					</select>
-					<?php } else { ?>
-					<p class="form-control-static"><?php out($zone->kind)?></p>
-					<?php } ?>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="classification" class="col-sm-2 control-label">Classification</label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<?php if($force_account_whitelist) { ?>
-					<select class="form-control" id="classification" name="classification">
-						<?php foreach($account_whitelist as $account) { ?>
-						<option value="<?php out($account)?>"<?php if($account == $zone->account) out(' selected', ESC_NONE)?>><?php out($account)?></option>
+				<div class="form-group" id="catalog-form-group" name="catalog-form-group">
+					<label for="catalog" class="col-sm-2 control-label">Catalog zone</label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<select id="catalog" name="catalog" class="form-control">
+							<option value=""></option>
+							<?php foreach($catalog_zones as $catalog) { ?>
+							<?php 	if($catalog->name != $zone->name) { ?>
+							<option value="<?php out($catalog->name)?>"<?php if($zone->catalog == $catalog->name) out(' selected')?>><?php out($catalog->name)?></option>
+							<?php 	} ?>
+							<?php } ?>
+						</select>
+						<?php } else { ?>
+						<p class="form-control-static"><?php out($zone->catalog)?></p>
 						<?php } ?>
-						<?php if(!in_array($zone->account, $account_whitelist)) { ?>
-						<option value="<?php out($zone->account)?>" selected><?php out($zone->account)?></option>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="classification" class="col-sm-2 control-label">Classification</label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<?php if($force_account_whitelist) { ?>
+						<select class="form-control" id="classification" name="classification">
+							<?php foreach($account_whitelist as $account) { ?>
+							<option value="<?php out($account)?>"<?php if($account == $zone->account) out(' selected', ESC_NONE)?>><?php out($account)?></option>
+							<?php } ?>
+							<?php if(!in_array($zone->account, $account_whitelist)) { ?>
+							<option value="<?php out($zone->account)?>" selected><?php out($zone->account)?></option>
+							<?php } ?>
+						</select>
+						<?php } else { ?>
+						<input type="text" class="form-control" id="classification" name="classification" list="account_list" required maxlength="40" value="<?php out($zone->account)?>">
+						<datalist id="account_list">
+							<?php foreach($accounts as $account) { ?>
+							<option value="<?php out($account)?>"><?php out($account)?></option>
+							<?php } ?>
+						</datalist>
+						<?PHP } ?>
+						<?php } else { ?>
+						<p class="form-control-static"><?php out($zone->account)?></p>
 						<?php } ?>
-					</select>
-					<?php } else { ?>
-					<input type="text" class="form-control" id="classification" name="classification" list="account_list" required maxlength="40" value="<?php out($zone->account)?>">
-					<datalist id="account_list">
-						<?php foreach($accounts as $account) { ?>
-						<option value="<?php out($account)?>"><?php out($account)?></option>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset id="soa-fieldset" name="soa-fieldset">
+				<legend>Start of authority (SOA)</legend>
+				<?php if($active_user->admin) { ?>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">SOA templates</label>
+					<div class="col-sm-10">
+						<?php foreach($soa_templates as $template) { ?>
+						<button type="button" class="btn btn-default soa-template" data-primary_ns="<?php out($template->primary_ns)?>" data-contact="<?php out($template->contact)?>" data-refresh="<?php out(DNSTime::abbreviate($template->refresh))?>" data-retry="<?php out(DNSTime::abbreviate($template->retry))?>" data-expire="<?php out(DNSTime::abbreviate($template->expire))?>" data-default_ttl="<?php out(DNSTime::abbreviate($template->default_ttl))?>" data-soa_ttl="<?php out(DNSTime::abbreviate($template->soa_ttl))?>"><?php out($template->name)?></button>
 						<?php } ?>
-					</datalist>
-					<?PHP } ?>
-					<?php } else { ?>
-					<p class="form-control-static"><?php out($zone->account)?></p>
-					<?php } ?>
+						<a href="<?php outurl('/templates/soa')?>" class="btn btn-link">Edit templates</a>
+					</div>
 				</div>
-			</div>
-			<h3>Start of authority (SOA)</h3>
-			<?php if($active_user->admin) { ?>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">SOA templates</label>
-				<div class="col-sm-10">
-					<?php foreach($soa_templates as $template) { ?>
-					<button type="button" class="btn btn-default soa-template" data-primary_ns="<?php out($template->primary_ns)?>" data-contact="<?php out($template->contact)?>" data-refresh="<?php out(DNSTime::abbreviate($template->refresh))?>" data-retry="<?php out(DNSTime::abbreviate($template->retry))?>" data-expire="<?php out(DNSTime::abbreviate($template->expire))?>" data-default_ttl="<?php out(DNSTime::abbreviate($template->default_ttl))?>" data-soa_ttl="<?php out(DNSTime::abbreviate($template->soa_ttl))?>"><?php out($template->name)?></button>
-					<?php } ?>
-					<a href="<?php outurl('/templates/soa')?>" class="btn btn-link">Edit templates</a>
+				<?php } ?>
+				<div class="form-group">
+					<label for="primary_ns" class="col-sm-2 control-label">Primary nameserver</label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<input type="text" class="form-control" id="primary_ns" name="primary_ns" required pattern="\S+" value="<?php out($zone->soa->primary_ns)?>">
+						<?php } else { ?>
+						<p class="form-control-static"><?php out($zone->soa->primary_ns)?></p>
+						<?php } ?>
+					</div>
 				</div>
-			</div>
-			<?php } ?>
-			<div class="form-group">
-				<label for="primary_ns" class="col-sm-2 control-label">Primary nameserver</label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="primary_ns" name="primary_ns" required pattern="\S+" value="<?php out($zone->soa->primary_ns)?>">
-					<?php } else { ?>
-					<p class="form-control-static"><?php out($zone->soa->primary_ns)?></p>
-					<?php } ?>
+				<div class="form-group">
+					<label for="contact" class="col-sm-2 control-label">Contact</label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<input type="text" class="form-control" id="contact" name="contact" required pattern="\S+" value="<?php out($zone->soa->contact)?>">
+						<?php } else { ?>
+						<p class="form-control-static"><?php out($zone->soa->contact)?></p>
+						<?php } ?>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="contact" class="col-sm-2 control-label">Contact</label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="contact" name="contact" required pattern="\S+" value="<?php out($zone->soa->contact)?>">
-					<?php } else { ?>
-					<p class="form-control-static"><?php out($zone->soa->contact)?></p>
-					<?php } ?>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Serial number</label>
+					<div class="col-sm-10">
+						<p class="form-control-static"><?php out($zone->soa->serial)?></p>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Serial number</label>
-				<div class="col-sm-10">
-					<p class="form-control-static"><?php out($zone->soa->serial)?></p>
+				<div class="form-group">
+					<label for="refresh" class="col-sm-2 control-label"><abbr title="Indicates the time when the slave will try to refresh the zone from the master">Refresh</abbr></label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<input type="text" class="form-control" id="refresh" name="refresh" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->refresh))?>">
+						<?php } else { ?>
+						<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->refresh))?></p>
+						<?php } ?>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="refresh" class="col-sm-2 control-label"><abbr title="Indicates the time when the slave will try to refresh the zone from the master">Refresh</abbr></label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="refresh" name="refresh" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->refresh))?>">
-					<?php } else { ?>
-					<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->refresh))?></p>
-					<?php } ?>
+				<div class="form-group">
+					<label for="retry" class="col-sm-2 control-label"><abbr title="Defines the time between retries if the slave (secondary) fails to contact the master when refresh (above) has expired. Typical values would be 180 (3 minutes) to 900 (15 minutes) or higher.">Retry</abbr></label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<input type="text" class="form-control" id="retry" name="retry" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->retry))?>">
+						<?php } else { ?>
+						<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->retry))?></p>
+						<?php } ?>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="retry" class="col-sm-2 control-label"><abbr title="Defines the time between retries if the slave (secondary) fails to contact the master when refresh (above) has expired. Typical values would be 180 (3 minutes) to 900 (15 minutes) or higher.">Retry</abbr></label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="retry" name="retry" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->retry))?>">
-					<?php } else { ?>
-					<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->retry))?></p>
-					<?php } ?>
+				<div class="form-group">
+					<label for="expire" class="col-sm-2 control-label"><abbr title="Indicates when the zone data is no longer authoritative. Used by Slave (Secondary) servers only.">Expire</abbr></label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<input type="text" class="form-control" id="expire" name="expire" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->expiry))?>">
+						<?php } else { ?>
+						<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->expiry))?></p>
+						<?php } ?>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="expire" class="col-sm-2 control-label"><abbr title="Indicates when the zone data is no longer authoritative. Used by Slave (Secondary) servers only.">Expire</abbr></label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="expire" name="expire" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->expiry))?>">
-					<?php } else { ?>
-					<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->expiry))?></p>
-					<?php } ?>
+				<div class="form-group">
+					<label for="default_ttl" class="col-sm-2 control-label"><abbr title="The time a NAME ERROR = NXDOMAIN result may be cached by any resolver.">Default TTL</abbr></label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<input type="text" class="form-control" id="default_ttl" name="default_ttl" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->default_ttl))?>">
+						<?php } else { ?>
+						<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->default_ttl))?></p>
+						<?php } ?>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="default_ttl" class="col-sm-2 control-label"><abbr title="The time a NAME ERROR = NXDOMAIN result may be cached by any resolver.">Default TTL</abbr></label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="default_ttl" name="default_ttl" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->default_ttl))?>">
-					<?php } else { ?>
-					<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->default_ttl))?></p>
-					<?php } ?>
+				<div class="form-group">
+					<label for="soa_ttl" class="col-sm-2 control-label"><abbr title="The time this SOA record may be cached by any resolver.">SOA TTL</abbr></label>
+					<div class="col-sm-10">
+						<?php if($active_user->admin) { ?>
+						<input type="text" class="form-control" id="soa_ttl" name="soa_ttl" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->ttl))?>">
+						<?php } else { ?>
+						<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->ttl))?></p>
+						<?php } ?>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="soa_ttl" class="col-sm-2 control-label"><abbr title="The time this SOA record may be cached by any resolver.">SOA TTL</abbr></label>
-				<div class="col-sm-10">
-					<?php if($active_user->admin) { ?>
-					<input type="text" class="form-control" id="soa_ttl" name="soa_ttl" required pattern="([0-9]+[smhdwSMHDW]?)+" maxlength="40" value="<?php out(DNSTime::abbreviate($zone->soa->ttl))?>">
-					<?php } else { ?>
-					<p class="form-control-static"><?php out(DNSTime::abbreviate($zone->soa->ttl))?></p>
-					<?php } ?>
+			</fieldset>
+			<fieldset id="comment-fieldset" name="comment-fieldset">
+				<legend>Comment</legend>
+				<?php if($active_user->admin) { ?>
+				<div class="form-group">
+					<label for="soa_change_comment" class="col-sm-2 control-label">Change comment</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="soa_change_comment" name="soa_change_comment" value=""<?php if($force_change_comment) out(' required');?>>
+					</div>
 				</div>
-			</div>
-			<hr>
-			<?php if($active_user->admin) { ?>
-			<div class="form-group">
-				<label for="soa_change_comment" class="col-sm-2 control-label">Change comment</label>
-				<div class="col-sm-10">
-					<input type="text" class="form-control" id="soa_change_comment" name="soa_change_comment" value=""<?php if($force_change_comment) out(' required');?>>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" name="update_zone" value="1" class="btn btn-primary">Save changes</button>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" name="update_zone" value="1" class="btn btn-primary">Save changes</button>
-				</div>
-			</div>
-			<?php } ?>
+				<?php } ?>
+			</fieldset>
 		</form>
 	</div>
 	<?php if($dnssec_enabled) { ?>

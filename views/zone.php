@@ -93,12 +93,15 @@ $cryptokeys = $zone->get_cryptokeys();
 $accounts = $zone_dir->list_accounts();
 $allusers = $user_dir->list_users();
 $replication_types = $replication_type_dir->list_replication_types();
+$catalog_zones = $zone_dir->list_zones_by_kind('Producer');
+$member_zones = $zone_dir->list_zones_by_catalog($zone->name);
 $force_change_review = isset($config['web']['force_change_review']) ? intval($config['web']['force_change_review']) : 0;
 $force_change_comment = isset($config['web']['force_change_comment']) ? intval($config['web']['force_change_comment']) : 0;
 $account_whitelist = !empty($config['dns']['classification_whitelist']) ? explode(',', $config['dns']['classification_whitelist']) : [];
 $force_account_whitelist = !empty($config['dns']['classification_whitelist']) ? 1 : 0;
 $dnssec_enabled = isset($config['dns']['dnssec']) ? intval($config['dns']['dnssec']) : 0;
 $dnssec_edit = isset($config['dns']['dnssec_edit']) ? intval($config['dns']['dnssec_edit']) : 1;
+$ns_templates = $template_dir->list_ns_templates();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if(isset($_POST['update_rrs'])) {
@@ -214,16 +217,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$active_user->add_alert($alert);
 		redirect();
 	} elseif(isset($_POST['update_zone']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator')) {
+		// Update zone settings
+		$previous_kind = $zone->kind;
 		$zone->kind = $_POST['kind'];
+		$zone->catalog = ($zone->kind == 'Producer') ? '' : $_POST['catalog'];
 		$zone->account = $_POST['classification'];
 		$zone->update();
-		$primary_ns = $_POST['primary_ns'];
-		$contact = $_POST['contact'];
-		$refresh = DNSTime::expand($_POST['refresh']);
-		$retry = DNSTime::expand($_POST['retry']);
-		$expiry = DNSTime::expand($_POST['expire']);
-		$default_ttl = DNSTime::expand($_POST['default_ttl']);
-		$soa_ttl = DNSTime::expand($_POST['soa_ttl']);
+		// Update zone SOA and NS records
+		$json = new StdClass;
+		$json->actions = array();
+		if($zone->kind == 'Producer') {
+			list($primary_ns, $contact, $serial, $refresh, $retry, $expiry, $default_ttl) = explode(' ', $config['catalog']['soa']);
+			$soa_ttl = $config['catalog']['soa_ttl'];
+		} else {
+			$primary_ns = $_POST['primary_ns'];
+			$contact = $_POST['contact'];
+			$refresh = DNSTime::expand($_POST['refresh']);
+			$retry = DNSTime::expand($_POST['retry']);
+			$expiry = DNSTime::expand($_POST['expire']);
+			$default_ttl = DNSTime::expand($_POST['default_ttl']);
+			$soa_ttl = DNSTime::expand($_POST['soa_ttl']);
+		}
 		if($zone->soa->primary_ns != $primary_ns
 		|| $zone->soa->contact != $contact
 		|| $zone->soa->refresh != $refresh
@@ -231,21 +245,61 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		|| $zone->soa->expiry != $expiry
 		|| $zone->soa->default_ttl != $default_ttl
 		|| $zone->soa->ttl != $soa_ttl) {
-			$record = new StdClass;
-			$record->content = "$primary_ns $contact {$zone->soa->serial} $refresh $retry $expiry $default_ttl";
-			$record->enabled = 'Yes';
-			$update = new StdClass;
-			$update->action = 'update';
-			$update->oldname = '@';
-			$update->oldtype = 'SOA';
-			$update->name = '@';
-			$update->type = 'SOA';
-			$update->ttl = $soa_ttl;
-			$update->records = array($record);
-			$json = new StdClass;
-			$json->actions = array($update);
+			$soa_record = new StdClass;
+			$soa_record->content = "$primary_ns $contact {$zone->soa->serial} $refresh $retry $expiry $default_ttl";
+			$soa_record->enabled = 'Yes';
+			$soa_update = new StdClass;
+			$soa_update->action = 'update';
+			$soa_update->oldname = '@';
+			$soa_update->oldtype = 'SOA';
+			$soa_update->name = '@';
+			$soa_update->type = 'SOA';
+			$soa_update->ttl = $soa_ttl;
+			$soa_update->records = array($soa_record);
+			array_push($json->actions, $soa_update);
+		}
+		if($previous_kind != $zone->kind) {
+			$ns_update = new StdClass;
+			$ns_update->action = 'update';
+			$ns_update->oldname = '@';
+			$ns_update->oldtype = 'NS';
+			$ns_update->name = '@';
+			$ns_update->type = 'NS';
+			$ns_update->ttl = $default_ttl;
+			// Use RFC-recommended 'invalid.' as NS for Producer zones
+			if($zone->kind == 'Producer') {
+				$ns_record = new StdClass;
+				$ns_record->content = "invalid.";
+				$ns_record->enabled = 'Yes';
+				$ns_update->records = array($ns_record);
+			// For Master and Native zones, use the default Nameservers template
+			// TODO: Allow to chose Nameservers template to apply, like in zone creation
+			} elseif ($zone->kind == 'Master' || $zone->kind == 'Native') {
+				foreach($ns_templates as $template) {
+					if($template->default === 1) {
+						$ns_update->records = array();
+						foreach(preg_split('/[,\s]+/', $template->nameservers) as $nameserver) {
+							$ns_record = new StdClass;
+							$ns_record->content = $nameserver;
+							$ns_record->enabled = 'Yes';
+							array_push($ns_update->records, $ns_record);
+						}
+					}
+				}
+			}
+			array_push($json->actions, $ns_update);
+		}
+		if(count($json->actions) > 0) {
 			$json->comment = $_POST['soa_change_comment'];
 			$zone->process_bulk_json_rrset_update(json_encode($json));
+		}
+		// When kind is changed away from Producer, update all member zones
+		// to no longer be part of the catalog
+		if($previous_kind === 'Producer' && $previous_kind != $zone->kind) {
+			foreach($member_zones as $member) {
+				$member->catalog = '';
+				$member->update();
+			}
 		}
 		redirect();
 	} elseif(isset($_POST['enable_dnssec']) && $active_user->admin && $dnssec_enabled && $dnssec_edit) {
@@ -336,10 +390,13 @@ if(!isset($content)) {
 	$content->set('cryptokeys', $cryptokeys);
 	$content->set('allusers', $allusers);
 	$content->set('replication_types', $replication_types);
+	$content->set('catalog_zones', $catalog_zones);
+	$content->set('member_zones', $member_zones);
 	$content->set('local_zone', $local_zone);
 	$content->set('local_ipv4_ranges', $config['dns']['local_ipv4_ranges']);
 	$content->set('local_ipv6_ranges', $config['dns']['local_ipv6_ranges']);
 	$content->set('soa_templates', $template_dir->list_soa_templates());
+	$content->set('ns_templates', $ns_templates);
 	$content->set('dnssec_enabled', $dnssec_enabled);
 	$content->set('dnssec_edit', $dnssec_edit);
 	$content->set('deletion', $deletion);

@@ -23,7 +23,7 @@ $template = $this->get('template');
 	<div class="form-group">
 		<label for="name" class="col-sm-2 control-label">Template name</label>
 		<div class="col-sm-10">
-			<input type="text" class="form-control" id="name" name="name" value="<?php out($template->name)?>" required>
+			<input type="text" class="form-control" id="name" name="name" value="<?php out($template->name)?>" required<?php if($template->name == 'Producer') { ?> readonly<?php } ?>>
 		</div>
 	</div>
 	<?php if($type == 'soa') { ?>
