@@ -501,6 +501,22 @@ class Zone extends Record {
 	*/
 	public function add_pending_update($update) {
 		global $active_user;
+		
+		// Security check: Prevent creation of pending updates for restricted record types
+		// Only global admins and zone super administrators can request changes to SOA, NS, and CAA records
+		$update_data = json_decode($update);
+		if($update_data && isset($update_data->actions)) {
+			foreach($update_data->actions as $action) {
+				if(($action->type == 'SOA' || $action->type == 'NS' || $action->type == 'CAA') ||
+				   (isset($action->oldtype) && ($action->oldtype == 'SOA' || $action->oldtype == 'NS' || $action->oldtype == 'CAA'))) {
+					if(!($active_user->admin || $active_user->is_zone_super_administrator($this))) {
+						throw new RuntimeException('You are not authorized to request changes to SOA, NS, or CAA records.');
+					}
+					break;
+				}
+			}
+		}
+		
 		$stmt = $this->database->prepare('INSERT INTO pending_update (zone_id, author_id, request_date, raw_data) VALUES (?, ?, NOW(), ?)');
 		$stmt->bindParam(1, $this->id, PDO::PARAM_INT);
 		$stmt->bindParam(2, $active_user->id, PDO::PARAM_INT);
@@ -781,7 +797,11 @@ class Zone extends Record {
 			$update->oldname = $update->name;
 			$update->oldtype = $update->type;
 		}
-		if(($update->type == 'SOA' || $update->type == 'NS') && !$active_user->admin) return;
+		// Security check: Only global admins and zone super administrators can edit SOA, NS and CAA records.
+		// We must check BOTH the new type and the original type to prevent privilege-escalation via rename/delete.
+		if((($update->type == 'SOA' || $update->type == 'NS' || $update->type == 'CAA') ||
+		    (isset($update->oldtype) && ($update->oldtype == 'SOA' || $update->oldtype == 'NS' || $update->oldtype == 'CAA')))
+		   && !($active_user->admin || $active_user->is_zone_super_administrator($this))) return;
 
 		if(isset($config['dns']['autocreate_reverse_records'])) {
 			$autocreate_ptr = (bool)$config['dns']['autocreate_reverse_records'];

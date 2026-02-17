@@ -68,6 +68,14 @@ header("Content-Security-Policy: default-src 'self'");
 				<?php } ?>
 				<?php } ?>
 			</ul>
+			<?php if(is_object($this->get('active_user'))) { ?>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="navbar-text">
+					<span class="glyphicon glyphicon-user"></span>
+					<?php out($this->get('active_user')->name)?> (<?php out($this->get('active_user')->uid)?>)
+				</li>
+			</ul>
+			<?php } ?>
 		</div>
 	</div>
 </div>

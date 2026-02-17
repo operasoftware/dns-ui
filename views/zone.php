@@ -110,7 +110,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		foreach($_POST['updates'] as $update) {
 			$json->actions[] = json_decode($update);
 		}
-		if(($active_user->admin || $active_user->access_to($zone) == 'administrator') && !$force_change_review) {
+		if(($active_user->admin || $active_user->access_to($zone) == 'administrator' || $active_user->is_zone_super_administrator($zone)) && !$force_change_review) {
 			try {
 				$zone->process_bulk_json_rrset_update(json_encode($json));
 				redirect();
@@ -126,12 +126,39 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$content->set('message', $e->getMessage());
 			}
 		} else {
-			$zone->add_pending_update(json_encode($json));
+			// Security check: Prevent creation of pending updates for restricted record types
+			// Only global admins and zone super administrators can request changes to SOA, NS, and CAA records
+			$restricted_changes = false;
+			foreach($json->actions as $action) {
+				if(($action->type == 'SOA' || $action->type == 'NS' || $action->type == 'CAA') ||
+				   (isset($action->oldtype) && ($action->oldtype == 'SOA' || $action->oldtype == 'NS' || $action->oldtype == 'CAA'))) {
+					$restricted_changes = true;
+					break;
+				}
+			}
+			
+			if($restricted_changes && !($active_user->admin || $active_user->is_zone_super_administrator($zone))) {
+				$alert = new UserAlert;
+				$alert->content = "You are not authorized to request changes to SOA, NS, or CAA records.";
+				$alert->class = "error";
+				$active_user->add_alert($alert);
+				redirect();
+			}
+			
+			try {
+				$zone->add_pending_update(json_encode($json));
+			} catch(RuntimeException $e) {
+				$alert = new UserAlert;
+				$alert->content = $e->getMessage();
+				$alert->class = "error";
+				$active_user->add_alert($alert);
+				redirect();
+			}
 			$mail = new Email;
-			// Mail SOA contact and administrators about pending update
+			// Mail SOA contact and administrators/super zone administrators about pending update
 			$mail->add_recipient(preg_replace('/^([^\.]+)\./', '$1@', trim($zone->soa->contact, '.')));
 			foreach($zone->list_access() as $access) {
-				if($access->level == 'administrator') {
+				if($access->level == 'administrator' || $access->level == 'zone-super-administrator') {
 					$mail->add_recipient($access->user->email, $access->user->name);
 				}
 			}
@@ -158,7 +185,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$zone->delete_pending_update($update);
 		}
 		redirect();
-	} elseif(isset($_POST['approve_update']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator')) {
+	} elseif(isset($_POST['approve_update']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator' || $active_user->is_zone_super_administrator($zone))) {
 		try {
 			$update = $zone->get_pending_update_by_id($_POST['approve_update']);
 		} catch(PendingUpdateNotFound $e) {
@@ -189,7 +216,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$content = new PageSection('zone_update_failed');
 			$content->set('message', $e->getMessage());
 		}
-	} elseif(isset($_POST['reject_update']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator')) {
+	} elseif(isset($_POST['reject_update']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator' || $active_user->is_zone_super_administrator($zone))) {
 		try {
 			$update = $zone->get_pending_update_by_id($_POST['reject_update']);
 		} catch(PendingUpdateNotFound $e) {
@@ -213,7 +240,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$alert->content = "Change request rejected.";
 		$active_user->add_alert($alert);
 		redirect();
-	} elseif(isset($_POST['update_zone']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator')) {
+	} elseif(isset($_POST['update_zone']) && ($active_user->admin || $active_user->access_to($zone) == 'administrator' || $active_user->is_zone_super_administrator($zone))) {
 		$zone->kind = $_POST['kind'];
 		$zone->account = $_POST['classification'];
 		$zone->update();

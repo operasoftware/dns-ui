@@ -77,12 +77,12 @@ $(function() {
 		$('#new_ttl').data('default-value', $('#new_ttl').val());
 		$('option:first-of-type', typeselect).remove();
 		$('button.delete-rr', form).on('click', function() { delete_rr($(this)); });
-		$('td.name', form).on('click', function() { make_editable($(this), 'name'); });
-		$('td.type', form).on('click', function() { make_editable($(this), 'type'); });
-		$('td.ttl', form).on('click', function() { make_editable($(this), 'ttl'); });
-		$('td.content', form).on('click', function() { make_editable($(this), 'content'); });
-		$('td.enabled', form).on('click', function() { make_editable($(this)); });
-		$('td.comment', form).on('click', function() { make_editable($(this), 'comment'); });
+		$('td.name', form).on('click', function() { if(can_edit_record($(this))) make_editable($(this), 'name'); });
+		$('td.type', form).on('click', function() { if(can_edit_record($(this))) make_editable($(this), 'type'); });
+		$('td.ttl', form).on('click', function() { if(can_edit_record($(this))) make_editable($(this), 'ttl'); });
+		$('td.content', form).on('click', function() { if(can_edit_record($(this))) make_editable($(this), 'content'); });
+		$('td.enabled', form).on('click', function() { if(can_edit_record($(this))) make_editable($(this)); });
+		$('td.comment', form).on('click', function() { if(can_edit_record($(this))) make_editable($(this), 'comment'); });
 		$('tbody tr', form).each(function() { max_rrsetnum = Math.max(max_rrsetnum, parseInt($(this).data('rrsetnum'), 10)); });
 		$('#new_name').on('keyup', function(event) { validate_new(); if(event.which == 13) add_new(); });
 		$('#new_name').on('change', function() { validate_new(); });
@@ -115,6 +115,20 @@ $(function() {
 				tr.data('delete', true);
 			}
 			update_changed(button);
+		}
+
+		// Check if user can edit this record
+		function can_edit_record(element) {
+			var tr = element.closest('tr');
+			var recordType = tr.data('type');
+			var userAdmin = form.data('user-admin') == 1;
+			var userSuperadmin = form.data('user-super-zone-admin') == 1;
+			
+			// NS and CAA records can only be edited by admins or super zone admins
+			if((recordType == 'NS' || recordType == 'CAA') && !(userAdmin || userSuperadmin)) {
+				return false;
+			}
+			return true;
 		}
 
 		// Make the selected row editable and focus the chosen cell
