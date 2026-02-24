@@ -78,15 +78,17 @@ class LDAP {
 		return false;
 	}
 
-	public static function escape($str = '') {
-		$metaChars = array("\\00", "\\", "(", ")", "*");
-		$quotedMetaChars = array();
-		foreach($metaChars as $key => $value) {
-			$quotedMetaChars[$key] = '\\'. dechex(ord($value));
-		}
-		$str = str_replace($metaChars, $quotedMetaChars, $str);
-		return $str;
-	}
+    public static function escape($str = '') {
+        // RFC4515: escape \ * ( ) NUL
+        $map = [
+            "\\"   => "\\5c",
+            "*"    => "\\2a",
+            "("    => "\\28",
+            ")"    => "\\29",
+            "\0"   => "\\00",
+        ];
+        return strtr($str, $map);
+    }
 }
 
 class LDAPConnectionFailureException extends RuntimeException {}
