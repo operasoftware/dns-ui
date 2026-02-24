@@ -156,7 +156,11 @@ class User extends Record {
 			$this->auth_realm = 'LDAP';
 			$this->uid = $ldapuser[strtolower($config['ldap']['user_id'])];
 			$this->name = $ldapuser[strtolower($config['ldap']['user_name'])];
-			$this->email = $ldapuser[strtolower($config['ldap']['user_email'])];
+			if (isset($ldapuser[strtolower($config['ldap']['user_email'])])) {
+				$this->email = $ldapuser[strtolower($config['ldap']['user_email'])];
+			} else {
+				$this->email = '';
+			}
 			if(isset($config['ldap']['user_active'])) {
 				$this->active = 0;
 				if(isset($config['ldap']['user_active_true'])) {
