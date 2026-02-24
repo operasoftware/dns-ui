@@ -230,9 +230,12 @@ class ZoneDirectory extends DBDirectory {
 	* @param string $address that DNS record points to
 	* @param array $revs_missing keep track of reverse zones that are missing
 	* @param array $revs_updated keep track of reverse zones that will be updated
+	* @param User|null $acting_user The user on whose behalf this change is executed. If null,
+	*			falls back to $active_user for backward-compatibility.
 	*/
-	public function check_reverse_record_zone($name, $type, $address, &$revs_missing, &$revs_notify) {
+	public function check_reverse_record_zone($name, $type, $address, &$revs_missing, &$revs_notify, $acting_user = null) {
 		global $zone_dir, $active_user;
+		$acting = $acting_user ?: $active_user;
 
 		if($type == 'A') {
 			$reverse_address = implode('.', array_reverse(explode('.', $address))).'.in-addr.arpa.';
@@ -248,6 +251,17 @@ class ZoneDirectory extends DBDirectory {
 		do {
 			try {
 				$reverse_zone = $zone_dir->get_zone_by_name($reverse_zone_name);
+				// only allow if acting user can administer the reverse zone
+				$level = ($acting->admin ? 'administrator' : $acting->access_to($reverse_zone));
+				if ($level !== 'administrator') {
+					// Don’t leak zone details if the user cannot actually access it
+					$alert = new UserAlert;
+					$alert->content = 'Reverse record could not be created for '.hesc($address).' in <a href="'.rrurl('/zones/'.urlencode(DNSZoneName::unqualify($reverse_zone->name))).'" class="alert-link">'.hesc(DNSZoneName::unqualify($reverse_zone->name)).'</a> because the original requester does not have permission to modify this reverse zone. Not creating PTR record for '.hesc($name);
+					$alert->class = 'warning';
+					$acting->add_alert($alert);
+					return false;
+				}
+
 				// See if a record already exists for this IP
 				foreach($reverse_zone->list_resource_record_sets() as $rrset) {
 					if($rrset->name == $reverse_address) {
