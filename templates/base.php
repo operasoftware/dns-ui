@@ -67,6 +67,7 @@ header("Content-Security-Policy: default-src 'self'");
 				<li<?php if($contents == $this->get('relative_request_url')) out(' class="active"', ESC_NONE); ?>><a href="<?php outurl($contents)?>"><?php out($name)?></a></li>
 				<?php } ?>
 				<?php } ?>
+				<?php if(!empty($web_config['logout_url'])) { ?><li><a href="<?php outurl($web_config['logout_url']) ?>"><?php if (!empty($web_config['logout_text'])) out($web_config['logout_text']); else { ?>Logout<?php } ?></a></li><?php } ?>
 			</ul>
 		</div>
 	</div>
