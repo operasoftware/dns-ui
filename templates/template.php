@@ -58,7 +58,7 @@ $template = $this->get('template');
 		</div>
 	</div>
 	<div class="form-group">
-		<label for="default_ttl" class="col-sm-2 control-label">Default TTL</label>
+		<label for="default_ttl" class="col-sm-2 control-label">Minimum TTL</label>
 		<div class="col-sm-10">
 			<input type="text" class="form-control" id="default_ttl" name="default_ttl" value="<?php out(DNSTime::abbreviate($template->default_ttl))?>" required pattern="([0-9]+[smhdwSMHDW]?)+">
 		</div>
