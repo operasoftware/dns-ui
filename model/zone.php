@@ -837,7 +837,12 @@ class Zone extends Record {
 			$rrset->ttl = DNSTime::expand($update->ttl);
 			$record_count = 0;
 			foreach($update->records as $record) {
-				if(!empty($record->delete)) continue;
+				if(!empty($record->delete)) {
+					if(!empty($record->remove_ptr) && ($update->oldtype == 'A' || $update->oldtype == 'AAAA')) {
+						$zone_dir->delete_reverse_record($update->oldname, $update->oldtype, $record->content, $revs_updated);
+					}
+					continue;
+				}
 				$record_count++;
 				$record->content = DNSContent::encode($record->content, $update->type, $this->name);
 				$rr = new ResourceRecord;
@@ -866,8 +871,14 @@ class Zone extends Record {
 			if(!isset($this->rrsets[$update->oldname.' '.$update->oldtype])) {
 				throw new BadData('Tried to delete a non-existent resource recordset: '.$update->oldname.' '.$update->oldtype.'.');
 			}
-			$change->before = serialize($this->rrsets[$update->oldname.' '.$update->oldtype]);
-			$this->delete_resource_record_set($this->rrsets[$update->oldname.' '.$update->oldtype]);
+			$rrset = $this->rrsets[$update->oldname.' '.$update->oldtype];
+			$change->before = serialize($rrset);
+			if(!empty($update->remove_ptr) && ($update->oldtype == 'A' || $update->oldtype == 'AAAA')) {
+				foreach($rrset->list_resource_records() as $rr) {
+					$zone_dir->delete_reverse_record($update->oldname, $update->oldtype, $rr->content, $revs_updated);
+				}
+			}
+			$this->delete_resource_record_set($rrset);
 			break;
 		}
 		return $change;

@@ -109,10 +109,34 @@ $(function() {
 				button.append(' Delete');
 				tr.removeClass('delete');
 				tr.data('delete', false);
+				tr.data('remove-ptr', false);
+				update_changed(button);
 			} else {
 				button.text('Undelete');
 				tr.addClass('delete');
 				tr.data('delete', true);
+				if(!tr.data('newrow') && (tr.data('type') == 'A' || tr.data('type') == 'AAAA')) {
+					var content = $('td.content input', tr).val();
+					// Only bother asking if a matching reverse (PTR) record actually exists
+					$.ajax({
+						url: '../api/v2/zones/' + encodeURIComponent(form.data('zone')) + '/reverse-records',
+						method: 'GET',
+						data: {name: tr.data('name'), type: tr.data('type'), address: content},
+						dataType: 'json'
+					}).done(function(response) {
+						if(response && response.exists) {
+							tr.data('remove-ptr', confirm('A reverse (PTR) record exists pointing to ' + content + '. Also remove it?'));
+						} else {
+							tr.data('remove-ptr', false);
+						}
+					}).fail(function() {
+						tr.data('remove-ptr', false);
+					}).always(function() {
+						update_changed(button);
+					});
+					return;
+				}
+				tr.data('remove-ptr', false);
 			}
 			update_changed(button);
 		}
@@ -309,10 +333,15 @@ $(function() {
 						rrchanged = true;
 						rrspan.appendChild(document.createTextNode(' '));
 						var span = document.createElement('span');
-						$(span).text('Resource record deleted.');
+						var deletetext = 'Resource record deleted.';
+						if($(this).data('remove-ptr')) deletetext += ' Reverse (PTR) record will also be removed.';
+						$(span).text(deletetext);
 						$(span).addClass('text-warning');
 						rrspan.appendChild(span);
 						record['delete'] = true;
+						if(update.type == 'A' || update.type == 'AAAA') {
+							record['remove_ptr'] = !!$(this).data('remove-ptr');
+						}
 					} else {
 						activerows++;
 						if(record['enabled'] == 'Yes') enabledrows++;

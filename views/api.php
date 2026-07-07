@@ -28,6 +28,10 @@ if(isset($router->vars['objects'])) {
 					} else {
 						$api->zone_changes($router->vars['id']);
 					}
+					break;
+				case 'reverse-records':
+					$api->zone_reverse_records($router->vars['id']);
+					break;
 				}
 			} else {
 				$api->zone($router->vars['id']);
@@ -146,6 +150,21 @@ class API {
 		$json = file_get_contents('php://input');
 		$zone->process_bulk_json_rrset_update($json);
 		$this->output(null);
+	}
+
+	public function zone_reverse_records($zone_name) {
+		$this->options(array('GET' => 'check_zone_reverse_record'), array($zone_name));
+	}
+
+	public function check_zone_reverse_record($zone_name) {
+		global $zone_dir, $active_user;
+		$zone = $zone_dir->get_zone_by_name($zone_name);
+		if(!$active_user->admin && !$active_user->access_to($zone)) throw new AccessDenied;
+		if(!isset($_GET['name']) || !isset($_GET['type']) || !isset($_GET['address'])) throw new BadData('Missing required parameters.');
+		if($_GET['type'] != 'A' && $_GET['type'] != 'AAAA') throw new BadData('Type must be A or AAAA.');
+		$name = utf8_to_punycode(DNSName::canonify($_GET['name'], $zone->name));
+		$exists = $zone_dir->has_reverse_record($name, $_GET['type'], $_GET['address']);
+		$this->output(array('exists' => $exists));
 	}
 
 	public function zone_changes($zone_name) {
