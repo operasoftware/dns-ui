@@ -224,14 +224,18 @@ class ZoneDirectory extends DBDirectory {
 	}
 
 	/**
-	* Check the list of zones to see if a suitable reverse zone exists for the forward record.
+	* Check the list of zones to see if a suitable reverse zone exists for the forward record, and if
+	* so create/update the matching PTR record via a direct call to the PowerDNS API.
+	* PowerDNS's own "set-ptr" record attribute that used to do this automatically has been removed,
+	* so DNS UI must create the PTR record itself.
 	* @param string $name of DNS record
 	* @param string $type of DNS record
 	* @param string $address that DNS record points to
+	* @param int $ttl to use for the PTR record
 	* @param array $revs_missing keep track of reverse zones that are missing
 	* @param array $revs_updated keep track of reverse zones that will be updated
 	*/
-	public function check_reverse_record_zone($name, $type, $address, &$revs_missing, &$revs_notify) {
+	public function create_reverse_record($name, $type, $address, $ttl, &$revs_missing, &$revs_notify) {
 		global $zone_dir, $active_user;
 
 		if($type == 'A') {
@@ -269,6 +273,25 @@ class ZoneDirectory extends DBDirectory {
 							return false;
 						}
 					}
+				}
+				// Create the PTR record directly via the PowerDNS API
+				$ptr_rrset = new ResourceRecordSet;
+				$ptr_rrset->name = $reverse_address;
+				$ptr_rrset->type = 'PTR';
+				$ptr_rrset->ttl = $ttl;
+				$ptr_record = new ResourceRecord;
+				$ptr_record->content = $name;
+				$ptr_record->disabled = false;
+				$ptr_rrset->add_resource_record($ptr_record);
+				try {
+					$reverse_zone->add_or_update_resource_record_set($ptr_rrset);
+					$reverse_zone->commit_changes();
+				} catch(ResourceRecordInvalid $e) {
+					$alert = new UserAlert;
+					$alert->content = "Failed to create reverse record for $address pointing to $name: ".$e->getMessage();
+					$alert->class = 'warning';
+					$active_user->add_alert($alert);
+					return false;
 				}
 				// Add reverse zone to list of zones to send a notify for
 				$revs_notify[$reverse_zone->pdns_id] = $reverse_zone;
