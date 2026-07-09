@@ -224,14 +224,18 @@ class ZoneDirectory extends DBDirectory {
 	}
 
 	/**
-	* Check the list of zones to see if a suitable reverse zone exists for the forward record.
+	* Check the list of zones to see if a suitable reverse zone exists for the forward record, and if
+	* so create/update the matching PTR record via a direct call to the PowerDNS API.
+	* PowerDNS's own "set-ptr" record attribute that used to do this automatically has been removed,
+	* so DNS UI must create the PTR record itself.
 	* @param string $name of DNS record
 	* @param string $type of DNS record
 	* @param string $address that DNS record points to
+	* @param int $ttl to use for the PTR record
 	* @param array $revs_missing keep track of reverse zones that are missing
 	* @param array $revs_updated keep track of reverse zones that will be updated
 	*/
-	public function check_reverse_record_zone($name, $type, $address, &$revs_missing, &$revs_notify) {
+	public function create_reverse_record($name, $type, $address, $ttl, &$revs_missing, &$revs_notify) {
 		global $zone_dir, $active_user;
 
 		if($type == 'A') {
@@ -270,6 +274,25 @@ class ZoneDirectory extends DBDirectory {
 						}
 					}
 				}
+				// Create the PTR record directly via the PowerDNS API
+				$ptr_rrset = new ResourceRecordSet;
+				$ptr_rrset->name = $reverse_address;
+				$ptr_rrset->type = 'PTR';
+				$ptr_rrset->ttl = $ttl;
+				$ptr_record = new ResourceRecord;
+				$ptr_record->content = $name;
+				$ptr_record->disabled = false;
+				$ptr_rrset->add_resource_record($ptr_record);
+				try {
+					$reverse_zone->add_or_update_resource_record_set($ptr_rrset);
+					$reverse_zone->commit_changes();
+				} catch(ResourceRecordInvalid $e) {
+					$alert = new UserAlert;
+					$alert->content = "Failed to create reverse record for $address pointing to $name: ".$e->getMessage();
+					$alert->class = 'warning';
+					$active_user->add_alert($alert);
+					return false;
+				}
 				// Add reverse zone to list of zones to send a notify for
 				$revs_notify[$reverse_zone->pdns_id] = $reverse_zone;
 				return true;
@@ -282,6 +305,109 @@ class ZoneDirectory extends DBDirectory {
 		$active_user->add_alert($alert);
 		$revs_missing[$type][] = array('name' => $name, 'address' => $address);
 		return false;
+	}
+
+	/**
+	* Locate the reverse (PTR) RRset for a forward record's address, if one exists.
+	* Searches for an appropriate reverse zone by starting with the full domain name, and
+	* removing subdomains until a match is found or there is nothing left to remove.
+	* @param string $type of forward DNS record (A or AAAA)
+	* @param string $address that the forward DNS record points to
+	* @return array|null array(Zone $reverse_zone, ResourceRecordSet $rrset), or null if none found
+	*/
+	private function find_reverse_rrset($type, $address) {
+		global $zone_dir;
+
+		if($type == 'A') {
+			$reverse_address = implode('.', array_reverse(explode('.', $address))).'.in-addr.arpa.';
+		} elseif($type == 'AAAA') {
+			$address = ipv6_address_expand($address);
+			$reverse_address = implode('.', array_reverse(str_split(str_replace(':', '', $address)))).'.ip6.arpa.';
+		} else {
+			return null;
+		}
+		$reverse_zone_name = $reverse_address;
+		do {
+			try {
+				$reverse_zone = $zone_dir->get_zone_by_name($reverse_zone_name);
+				foreach($reverse_zone->list_resource_record_sets() as $rrset) {
+					if($rrset->name == $reverse_address && $rrset->type == 'PTR') {
+						return array($reverse_zone, $rrset);
+					}
+				}
+				return null;
+			} catch(ZoneNotFound $e) {
+			}
+		} while($this->remove_subdomain($reverse_zone_name));
+		return null;
+	}
+
+	/**
+	* Check whether a reverse (PTR) record exists pointing back at the given forward record.
+	* @param string $name of DNS record
+	* @param string $type of DNS record
+	* @param string $address that DNS record points to
+	* @return bool true if a matching PTR record exists
+	*/
+	public function has_reverse_record($name, $type, $address) {
+		$found = $this->find_reverse_rrset($type, $address);
+		if(is_null($found)) return false;
+		list(, $rrset) = $found;
+		foreach($rrset->list_resource_records() as $rr) {
+			if($rr->content == $name) return true;
+		}
+		return false;
+	}
+
+	/**
+	* Check the list of zones to see if a suitable reverse zone exists for the forward record, and if
+	* so remove the matching PTR record via a direct call to the PowerDNS API.
+	* @param string $name of DNS record whose PTR record should be removed
+	* @param string $type of DNS record
+	* @param string $address that DNS record pointed to
+	* @param array $revs_notify keep track of reverse zones that will be updated
+	* @return bool true if a PTR record was found and removed
+	*/
+	public function delete_reverse_record($name, $type, $address, &$revs_notify) {
+		global $active_user;
+
+		$found = $this->find_reverse_rrset($type, $address);
+		if(is_null($found)) return false;
+		list($reverse_zone, $rrset) = $found;
+		$remaining_rrs = array();
+		$matched = false;
+		foreach($rrset->list_resource_records() as $rr) {
+			if($rr->content == $name) {
+				$matched = true;
+			} else {
+				$remaining_rrs[] = $rr;
+			}
+		}
+		if(!$matched) return false;
+		try {
+			if(count($remaining_rrs) == 0) {
+				$reverse_zone->delete_resource_record_set($rrset);
+			} else {
+				$new_rrset = new ResourceRecordSet;
+				$new_rrset->name = $rrset->name;
+				$new_rrset->type = $rrset->type;
+				$new_rrset->ttl = $rrset->ttl;
+				foreach($remaining_rrs as $rr) {
+					$new_rrset->add_resource_record($rr);
+				}
+				$reverse_zone->add_or_update_resource_record_set($new_rrset);
+			}
+			$reverse_zone->commit_changes();
+		} catch(ResourceRecordInvalid $e) {
+			$alert = new UserAlert;
+			$alert->content = "Failed to remove reverse record for $address pointing to $name: ".$e->getMessage();
+			$alert->class = 'warning';
+			$active_user->add_alert($alert);
+			return false;
+		}
+		// Add reverse zone to list of zones to send a notify for
+		$revs_notify[$reverse_zone->pdns_id] = $reverse_zone;
+		return true;
 	}
 
 	/**
